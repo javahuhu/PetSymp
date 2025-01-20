@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_native_splash: ^2.4.1
+  flutter_screenutil: ^5.9.3
+  url_launcher: ^6.3.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -60,11 +62,23 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/petlogo.png
-    - assets/cat.png
-    - assets/catanddog.jpg
-    - assets/logindog.jpg
-    - assets/catlogin.jpg
+      - assets/petlogo.png
+      - assets/cat.png
+      - assets/catanddog.jpg
+      - assets/logindog.jpg
+      - assets/catlogin.jpg
+      - assets/facebooklogo.png
+      - assets/googlelogo.png
+      - assets/instagramlogo.png
+      - assets/dogfirstaidkit.jpg
+      - assets/getstartedpet.jpg
+      - assets/veetveet.jpg
+      - assets/catanddog.jpg
+      - assets/takingcareofpets.jpg
+      - assets/pethiscatttt.jpg
+      - assets/logo.png
+      - assets/paw.png
+      - assets/catpeeking.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

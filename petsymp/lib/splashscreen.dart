@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'Login.dart'; // For Timer and Future
+import 'login.dart'; // For Timer and Future
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Navigate to the HomeScreen after 3 seconds
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),
@@ -36,8 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/petlogo.png', width: 270, height: 270),
-              const SizedBox(height: 500), // Your splash image
+            Image.asset('assets/logo.png', width: 350, height: 350),
+              const SizedBox(height: 450), // Your splash image
             const CircularProgressIndicator( // Optional loading spinner
               valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 0, 0, 0)),
             ),
