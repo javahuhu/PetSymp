@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'homepage.dart';
+
 class GetstartedScreen extends StatefulWidget {
   const GetstartedScreen({super.key});
 
@@ -8,8 +9,8 @@ class GetstartedScreen extends StatefulWidget {
 }
 
 class GetstartedScreenState extends State<GetstartedScreen> {
-  // State variables to control visibility of images
-  List<bool> _visibleImages = [false, false, false, false, false];
+  // State variables to control visibility of images and button
+  List<bool> _visibleImages = [false, false, false, false, false, false]; // Last index for button
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
   // Method to reset visibility and restart the animation
   void _resetAndAnimateImages() {
     setState(() {
-      _visibleImages = [false, false, false, false, false];
+      _visibleImages = [false, false, false, false, false, false]; // Reset button visibility
     });
     Future.delayed(const Duration(milliseconds: 50), _animateImages);
   }
@@ -37,14 +38,15 @@ class GetstartedScreenState extends State<GetstartedScreen> {
     for (int i = 0; i < _visibleImages.length; i++) {
       await Future.delayed(const Duration(milliseconds: 1000)); // Delay for each image
       setState(() {
-        _visibleImages[i] = true; // Make the image visible
+        _visibleImages[i] = true; // Make the current element visible
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( backgroundColor: const Color(0xFFCFCFCC),
+    return Scaffold(
+      backgroundColor: const Color(0xFFCFCFCC),
       body: Stack(
         children: [
           // Custom Background with Chubby Curves
@@ -141,32 +143,36 @@ class GetstartedScreenState extends State<GetstartedScreen> {
                 ),
               ),
 
-              // Button at the Bottom
+              // Button at the Bottom with Animation
               Padding(
                 padding: const EdgeInsets.only(bottom: 50.0),
                 child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePageScreen(),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 500), // Animation duration
+                    opacity: _visibleImages[5] ? 1.0 : 0.0, // Button visibility
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePageScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3D2F28),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3D2F28),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
+                        fixedSize: const Size(200, 65), // Button width and height
                       ),
-                      fixedSize: const Size(200, 65), // Button width and height
-                    ),
-                    child: const Text(
-                      "Get Started",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
+                      child: const Text(
+                        "Get Started",
+                        style: TextStyle(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

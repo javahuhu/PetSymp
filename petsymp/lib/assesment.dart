@@ -1,4 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/homepage.dart';
+import 'package:flutter/services.dart';
+
+// Custom TextInputFormatter to capitalize only the first letter
+class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue; // Return empty value
+    }
+
+    // Capitalize the first letter and keep the rest as-is
+    final text = newValue.text;
+    final firstLetter = text[0].toUpperCase();
+    final restOfText = text.substring(1);
+
+    return newValue.copyWith(
+      text: firstLetter + restOfText,
+      selection: newValue.selection,
+    );
+  }
+}
 
 class AssesmentScreen extends StatefulWidget {
   const AssesmentScreen({super.key});
@@ -8,7 +33,31 @@ class AssesmentScreen extends StatefulWidget {
 }
 
 class AssesmentScreenState extends State<AssesmentScreen> {
+  bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
+  final TextEditingController _controller = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Trigger the animation after the widget builds
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _isAnimated = true;
+      });
+    });
+  }
+
+  void navigateToNextPage() {
+    if (_formKey.currentState?.validate() ?? false) {
+      // Navigate only if the input is valid
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePageScreen()),
+      );
+    }
+  }
 
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
@@ -26,7 +75,6 @@ class AssesmentScreenState extends State<AssesmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Screen dimensions
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
 
@@ -34,18 +82,18 @@ class AssesmentScreenState extends State<AssesmentScreen> {
       backgroundColor: const Color(0xFFCFCFCC),
       body: Stack(
         children: [
-          // Circular Image and Texts
-          if (_selectedIndex == 0) // Only show this layout when on the first tab
-            Positioned(
-              top: screenHeight * 0.13, // 13% from the top of the screen
-              left: screenWidth * 0.1, // 10% from the left of the screen
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start, // Aligns all text to the left
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          if (_selectedIndex == 0) // Show this layout only on the first tab
+            Stack(
+              children: [
+                // AnimatedPositioned for Paw Image
+                AnimatedPositioned(
+                  duration: const Duration(seconds: 2),
+                  curve: Curves.easeInOut,
+                  top: _isAnimated ? screenHeight * 0.13 : -100, // From off-screen to final position
+                  left: screenWidth * 0.1,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Circular Image
                       Container(
                         width: screenWidth * 0.15, // 15% of screen width
                         height: screenWidth * 0.15, // Equal height for circular image
@@ -57,106 +105,112 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.05), // 5% of screen width for spacing
-
-                      // Text beside the image
-                      Padding(
-                        padding: EdgeInsets.only(top: screenHeight * 0.03), // Relative padding
-                        child: const Text(
-                          "Hi, I’m Etsy",
-                          style: TextStyle(
-                            fontSize: 27, // Fixed font size for readability
-                            fontWeight: FontWeight.bold, // Make the text bold
+                      SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
+                      const Text(
+                        "Hi, I’m Etsy",
+                        style: TextStyle(
+                          fontSize: 27,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.2, // Text and input below the paw
+                  left: screenWidth * 0.12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Before we start your assessment,",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const Text(
+                        "input your USERNAME first.",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: screenWidth * 0.8,
+                        child: Form(
+                          key: _formKey,
+                          child: TextFormField(
+                            controller: _controller,
+                            autofillHints: const [AutofillHints.name],
+                            inputFormatters: [
+                              FirstLetterUpperCaseTextFormatter(),
+                            ],
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              hintText: 'Enter your name',
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 20.0,
+                                horizontal: 15.0,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your username';
+                              }
+                              if (value.length < 8) {
+                                return "Username must contain at least 8 letters";
+                              }
+                              if (value.length != 8) {
+                                return "Username must be exactly 8 characters";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: screenHeight * 0.02), // 2% of screen height for spacing
-
-                  // Long Text Below the Image and First Text
-                  const Text(
-                    "Before we start your assessment,",
-                    style: TextStyle(
-                      fontSize: 22, // Adjust font size
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black, // Normal font weight for description
+                ),
+                // Next Button at the previous position
+                Positioned(
+                  top: 900,
+                  left: 350,
+                  child: ElevatedButton(
+                    onPressed: navigateToNextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.black,
+                      shadowColor: Colors.transparent,
+                      side: const BorderSide(
+                        color: Colors.black,
+                        width: 2.0,
+                      ),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                      ),
+                      fixedSize: const Size(100, 55),
                     ),
-                  ),
-                  const Text(
-                    "input your USERNAME first.",
-                    style: TextStyle(
-                      color: Colors.black, // Text color
-                      fontSize: 22, // Adjust font size
-                      fontWeight: FontWeight.bold, // Normal font weight for description
-                    ),
-                  ),
-
-                  // TextField for input
-                  Padding(
-                    padding: EdgeInsets.only(top: screenHeight * 0.03), // Add spacing above the TextField
-                    child: SizedBox(
-                      width: screenWidth * 0.8, // 80% of screen width
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          hintText: 'Enter your username',
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15.0, horizontal: 10.0),
-                        ),
+                    child: const Text(
+                      "Next",
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-
-
-
-                 // Positioned Elevated Button
-          Padding(
-                    padding: const EdgeInsets.fromLTRB(300, 520, 0, 0), // Add padding for spacing
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AssesmentScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent, // Transparent background
-                        foregroundColor: Colors.black, // Text color
-                        shadowColor: Colors.transparent, // No shadow
-                        side: const BorderSide( // Border properties
-                          color: Colors.black, // Border color
-                          width: 2.0, // Border width
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100), // Rounded corners
-                        ),
-                        fixedSize: const Size(100, 55), // Button size
-                      ),
-                      child: const Text(
-                        "Next",
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-            
-
-
-                ],
-              ),
+                ),
+              ],
             ),
-
-          // Placeholder for other tabs
           if (_selectedIndex != 0)
             Center(
-              child: _pages.elementAt(_selectedIndex), // Display corresponding content for other tabs
+              child: _pages.elementAt(_selectedIndex),
             ),
         ],
       ),
@@ -175,10 +229,10 @@ class AssesmentScreenState extends State<AssesmentScreen> {
             label: 'Settings',
           ),
         ],
-        currentIndex: _selectedIndex, // Highlights the selected tab
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1), // Highlight color for the selected item
-        unselectedItemColor: Colors.grey, // Unselected tab color
-        onTap: _onItemTapped, // Handles tab selection
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
       ),
     );
   }
