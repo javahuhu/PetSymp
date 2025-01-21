@@ -1,15 +1,13 @@
-
-
 import 'package:flutter/material.dart';
-import 'assesment.dart';
-class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({super.key});
+
+class AssesmentScreen extends StatefulWidget {
+  const AssesmentScreen({super.key});
 
   @override
-  HomePageScreenState createState() => HomePageScreenState();
+  AssesmentScreenState createState() => AssesmentScreenState();
 }
 
-class HomePageScreenState extends State<HomePageScreen> {
+class AssesmentScreenState extends State<AssesmentScreen> {
   int _selectedIndex = 0; // State to track the selected tab
 
   // Pages corresponding to each tab
@@ -39,7 +37,7 @@ class HomePageScreenState extends State<HomePageScreen> {
           // Circular Image and Texts
           if (_selectedIndex == 0) // Only show this layout when on the first tab
             Positioned(
-              top: screenHeight * 0.13, // 20% from the top of the screen
+              top: screenHeight * 0.13, // 13% from the top of the screen
               left: screenWidth * 0.1, // 10% from the left of the screen
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start, // Aligns all text to the left
@@ -78,7 +76,7 @@ class HomePageScreenState extends State<HomePageScreen> {
 
                   // Long Text Below the Image and First Text
                   const Text(
-                    "I can help you to analyze your pet ",
+                    "Before we start your assessment,",
                     style: TextStyle(
                       fontSize: 22, // Adjust font size
                       fontWeight: FontWeight.normal,
@@ -86,7 +84,7 @@ class HomePageScreenState extends State<HomePageScreen> {
                     ),
                   ),
                   const Text(
-                    "health issues.",
+                    "input your USERNAME first.",
                     style: TextStyle(
                       color: Colors.black, // Text color
                       fontSize: 22, // Adjust font size
@@ -94,59 +92,64 @@ class HomePageScreenState extends State<HomePageScreen> {
                     ),
                   ),
 
+                  // TextField for input
                   Padding(
-                padding: const EdgeInsets.only(top: 55.0),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AssesmentScreen(),
+                    padding: EdgeInsets.only(top: screenHeight * 0.03), // Add spacing above the TextField
+                    child: SizedBox(
+                      width: screenWidth * 0.8, // 80% of screen width
+                      child: TextField(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          hintText: 'Enter your username',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15.0, horizontal: 10.0),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3D2F28),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      fixedSize: const Size(250, 55), // Button width and height
-                    ),
-                    child: const Text(
-                      "Start Assesment",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-              ),
+
+
+
+                 // Positioned Elevated Button
+          Padding(
+                    padding: const EdgeInsets.fromLTRB(300, 520, 0, 0), // Add padding for spacing
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AssesmentScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent, // Transparent background
+                        foregroundColor: Colors.black, // Text color
+                        shadowColor: Colors.transparent, // No shadow
+                        side: const BorderSide( // Border properties
+                          color: Colors.black, // Border color
+                          width: 2.0, // Border width
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100), // Rounded corners
+                        ),
+                        fixedSize: const Size(100, 55), // Button size
+                      ),
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+            
+
 
                 ],
-              ),
-            ),
-
-          // Rotated Image Positioned at the Bottom
-          if (_selectedIndex == 0) // Only show this layout when on the first tab
-            Align(
-              alignment: Alignment.bottomCenter, // Align the image at the bottom
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationZ(-6.3 / 4), // Rotation angle
-                child: Container(
-                  height: screenHeight * 0.20, // 25% of screen height
-                  width: screenWidth * 0.8, // 80% of screen width
-                  margin: EdgeInsets.only(top: screenHeight * 0.27), // 20% top margin
-                  child: FittedBox(
-                    fit: BoxFit.fill, // Forces the image to fill the container
-                    child: Image.asset(
-                      "assets/catpeeking.png", // Update this path to your cat image
-                    ),
-                  ),
-                ),
               ),
             ),
 

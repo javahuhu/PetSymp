@@ -29,7 +29,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
     setState(() {
       _visibleImages = [false, false, false, false, false];
     });
-    Future.delayed(const Duration(milliseconds: 100), _animateImages);
+    Future.delayed(const Duration(milliseconds: 50), _animateImages);
   }
 
   // Method to animate visibility of images sequentially
