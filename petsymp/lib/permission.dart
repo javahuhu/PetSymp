@@ -1,63 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:petsymp/permission.dart';
+import 'package:petsymp/ageinput.dart';
 
-// Custom TextInputFormatter to capitalize only the first letter
-class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    if (newValue.text.isEmpty) {
-      return newValue; // Return empty value
-    }
 
-    // Capitalize the first letter and keep the rest as-is
-    final text = newValue.text;
-    final firstLetter = text[0].toUpperCase();
-    final restOfText = text.substring(1);
 
-    return newValue.copyWith(
-      text: firstLetter + restOfText,
-      selection: newValue.selection,
-    );
-  }
-}
 
-class AssesmentScreen extends StatefulWidget {
-  const AssesmentScreen({super.key});
+class PermissionScreen extends StatefulWidget {
+  const PermissionScreen({super.key});
 
   @override
-  AssesmentScreenState createState() => AssesmentScreenState();
+  PermissionScreenState createState() => PermissionScreenState();
 }
 
-class AssesmentScreenState extends State<AssesmentScreen> {
+class PermissionScreenState extends State<PermissionScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     // Trigger the animation after the widget builds
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _isAnimated = true;
       });
     });
   }
 
-  void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // Navigate only if the input is valid
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PermissionScreen()),
-      );
-    }
-  }
+  
 
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
@@ -72,6 +41,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
       _selectedIndex = index; // Update the selected index
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +75,21 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
+
+                      SizedBox(width: screenWidth * 0.05), // 5% of screen width for spacing
+
+                      // Text beside the image
+                      Padding(
+                        padding: EdgeInsets.only(top: screenHeight * 0.03), // Relative padding
+                        child: const Text(
+                          "Hi, [Username]",
+                          style: TextStyle(
+                            fontSize: 27, // Fixed font size for readability
+                            fontWeight: FontWeight.bold, // Make the text bold
+                          ),
+                        ),
+                      ),
+                       // Spacing between paw and text
                       
                     ],
                   ),
@@ -113,72 +97,52 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
-                  child: Column(
+                  child:  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Before we start your assessment,",
+                       Text(
+                        "Please provide the",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
                           color: Colors.black,
                         ),
                       ),
-                      const Text(
-                        "input your USERNAME first.",
+                       Text(
+                        "following basic information",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 22),
-                      SizedBox(
-                        width: screenWidth * 0.8,
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            controller: _controller,
-                            autofillHints: const [AutofillHints.name],
-                            inputFormatters: [
-                              FirstLetterUpperCaseTextFormatter(),
-                            ],
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              hintText: 'Enter your name',
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20.0,
-                                horizontal: 15.0,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your username';
-                              }
-                              if (value.length < 8) {
-                                return "Username must contain at least 8 letters";
-                              }
-                              if (value.length != 8) {
-                                return "Username must be exactly 8 characters";
-                              }
-                              return null;
-                            },
-                          ),
+                    
+
+                      Text(
+                        "Regarding to your pet",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ],
                   ),
                 ),
+
                 // Next Button at the previous position
                 Positioned(
-                  top: screenHeight * 0.87,
-                  left: screenWidth * 0.75,
-                  child: ElevatedButton(
-                    onPressed: navigateToNextPage,
-                    style: ButtonStyle(
+                top: screenHeight * 0.87,
+                left: screenWidth * 0.65,
+                child: ElevatedButton(
+                  onPressed: () {
+                   Navigator.push(
+                    context,
+                    MaterialPageRoute
+                    (builder: (context) => const AgeinputScreen()),
+                  );
+                  },
+                  style: ButtonStyle(
                     // Dynamic background color based on button state
                     backgroundColor: WidgetStateProperty.resolveWith(
                       (states) {
@@ -210,18 +174,18 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                       ),
                     ),
                     fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
+                      const Size(150, 55),
                     ),
                   ),
-                    child: const Text(
-                      "Next",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: const Text(
+                    "CONFIRM",
+                    style: TextStyle(
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+              ),
               ],
             ),
           if (_selectedIndex != 0)

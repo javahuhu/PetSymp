@@ -25,14 +25,14 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class AssesmentScreen extends StatefulWidget {
-  const AssesmentScreen({super.key});
+class BreedScreen extends StatefulWidget {
+  const BreedScreen({super.key});
 
   @override
-  AssesmentScreenState createState() => AssesmentScreenState();
+  BreedScreenState createState() => BreedScreenState();
 }
 
-class AssesmentScreenState extends State<AssesmentScreen> {
+class BreedScreenState extends State<BreedScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
   final TextEditingController _controller = TextEditingController();
@@ -117,22 +117,15 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Before we start your assessment,",
+                        "What is your pet Breed?",
                         style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const Text(
-                        "input your USERNAME first.",
-                        style: TextStyle(
-                          color: Colors.black,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
-                      const SizedBox(height: 22),
+                      
+                      const SizedBox(height: 50),
                       SizedBox(
                         width: screenWidth * 0.8,
                         child: Form(
@@ -148,7 +141,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
-                              hintText: 'Enter your name',
+                              hintText: 'Enter your pet breed',
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20.0,
                                 horizontal: 15.0,
@@ -156,14 +149,9 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your username';
+                                return 'Please enter the breed of pet';
                               }
-                              if (value.length < 8) {
-                                return "Username must contain at least 8 letters";
-                              }
-                              if (value.length != 8) {
-                                return "Username must be exactly 8 characters";
-                              }
+                              
                               return null;
                             },
                           ),

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/breed.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/permission.dart';
 
-// Custom TextInputFormatter to capitalize only the first letter
+class MeasureinputScreen extends StatefulWidget {
+  const MeasureinputScreen({super.key});
+
+  @override
+  MeasureinputScreenState createState() => MeasureinputScreenState();
+}
+
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -25,36 +32,39 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class AssesmentScreen extends StatefulWidget {
-  const AssesmentScreen({super.key});
-
-  @override
-  AssesmentScreenState createState() => AssesmentScreenState();
-}
-
-class AssesmentScreenState extends State<AssesmentScreen> {
+class MeasureinputScreenState extends State<MeasureinputScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     // Trigger the animation after the widget builds
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _isAnimated = true;
       });
     });
   }
 
+  // Helper method to launch external URLs
+  Future<void> gotoPage(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
       // Navigate only if the input is valid
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const PermissionScreen()),
+        MaterialPageRoute(builder: (context) => const BreedScreen()),
       );
     }
   }
@@ -106,74 +116,103 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                         ),
                       ),
                       SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
-                      
                     ],
                   ),
                 ),
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Before we start your assessment,",
+                      Text(
+                        "What is the Height and Weight",
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        "of your pet?",
+                        style: TextStyle(
+                          fontSize: 25,
                           fontWeight: FontWeight.normal,
                           color: Colors.black,
-                        ),
-                      ),
-                      const Text(
-                        "input your USERNAME first.",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                      SizedBox(
-                        width: screenWidth * 0.8,
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            controller: _controller,
-                            autofillHints: const [AutofillHints.name],
-                            inputFormatters: [
-                              FirstLetterUpperCaseTextFormatter(),
-                            ],
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              hintText: 'Enter your name',
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20.0,
-                                horizontal: 15.0,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your username';
-                              }
-                              if (value.length < 8) {
-                                return "Username must contain at least 8 letters";
-                              }
-                              if (value.length != 8) {
-                                return "Username must be exactly 8 characters";
-                              }
-                              return null;
-                            },
-                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Next Button at the previous position
+
                 Positioned(
+                  top: screenHeight * 0.32, // Adjusted position for the form
+                  left: screenWidth * 0.12,
+                  right: screenWidth * 0.12,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _weightController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                          ],
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            hintText: 'Enter pet weight (kg)',
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15.0,
+                              horizontal: 15.0,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter weight of the pet';
+                            }
+                             if (value.length !=2) {
+                              return 'Please enter 2 digit numbers only';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _heightController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                          ],
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            hintText: 'Enter pet height (cm)',
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15.0,
+                              horizontal: 15.0,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter height of the pet';
+                            }
+
+                            if (value.length !=2) {
+                              return 'Please enter 2 digit numbers only';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                 Positioned(
                   top: screenHeight * 0.87,
                   left: screenWidth * 0.75,
                   child: ElevatedButton(
@@ -222,6 +261,8 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     ),
                   ),
                 ),
+
+               
               ],
             ),
           if (_selectedIndex != 0)

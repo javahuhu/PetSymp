@@ -33,6 +33,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   flutter_screenutil: ^5.9.3
   url_launcher: ^6.3.1
+  counter_slider: ^0.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

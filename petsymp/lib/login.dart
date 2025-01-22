@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'getstarted.dart';
-import 'package:flutter/services.dart'; // For launching URLs
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,12 +34,18 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Use MediaQuery for responsive design
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Background Image
           Container(
+            height: screenHeight,
+            width: screenWidth,
             decoration: const BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
@@ -53,17 +59,17 @@ class LoginScreenState extends State<LoginScreen> {
             children: [
               // Spacing at the top
               Padding(
-                padding: const EdgeInsets.only(left: 15.0),
+                padding: EdgeInsets.only(left: screenWidth * 0.0),
                 child: Image.asset(
                   'assets/logo.png',
-                  width: 300,
-                  height: 300,
+                  width: screenWidth * 0.7,
+                  height: screenHeight * 0.3,
                 ),
               ),
-              const SizedBox(height: 187.5), // Spacing between logo and text
-              const Padding(
-                padding: EdgeInsets.only(left: 35.0),
-                child: Text(
+              SizedBox(height: screenHeight * 0.16), // Responsive spacing
+              Padding(
+                padding: EdgeInsets.only(left: screenWidth * 0.09),
+                child: const Text(
                   'Welcome!',
                   style: TextStyle(
                     fontSize: 35.0,
@@ -72,19 +78,18 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 120.0), // Spacing before text field
+              SizedBox(height: screenHeight * 0.1), // Responsive spacing
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.09),
                 child: Form(
                   key: _formKey,
                   child: TextFormField(
                     controller: _controller,
                     keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), 
-                    FilteringTextInputFormatter.digitsOnly
-
-  ],
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     decoration: const InputDecoration(
                       border: UnderlineInputBorder(),
                       labelText: "Enter your phone number",
@@ -98,17 +103,15 @@ class LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your phone number';
                       }
-
-                      if (value.length !=11){
+                      if (value.length != 11) {
                         return "Phone Number must be 11 digits";
                       }
-
                       return null;
                     },
                   ),
                 ),
               ),
-              const SizedBox(height: 25.0),
+              SizedBox(height: screenHeight * 0.03),
               Center(
                 child: ElevatedButton(
                   onPressed: navigateToNextPage, // Validation is handled here
@@ -118,7 +121,7 @@ class LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
-                    fixedSize: const Size(400, 65),
+                    fixedSize: Size(screenWidth * 0.9, screenHeight * 0.07),
                   ),
                   child: const Text(
                     "Log In",
@@ -129,20 +132,20 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 25.0),
+              SizedBox(height: screenHeight * 0.03),
 
               // Divider + "OR" + Divider
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: Divider(
                       color: Colors.black,
                       thickness: 2,
-                      indent: 20,
-                      endIndent: 5,
+                      indent: screenWidth * 0.05,
+                      endIndent: screenWidth * 0.02,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "OR",
                     style: TextStyle(
                       fontSize: 18,
@@ -155,77 +158,71 @@ class LoginScreenState extends State<LoginScreen> {
                     child: Divider(
                       color: Colors.black,
                       thickness: 2,
-                      indent: 5,
-                      endIndent: 20,
+                      indent: screenWidth * 0.02,
+                      endIndent: screenWidth * 0.05,
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 25.0),
+              SizedBox(height: screenHeight * 0.03),
 
               // Clickable Circle Image for external links
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 116),
-                    child: InkWell(
-                      onTap: () async {
-                        await gotoPage("https://accounts.google.com/");
-                      },
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/googlelogo.png',
-                            fit: BoxFit.cover,
-                          ),
+                  SizedBox(width: screenWidth * 0.01),
+                  InkWell(
+                    onTap: () async {
+                      await gotoPage("https://accounts.google.com/");
+                    },
+                    child: Container(
+                      width: screenWidth * 0.13,
+                      height: screenWidth * 0.13,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/googlelogo.png',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25),
-                    child: InkWell(
-                      onTap: () async {
-                        await gotoPage("https://www.facebook.com/");
-                      },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/facebooklogo.png',
-                            fit: BoxFit.cover,
-                          ),
+                  SizedBox(width: screenWidth * 0.05),
+                  InkWell(
+                    onTap: () async {
+                      await gotoPage("https://www.facebook.com/");
+                    },
+                    child: Container(
+                      width: screenWidth * 0.18,
+                      height: screenWidth * 0.18,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/facebooklogo.png',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25),
-                    child: InkWell(
-                      onTap: () async {
-                        await gotoPage("https://www.instagram.com/");
-                      },
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/instagramlogo.png',
-                            fit: BoxFit.cover,
-                          ),
+                  SizedBox(width: screenWidth * 0.05),
+                  InkWell(
+                    onTap: () async {
+                      await gotoPage("https://www.instagram.com/");
+                    },
+                    child: Container(
+                      width: screenWidth * 0.13,
+                      height: screenWidth * 0.13,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/instagramlogo.png',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
