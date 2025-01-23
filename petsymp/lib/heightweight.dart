@@ -92,7 +92,21 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
       backgroundColor: const Color(0xFFCFCFCC),
       body: Stack(
         children: [
-          if (_selectedIndex == 0) // Show this layout only on the first tab
+          if (_selectedIndex == 0)
+          Positioned(
+            top: screenHeight * 0.03,
+            left: screenWidth * 0.01,
+            child: ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_sharp,
+                  color:  Color.fromRGBO(61, 47, 40, 1),
+                  size: 40.0,),
+                  label: const Text(''),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),), // Show this layout only on the first tab
             Stack(
               children: [
                 // AnimatedPositioned for Paw Image

@@ -100,119 +100,101 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                   left: screenWidth * 0.12,
                   right: screenWidth * 0.12,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Custom Counter Slider
+                      // Circle and Line in a Stack for Proper Alignment
                       Stack(
+                        clipBehavior: Clip.none, // Ensure the circle can overflow without being clipped
+                        alignment: Alignment.centerLeft,
                         children: [
+                          // Thin Line
                           Container(
-                            height: 30,
+                            height: 4,
                             width: screenWidth * 0.72,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              borderRadius: BorderRadius.circular(25),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(Radius.circular(2)),
                             ),
                           ),
-
+                          // Circle Positioned on the Line
                           Positioned(
-                            left: (screenWidth * 0.7 - 20) * (value / 10),
+                            left: (screenWidth * 0.72 - 40) * (value / 10), // Dynamic position along the line
+                            top: -20, // Raise the circle above the line
                             child: GestureDetector(
                               onHorizontalDragUpdate: (details) {
                                 setState(() {
-                                  double newPosition = (value + details.delta.dx / (screenWidth * 0.7) * 10).clamp(0, 10);
+                                  // Update position based on drag
+                                  double newPosition =
+                                      (value + details.delta.dx / (screenWidth * 0.72) * 10).clamp(0, 10);
                                   value = newPosition.round();
                                 });
                               },
                               child: Container(
-                                width: 30,
-                                height: 30,
+                                width: 40, // Circle size
+                                height: 40,
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.black,
-                                  
+                                  color: Colors.black, // Circle color
                                 ),
-                                  
-                                  child:  Center( child: Text(
-                                  "$value",
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                child: Center(
+                                  child: Text(
+                                    "$value", // Display value inside the circle
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                )),
-                                
+                                ),
                               ),
                             ),
                           ),
-
-                          
                         ],
                       ),
-                      SizedBox(height: screenHeight * 0.05), // Add space between slider and buttons
-                      // Buttons Row with Column Alignment
+                      const SizedBox(height: 40), // Space between slider and buttons
+                      // + and - Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // + Button Below Slider on the Left
-                          Column(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (value < 10) {
-                                    setState(() {
-                                      value++; // Increment the value
-                                    });
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(15),
-                                ),
-                                child: const Text(
-                                  "+",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          // + Button
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (value < 10) value++; // Increment value and move circle right
+                              });
+                            },
+                            child: const CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.black,
+                              child:  Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 30,
                               ),
-                              SizedBox(height: screenHeight * 0.05), // Spacing below button for aesthetics
-                            ],
+                            ),
                           ),
-                          // - Button Below Slider on the Right
-                          Column(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (value > 0) {
-                                    setState(() {
-                                      value--; // Decrement the value
-                                    });
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(15),
-                                ),
-                                child: const Text(
-                                  "-",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          // - Button
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (value > 0) value--; // Decrement value and move circle left
+                              });
+                            },
+                            child: const CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.black,
+                              child:  Icon(
+                                Icons.remove,
+                                color: Colors.white,
+                                size: 30,
                               ),
-                              SizedBox(height: screenHeight * 0.05), // Spacing below button for aesthetics
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     ],
-                  ),
+                  )
+
                 ),
 
                 // Next Button at the previous position

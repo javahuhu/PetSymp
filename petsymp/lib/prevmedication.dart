@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/Prevmedication.dart';
-
+import 'package:petsymp/medhistory.dart';
 
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -26,14 +25,14 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class BreedScreen extends StatefulWidget {
-  const BreedScreen({super.key});
+class PrevmedScreen extends StatefulWidget {
+  const PrevmedScreen({super.key});
 
   @override
-  BreedScreenState createState() => BreedScreenState();
+  PrevmedScreenState createState() => PrevmedScreenState();
 }
 
-class BreedScreenState extends State<BreedScreen> {
+class PrevmedScreenState extends State<PrevmedScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
   final TextEditingController _controller = TextEditingController();
@@ -55,7 +54,7 @@ class BreedScreenState extends State<BreedScreen> {
       // Navigate only if the input is valid
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const PrevmedScreen()),
+        MaterialPageRoute(builder: (context) => const MedhistoryScreen()),
       );
     }
   }
@@ -84,6 +83,7 @@ class BreedScreenState extends State<BreedScreen> {
       body: Stack(
         children: [
           if (_selectedIndex == 0)
+          
           Positioned(
             top: screenHeight * 0.03,
             left: screenWidth * 0.01,
@@ -132,7 +132,7 @@ class BreedScreenState extends State<BreedScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "What is your pet Breed?",
+                        "What is your pet previous medication?",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -157,7 +157,7 @@ class BreedScreenState extends State<BreedScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
-                              hintText: 'Enter your pet breed',
+                              hintText: 'Previous Medication of the Pet',
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20.0,
                                 horizontal: 15.0,
@@ -165,8 +165,9 @@ class BreedScreenState extends State<BreedScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter the breed of pet';
+                                return 'Please enter the previous medication';
                               }
+                              
                               return null;
                             },
                           ),
