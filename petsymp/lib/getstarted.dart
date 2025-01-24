@@ -43,6 +43,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

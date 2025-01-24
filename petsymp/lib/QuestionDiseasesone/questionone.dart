@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/QuestionDiseasesone/questionone.dart';
-import 'package:petsymp/anothersearchsymptoms.dart';
+import 'package:petsymp/QuestionDiseasesone/questiontwo.dart';
 
 
-class AnothersympScreen extends StatefulWidget {
-  const AnothersympScreen({super.key});
+class QoneScreen extends StatefulWidget {
+  const QoneScreen({super.key});
 
   @override
-  AnothersympScreenState createState() =>AnothersympScreenState();
+  QoneScreenState createState() =>QoneScreenState();
 }
 
-class AnothersympScreenState extends State<AnothersympScreen> {
+class QoneScreenState extends State<QoneScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
 
@@ -110,31 +109,42 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Does she/he have",
+                       Text(
+                        "Have you noticed any unusual",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      Text(
-                        "another symptoms?",
+
+                       Text(
+                        "substances, like blood or mucus,",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
+
+                       Text(
+                        "in your pet’s vomit or stools",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+
                       SizedBox(height: 50),
                     ],
                   ),
                 ),
                 // Animated Buttons
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.35, "Yes", const AnothersearchsymptomsScreen(), 0),
+                    screenHeight, screenWidth,  0.8, "Yes", const QtwoScreen(), 0),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "No", const QoneScreen(),1),
+                    screenHeight, screenWidth, 0.87, "No", const QtwoScreen(),1),
               
               ],
             ),
@@ -174,7 +184,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.29 - 50,
+      left: screenWidth * 0.75,
       child: ElevatedButton(
         onPressed: () {
           
@@ -211,11 +221,11 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                     ),
                     shape: WidgetStateProperty.all(
                       const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
                       ),
                     ),
                     fixedSize: WidgetStateProperty.all(
-                      const Size(300, 55),
+                      const Size(100, 55),
                     ),
                   ),
               child: Text(

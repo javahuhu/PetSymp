@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/QuestionDiseasesone/questionone.dart';
-import 'package:petsymp/anothersearchsymptoms.dart';
-
-
-class AnothersympScreen extends StatefulWidget {
-  const AnothersympScreen({super.key});
+import 'package:petsymp/Summaryinput.dart';
+import 'userdata.dart';
+import 'package:provider/provider.dart';
+class ReportScreen extends StatefulWidget {
+  const ReportScreen({super.key});
 
   @override
-  AnothersympScreenState createState() =>AnothersympScreenState();
+  ReportScreenState createState() =>ReportScreenState();
 }
 
-class AnothersympScreenState extends State<AnothersympScreen> {
+class ReportScreenState extends State<ReportScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
 
@@ -53,6 +52,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userName = Provider.of<UserData>(context).userName;
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -107,34 +107,41 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
-                  child: const Column(
+                  child:  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Does she/he have",
+                       Text(
+                        "Thank you, $userName I have put",
+                        style:const  TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+
+                       const Text(
+                        "together a report to your inputs.",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      Text(
-                        "another symptoms?",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(height: 50),
+
+                    
+                      
+                      
+
+                      
+
+                      const SizedBox(height: 50),
                     ],
                   ),
                 ),
                 // Animated Buttons
+                
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.35, "Yes", const AnothersearchsymptomsScreen(), 0),
-                buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "No", const QoneScreen(),1),
+                    screenHeight, screenWidth, 0.87, "Continue", const SummaryScreen(),1),
               
               ],
             ),
@@ -174,7 +181,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.29 - 50,
+      left: screenWidth * 0.65,
       child: ElevatedButton(
         onPressed: () {
           
@@ -211,11 +218,11 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                     ),
                     shape: WidgetStateProperty.all(
                       const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
                       ),
                     ),
                     fixedSize: WidgetStateProperty.all(
-                      const Size(300, 55),
+                      const Size(155, 55),
                     ),
                   ),
               child: Text(

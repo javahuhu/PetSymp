@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/QuestionDiseasesone/questionone.dart';
-import 'package:petsymp/anothersearchsymptoms.dart';
+import 'package:petsymp/recommendationone.dart';
 
 
-class AnothersympScreen extends StatefulWidget {
-  const AnothersympScreen({super.key});
+class SummaryScreen extends StatefulWidget {
+  const SummaryScreen({super.key});
 
   @override
-  AnothersympScreenState createState() =>AnothersympScreenState();
+  SummaryScreenState createState() =>SummaryScreenState();
 }
 
-class AnothersympScreenState extends State<AnothersympScreen> {
+class SummaryScreenState extends State<SummaryScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
 
@@ -100,6 +99,16 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                         ),
                       ),
                       SizedBox(width: screenWidth * 0.05),
+                      Padding(
+                        padding: EdgeInsets.only(top: screenHeight * 0.03), // Relative padding
+                        child: const Text(
+                          "Summary of input",
+                          style: TextStyle(
+                            fontSize: 27, // Fixed font size for readability
+                            fontWeight: FontWeight.bold, // Make the text bold
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -110,31 +119,39 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Does she/he have",
+                       Text(
+                        "",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      Text(
-                        "another symptoms?",
+
+                       Text(
+                        "",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
+
+                    
+                      
+                      
+
+                      
+
                       SizedBox(height: 50),
                     ],
                   ),
                 ),
+                
                 // Animated Buttons
+                
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.35, "Yes", const AnothersearchsymptomsScreen(), 0),
-                buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "No", const QoneScreen(),1),
+                    screenHeight, screenWidth, 0.8, "Proceed", const RecommendationoneScreen(),1),
               
               ],
             ),
@@ -174,7 +191,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.29 - 50,
+      left: screenWidth * 0.45 - 50,
       child: ElevatedButton(
         onPressed: () {
           
@@ -188,18 +205,18 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                     backgroundColor: WidgetStateProperty.resolveWith(
                       (states) {
                         if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
+                          return const Color.fromARGB(255, 255, 255, 255); // Background color when pressed
                         }
-                        return Colors.transparent; // Default background color
+                        return const Color.fromRGBO(61, 47, 40, 1); // Default background color
                       },
                     ),
                     // Dynamic text color based on button state
                     foregroundColor: WidgetStateProperty.resolveWith(
                       (states) {
                         if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
+                          return const Color.fromARGB(255, 0, 0, 0); // Text color when pressed
                         }
-                        return Colors.black; // Default text color
+                        return const Color.fromARGB(255, 255, 255, 255); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
@@ -211,11 +228,11 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                     ),
                     shape: WidgetStateProperty.all(
                       const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
                       ),
                     ),
                     fixedSize: WidgetStateProperty.all(
-                      const Size(300, 55),
+                      const Size(155, 55),
                     ),
                   ),
               child: Text(

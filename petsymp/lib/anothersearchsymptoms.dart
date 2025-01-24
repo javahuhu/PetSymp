@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/duration.dart';
-import 'medhistory.dart';
+
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
   const AnothersearchsymptomsScreen({super.key});
@@ -115,7 +115,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         screenWidth,
                         "Associated Behavior",
                         ["Drooling or licking lips excessively before", "or after vomiting."],
-                        const MedhistoryScreen(),
+                        const DurationScreen(),
                       ),
                     ),
                     Positioned(
@@ -137,7 +137,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         screenWidth,
                         "Frequent Episodes",
                         ["Repeated vomiting over a short period"],
-                        const MedhistoryScreen(),
+                        const DurationScreen(),
                       ),
                     ),
                   ],

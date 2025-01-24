@@ -3,8 +3,8 @@ import 'package:petsymp/heightweight.dart';
 
 
 class AgeinputScreen extends StatefulWidget {
-  const AgeinputScreen({super.key});
-
+ 
+const AgeinputScreen({super.key});
   @override
   AgeinputScreenState createState() => AgeinputScreenState();
 }
@@ -205,7 +205,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const MeasureinputScreen()),
+                        MaterialPageRoute(builder: (context) =>  const MeasureinputScreen()),
                       );
                     },
                     style: ButtonStyle(

@@ -167,7 +167,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
-                              hintText: 'e.g. Vomiting or Diarrhea etc.',
+                              hintText: 'e.g. Vomiting or Diarrhea etc. ',
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20.0,
                                 horizontal: 15.0,

@@ -4,8 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 
 class MeasureinputScreen extends StatefulWidget {
-  const MeasureinputScreen({super.key});
-
+const MeasureinputScreen({super.key});
   @override
   MeasureinputScreenState createState() => MeasureinputScreenState();
 }
@@ -64,7 +63,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
       // Navigate only if the input is valid
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const BreedScreen()),
+        MaterialPageRoute(builder: (context) => const  BreedScreen()),
       );
     }
   }
@@ -177,6 +176,22 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                  width: 2.0, // Thickness when not focused
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color:  Color.fromRGBO(72, 38, 163, 1),// Border color when focused
+                                  width: 2.0, // Thickness when focused
+                                ),
+                              ),
+
                             hintText: 'Enter pet weight (kg)',
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 15.0,
@@ -204,6 +219,23 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
+                            
+
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                  width: 2.0, // Thickness when not focused
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color:  Color.fromRGBO(72, 38, 163, 1),// Border color when focused
+                                  width: 2.0, // Thickness when focused
+                                ),
+                              ),
+
                             hintText: 'Enter pet height (cm)',
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 15.0,

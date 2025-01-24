@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/duration.dart';
-import 'medhistory.dart';
+
 
 class SearchsymptomsScreen extends StatefulWidget {
   const SearchsymptomsScreen({super.key});
@@ -115,7 +115,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         screenWidth,
                         "Changes in Movement",
                         ["Unwillingness into activity, recreation, or", "movement."],
-                        const MedhistoryScreen(),
+                        const DurationScreen(),
                       ),
                     ),
                     Positioned(
@@ -137,7 +137,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         screenWidth,
                         "Low Energy",
                         ["Less attentive to stimuli such as food, toys,", "or your own voice."],
-                        const MedhistoryScreen(),
+                        const DurationScreen(),
                       ),
                     ),
                   ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:petsymp/permission.dart';
+import 'userdata.dart';
 
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -13,7 +15,6 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
       return newValue; // Return empty value
     }
 
-    // Capitalize the first letter and keep the rest as-is
     final text = newValue.text;
     final firstLetter = text[0].toUpperCase();
     final restOfText = text.substring(1);
@@ -35,13 +36,12 @@ class AssesmentScreen extends StatefulWidget {
 class AssesmentScreenState extends State<AssesmentScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _usernamecontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation after the widget builds
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -49,9 +49,12 @@ class AssesmentScreenState extends State<AssesmentScreen> {
     });
   }
 
-  void navigateToNextPage() {
+  void navigateToNextPage(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
-      // Navigate only if the input is valid
+      // Save userName globally using Provider
+      Provider.of<UserData>(context, listen: false).setUserName(_usernamecontroller.text);
+
+      // Navigate to PermissionScreen
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const PermissionScreen()),
@@ -66,7 +69,6 @@ class AssesmentScreenState extends State<AssesmentScreen> {
     Icon(Icons.settings, size: 150), // Third page content
   ];
 
-  // Method to handle bottom navigation tab changes
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index; // Update the selected index
@@ -85,18 +87,17 @@ class AssesmentScreenState extends State<AssesmentScreen> {
           if (_selectedIndex == 0) // Show this layout only on the first tab
             Stack(
               children: [
-                // AnimatedPositioned for Paw Image
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
-                  top: _isAnimated ? screenHeight * 0.13 : -100, // From off-screen to final position
+                  top: _isAnimated ? screenHeight * 0.13 : -100,
                   left: screenWidth * 0.1,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: screenWidth * 0.15, // 15% of screen width
-                        height: screenWidth * 0.15, // Equal height for circular image
+                        width: screenWidth * 0.15,
+                        height: screenWidth * 0.15,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                         ),
@@ -105,13 +106,12 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
-                      
+                      SizedBox(width: screenWidth * 0.05),
                     ],
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.22, // Text and input below the paw
+                  top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +138,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
-                            controller: _controller,
+                            controller: _usernamecontroller,
                             autofillHints: const [AutofillHints.name],
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),
@@ -147,6 +147,20 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  width: 2.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color: Color.fromRGBO(72, 38, 163, 1),
+                                  width: 2.0,
+                                ),
                               ),
                               hintText: 'Enter your name',
                               contentPadding: const EdgeInsets.symmetric(
@@ -172,47 +186,19 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     ],
                   ),
                 ),
-                // Next Button at the previous position
                 Positioned(
                   top: screenHeight * 0.87,
                   left: screenWidth * 0.75,
                   child: ElevatedButton(
-                    onPressed: navigateToNextPage,
-                    style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return Colors.black; // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
+                    onPressed: () => navigateToNextPage(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
                       ),
+                      fixedSize: const Size(100, 55),
                     ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
-                  ),
                     child: const Text(
                       "Next",
                       style: TextStyle(
@@ -224,7 +210,8 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 ),
               ],
             ),
-          if (_selectedIndex != 0)
+
+             if (_selectedIndex != 0)
             Center(
               child: _pages.elementAt(_selectedIndex),
             ),

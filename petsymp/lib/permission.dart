@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/ageinput.dart';
-
-
-
-
+import 'userdata.dart';
+import 'package:provider/provider.dart';
 class PermissionScreen extends StatefulWidget {
-  const PermissionScreen({super.key});
+ const PermissionScreen({super.key});
 
   @override
   PermissionScreenState createState() => PermissionScreenState();
@@ -47,6 +45,7 @@ class PermissionScreenState extends State<PermissionScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userName = Provider.of<UserData>(context).userName;
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -81,9 +80,9 @@ class PermissionScreenState extends State<PermissionScreen> {
                       // Text beside the image
                       Padding(
                         padding: EdgeInsets.only(top: screenHeight * 0.03), // Relative padding
-                        child: const Text(
-                          "Hi, [Username]",
-                          style: TextStyle(
+                        child:   Text(
+                          "Hi, $userName",
+                          style:  const TextStyle(
                             fontSize: 27, // Fixed font size for readability
                             fontWeight: FontWeight.bold, // Make the text bold
                           ),
@@ -139,7 +138,7 @@ class PermissionScreenState extends State<PermissionScreen> {
                    Navigator.push(
                     context,
                     MaterialPageRoute
-                    (builder: (context) => const AgeinputScreen()),
+                    (builder: (context) =>  const AgeinputScreen()),
                   );
                   },
                   style: ButtonStyle(

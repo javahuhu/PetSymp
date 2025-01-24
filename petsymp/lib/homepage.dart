@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'assesment.dart';
 
 class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({super.key});
+   const HomePageScreen({super.key});
+
 
   @override
   HomePageScreenState createState() => HomePageScreenState();
@@ -46,7 +47,7 @@ class HomePageScreenState extends State<HomePageScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+       backgroundColor: const Color(0xFFCFCFCC),
       body: Stack(
         children: [
           // Circular Image and Texts

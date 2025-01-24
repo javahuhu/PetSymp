@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'splashscreen.dart';
-
+import 'userdata.dart';
+import 'package:provider/provider.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserData(),
+      child: const MyApp(),
+    ),
+  );
 }
  
 class MyApp extends StatelessWidget {

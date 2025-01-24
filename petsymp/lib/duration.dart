@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/anothersymptoms.dart';
-import 'package:petsymp/searchsymptoms.dart';
+
 
 class DurationScreen extends StatefulWidget {
   const DurationScreen({super.key});
@@ -36,7 +36,7 @@ class DurationScreenState extends State<DurationScreen> {
 
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
+    Icon(Icons.home, size: 150,), // First page content
     Icon(Icons.person, size: 150), // Second page content
     Icon(Icons.settings, size: 150), // Third page content
   ];
@@ -133,15 +133,15 @@ class DurationScreenState extends State<DurationScreen> {
                 buildAnimatedButton(
                     screenHeight, screenWidth, 0.35, "Three days", const AnothersympScreen(), 0),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "Five days", const SearchsymptomsScreen(),1),
+                    screenHeight, screenWidth, 0.42, "Five days", const AnothersympScreen(),1),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.49, "One week", const SearchsymptomsScreen(),2),
+                    screenHeight, screenWidth, 0.49, "One week", const AnothersympScreen(),2),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.561, "Two weeks", const SearchsymptomsScreen(),3),
+                    screenHeight, screenWidth, 0.561, "Two weeks", const AnothersympScreen(),3),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.633, "Three weeks", const SearchsymptomsScreen(),4),
+                    screenHeight, screenWidth, 0.633, "Three weeks", const AnothersympScreen(),4),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.706, "One month", const SearchsymptomsScreen(),5),
+                    screenHeight, screenWidth, 0.706, "One month", const AnothersympScreen(),5),
               ],
             ),
           if (_selectedIndex != 0)

@@ -166,6 +166,22 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
+
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                  width: 2.0, // Thickness when not focused
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: const BorderSide(
+                                  color:  Color.fromRGBO(72, 38, 163, 1),// Border color when focused
+                                  width: 2.0, // Thickness when focused
+                                ),
+                              ),
+                              
                               hintText: 'e.g Lethargy, Vomiting, Rushes etc.',
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20.0,
