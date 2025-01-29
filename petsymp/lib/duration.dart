@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/anothersymptoms.dart';
-
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
 class DurationScreen extends StatefulWidget {
   const DurationScreen({super.key});
@@ -10,16 +11,14 @@ class DurationScreen extends StatefulWidget {
 }
 
 class DurationScreenState extends State<DurationScreen> {
-  bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  bool _isAnimated = false;
+  int _selectedIndex = 0;
 
-  // Control the visibility of buttons
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation for each button with a delay
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -27,24 +26,22 @@ class DurationScreenState extends State<DurationScreen> {
       for (int i = 0; i < _buttonVisible.length; i++) {
         Future.delayed(Duration(milliseconds: 300 * i), () {
           setState(() {
-            _buttonVisible[i] = true; // Make each button visible sequentially
+            _buttonVisible[i] = true;
           });
         });
       }
     });
   }
 
-  // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150,), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
+    Icon(Icons.home, size: 150),
+    Icon(Icons.person, size: 150),
+    Icon(Icons.settings, size: 150),
   ];
 
-  // Method to handle bottom navigation tab changes
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Update the selected index
+      _selectedIndex = index;
     });
   }
 
@@ -52,6 +49,8 @@ class DurationScreenState extends State<DurationScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+   
+  
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -129,19 +128,19 @@ class DurationScreenState extends State<DurationScreen> {
                     ],
                   ),
                 ),
-                // Animated Buttons
+                // Animated Buttons with Provider
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.35, "Three days", const AnothersympScreen(), 0),
+                    screenHeight, screenWidth, 0.35, "Three days", context, 0),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "Five days", const AnothersympScreen(),1),
+                    screenHeight, screenWidth, 0.42, "Five days", context, 1),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.49, "One week", const AnothersympScreen(),2),
+                    screenHeight, screenWidth, 0.49, "One week", context, 2),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.561, "Two weeks", const AnothersympScreen(),3),
+                    screenHeight, screenWidth, 0.561, "Two weeks", context, 3),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.633, "Three weeks", const AnothersympScreen(),4),
+                    screenHeight, screenWidth, 0.633, "Three weeks", context, 4),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.706, "One month", const AnothersympScreen(),5),
+                    screenHeight, screenWidth, 0.706, "One month", context, 5),
               ],
             ),
           if (_selectedIndex != 0)
@@ -174,8 +173,8 @@ class DurationScreenState extends State<DurationScreen> {
   }
 
   // Method to create an animated button
-  Widget buildAnimatedButton(double screenHeight, double screenWidth,
-      double topPosition,String label, Widget destination, int index) {
+  Widget buildAnimatedButton(
+      double screenHeight, double screenWidth, double topPosition, String label, BuildContext context, int index) {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
@@ -183,48 +182,51 @@ class DurationScreenState extends State<DurationScreen> {
       left: screenWidth * 0.29 - 50,
       child: ElevatedButton(
         onPressed: () {
-          
-         Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => destination),
-      );
+          // Store selected duration in Provider
+          Provider.of<UserData>(context, listen: false).setDuration(label);
+
+          // Navigate to AnothersympScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AnothersympScreen(),
+            ),
+          );
         },
         style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return Colors.black; // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(300, 55),
-                    ),
-                  ),
-              child: Text(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color.fromARGB(255, 0, 0, 0);
+              }
+              return Colors.transparent;
+            },
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color.fromARGB(255, 255, 255, 255);
+              }
+              return Colors.black;
+            },
+          ),
+          shadowColor: WidgetStateProperty.all(Colors.transparent),
+          side: WidgetStateProperty.all(
+            const BorderSide(
+              color: Colors.black,
+              width: 2.0,
+            ),
+          ),
+          shape: WidgetStateProperty.all(
+            const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(3)),
+            ),
+          ),
+          fixedSize: WidgetStateProperty.all(
+            const Size(300, 55),
+          ),
+        ),
+        child: Text(
           label,
           style: const TextStyle(
             fontSize: 22.0,

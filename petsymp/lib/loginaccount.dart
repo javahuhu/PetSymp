@@ -62,24 +62,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
         children: [
 
            
-          // Back Button
-          Positioned(
-            top: screenHeight * 0.03,
-            left: screenWidth * 0.01,
-            child: ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
-                Icons.arrow_back_sharp,
-                color: Color.fromRGBO(61, 47, 40, 1),
-                size: 40.0,
-              ),
-              label: const Text(''),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-              ),
-            ),
-          ),
+          
           // Logo at the top
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:petsymp/duration.dart';
-
+import 'package:petsymp/userdata.dart'; // Import UserData Provider
 
 class SearchsymptomsScreen extends StatefulWidget {
-  const SearchsymptomsScreen({super.key});
+  final String petSymptom;
+
+  const SearchsymptomsScreen({super.key, required this.petSymptom});
 
   @override
   SearchsymptomsScreenState createState() => SearchsymptomsScreenState();
 }
 
 class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
-  bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  bool _isAnimated = false;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation after the widget builds
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -24,17 +26,15 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
     });
   }
 
-  // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
+    Icon(Icons.home, size: 150),
+    Icon(Icons.person, size: 150),
+    Icon(Icons.settings, size: 150),
   ];
 
-  // Method to handle bottom navigation tab changes
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Update the selected index
+      _selectedIndex = index;
     });
   }
 
@@ -49,12 +49,11 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: screenHeight + 25, // Ensure additional space for the last button
+              height: screenHeight + 25,
               width: screenWidth,
               child: Stack(
                 children: [
                   if (_selectedIndex == 0) ...[
-                    // Back Button
                     Positioned(
                       top: screenHeight * 0.03,
                       left: screenWidth * 0.01,
@@ -72,7 +71,6 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         ),
                       ),
                     ),
-                    // Animated Header
                     AnimatedPositioned(
                       duration: const Duration(seconds: 1),
                       curve: Curves.easeInOut,
@@ -96,7 +94,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                           Padding(
                             padding: EdgeInsets.only(top: screenHeight * 0.03),
                             child: const Text(
-                              "Search Symptoms",
+                              "Select Symptoms",
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight: FontWeight.bold,
@@ -106,16 +104,15 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         ],
                       ),
                     ),
-                    // Symptoms Sections with Container
                     Positioned(
                       top: screenHeight * 0.25,
                       left: screenWidth * 0.05,
                       right: screenWidth * 0.05,
                       child: buildSymptomsContainer(
                         screenWidth,
-                        "Changes in Movement",
+                        widget.petSymptom,
                         ["Unwillingness into activity, recreation, or", "movement."],
-                        const DurationScreen(),
+                        context, // Pass context for Provider
                       ),
                     ),
                     Positioned(
@@ -126,7 +123,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         screenWidth,
                         "Reduced Appetite",
                         ["Consuming little or having little appetite for", "food or treats."],
-                        const DurationScreen(),
+                        context,
                       ),
                     ),
                     Positioned(
@@ -137,7 +134,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                         screenWidth,
                         "Low Energy",
                         ["Less attentive to stimuli such as food, toys,", "or your own voice."],
-                        const DurationScreen(),
+                        context,
                       ),
                     ),
                   ],
@@ -174,11 +171,10 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
     );
   }
 
-  // Helper method to build a container with symptoms and button
-  Widget buildSymptomsContainer(double screenWidth, String title,
-      List<String> details, Widget navigate) {
+  Widget buildSymptomsContainer(
+      double screenWidth, String title, List<String> details, BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16), // Add padding inside the container
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 250, 249, 249),
         borderRadius: BorderRadius.circular(12),
@@ -215,53 +211,58 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
+                 final userData = Provider.of<UserData>(context, listen: false);
+
+                // Store the selected symptom
+                userData.setSelectedSymptom(title);
+                userData.addPetSymptom(title);
+
+                // Navigate to DurationScreen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => navigate),
+                  MaterialPageRoute(
+                    builder: (context) => const DurationScreen(),
+                  ),
                 );
               },
               style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return Colors.black; // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(120, 45),
-                    ),
+                backgroundColor: WidgetStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 0, 0, 0);
+                    }
+                    return Colors.transparent;
+                  },
+                ),
+                foregroundColor: WidgetStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 255, 255, 255);
+                    }
+                    return Colors.black;
+                  },
+                ),
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                side: WidgetStateProperty.all(
+                  const BorderSide(
+                    color: Colors.black,
+                    width: 2.0,
                   ),
-          
+                ),
+                shape: WidgetStateProperty.all(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                  ),
+                ),
+                fixedSize: WidgetStateProperty.all(
+                  const Size(120, 45),
+                ),
+              ),
               child: const Text(
                 "Select",
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
-                  
                 ),
               ),
             ),

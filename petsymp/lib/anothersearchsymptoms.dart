@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/duration.dart';
-
+import 'QuestionDiseasesone/questionone.dart';
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
   const AnothersearchsymptomsScreen({super.key});
 
   @override
-  AnothersearchsymptomsScreenState createState() => AnothersearchsymptomsScreenState();
+  AnothersearchsymptomsScreenState createState() =>
+      AnothersearchsymptomsScreenState();
 }
 
 class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen> {
-  bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  bool _isAnimated = false;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation after the widget builds
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -24,17 +25,15 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     });
   }
 
-  // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
+    Icon(Icons.home, size: 150),
+    Icon(Icons.person, size: 150),
+    Icon(Icons.settings, size: 150),
   ];
 
-  // Method to handle bottom navigation tab changes
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Update the selected index
+      _selectedIndex = index;
     });
   }
 
@@ -42,6 +41,13 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userData = Provider.of<UserData>(context);
+
+  String allSymptoms = [
+  if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom, // ✅ Correct: selectedSymptom is a string
+  if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom
+].where((element) => element.isNotEmpty).join(" + "); // ✅ Prevents empty strings
+ // Avoid empty strings
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -49,12 +55,11 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
         child: Column(
           children: [
             SizedBox(
-              height: screenHeight + 25, // Ensure additional space for the last button
+              height: screenHeight + 25,
               width: screenWidth,
               child: Stack(
                 children: [
                   if (_selectedIndex == 0) ...[
-                    // Back Button
                     Positioned(
                       top: screenHeight * 0.03,
                       left: screenWidth * 0.01,
@@ -72,7 +77,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         ),
                       ),
                     ),
-                    // Animated Header
                     AnimatedPositioned(
                       duration: const Duration(seconds: 1),
                       curve: Curves.easeInOut,
@@ -92,11 +96,11 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                               fit: BoxFit.contain,
                             ),
                           ),
-                          SizedBox(width: screenWidth * 0.05),
+                          SizedBox(width: screenWidth * 0.02),
                           Padding(
                             padding: EdgeInsets.only(top: screenHeight * 0.03),
                             child: const Text(
-                              "Search Symptoms",
+                              "Select Another Symptoms",
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight: FontWeight.bold,
@@ -106,16 +110,17 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         ],
                       ),
                     ),
-                    // Symptoms Sections with Container
+
+                    // Symptoms List
                     Positioned(
                       top: screenHeight * 0.25,
                       left: screenWidth * 0.05,
                       right: screenWidth * 0.05,
                       child: buildSymptomsContainer(
                         screenWidth,
-                        "Associated Behavior",
+                        allSymptoms.isNotEmpty ? allSymptoms : "Select Another Symptoms",
                         ["Drooling or licking lips excessively before", "or after vomiting."],
-                        const DurationScreen(),
+                        const QoneScreen(),
                       ),
                     ),
                     Positioned(
@@ -126,7 +131,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         screenWidth,
                         "Frequent Bowel Movements",
                         ["Loose, watery stools."],
-                        const DurationScreen(),
+                        const QoneScreen(),
                       ),
                     ),
                     Positioned(
@@ -137,7 +142,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         screenWidth,
                         "Frequent Episodes",
                         ["Repeated vomiting over a short period"],
-                        const DurationScreen(),
+                        const QoneScreen(),
                       ),
                     ),
                   ],
@@ -174,11 +179,10 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     );
   }
 
-  // Helper method to build a container with symptoms and button
   Widget buildSymptomsContainer(double screenWidth, String title,
       List<String> details, Widget navigate) {
     return Container(
-      padding: const EdgeInsets.all(16), // Add padding inside the container
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 250, 249, 249),
         borderRadius: BorderRadius.circular(12),
@@ -221,47 +225,43 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 );
               },
               style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return Colors.black; // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(120, 45),
-                    ),
+                backgroundColor: WidgetStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 0, 0, 0);
+                    }
+                    return Colors.transparent;
+                  },
+                ),
+                foregroundColor: WidgetStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 255, 255, 255);
+                    }
+                    return Colors.black;
+                  },
+                ),
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                side: WidgetStateProperty.all(
+                  const BorderSide(
+                    color: Colors.black,
+                    width: 2.0,
                   ),
-          
+                ),
+                shape: WidgetStateProperty.all(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3)),
+                  ),
+                ),
+                fixedSize: WidgetStateProperty.all(
+                  const Size(120, 45),
+                ),
+              ),
               child: const Text(
                 "Select",
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
-                  
                 ),
               ),
             ),

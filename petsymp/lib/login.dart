@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/loginaccount.dart';
-
+import 'package:petsymp/signup.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,7 +97,10 @@ class LoginScreenState extends State<LoginScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: (){
-
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SignupScreen()),
+                      );
                   } ,// Validation is handled here
                   style: ElevatedButton.styleFrom(
                     backgroundColor:  const Color.fromARGB(255, 0, 0, 0),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/searchsymptoms.dart';
+import 'package:petsymp/anothersearchsymptoms.dart';
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -26,6 +28,7 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
 }
 
 class MentionsympScreen extends StatefulWidget {
+
   const MentionsympScreen({super.key});
 
   @override
@@ -35,7 +38,7 @@ class MentionsympScreen extends StatefulWidget {
 class MentionsympScreenState extends State<MentionsympScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _anothersymptomscontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -51,10 +54,10 @@ class MentionsympScreenState extends State<MentionsympScreen> {
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Navigate only if the input is valid
+      Provider.of<UserData>(context, listen: false).setAnotherSymptom(_anothersymptomscontroller.text);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SearchsymptomsScreen()),
+        MaterialPageRoute(builder: (context) =>  const AnothersearchsymptomsScreen()),
       );
     }
   }
@@ -156,7 +159,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
-                            controller: _controller,
+                            controller: _anothersymptomscontroller,
                             autofillHints: const [AutofillHints.name],
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),

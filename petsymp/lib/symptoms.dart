@@ -35,7 +35,7 @@ class SymptomsScreen extends StatefulWidget {
 class SymptomsScreenState extends State<SymptomsScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _symptomscontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -51,10 +51,11 @@ class SymptomsScreenState extends State<SymptomsScreen> {
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
+       String petSymptom = _symptomscontroller.text.trim();
       // Navigate only if the input is valid
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SearchsymptomsScreen()),
+        MaterialPageRoute(builder: (context) =>  SearchsymptomsScreen(petSymptom: petSymptom)),
       );
     }
   }
@@ -155,7 +156,7 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
-                            controller: _controller,
+                            controller: _symptomscontroller,
                             autofillHints: const [AutofillHints.name],
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),

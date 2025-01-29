@@ -1,50 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/QuestionDiseasesone/questiontwo.dart';
-
+import 'package:provider/provider.dart';
+import 'package:petsymp/userdata.dart';
+import 'package:petsymp/report.dart';
 
 class QoneScreen extends StatefulWidget {
   const QoneScreen({super.key});
 
   @override
-  QoneScreenState createState() =>QoneScreenState();
+  QoneScreenState createState() => QoneScreenState();
 }
 
 class QoneScreenState extends State<QoneScreen> {
-  bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  bool _isAnimated = false;
+  int _selectedIndex = 0;
+  int currentQuestionIndex = 0;
 
-  // Control the visibility of buttons
-  final List<bool> _buttonVisible = [false, false, false, false, false, false];
+  List<bool> _buttonVisible = [false, false];
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation for each button with a delay
-    Future.delayed(const Duration(milliseconds: 200), () {
+    _triggerAnimation();
+  }
+
+  void _triggerAnimation() {
+    setState(() {
+      _isAnimated = false;
+      _buttonVisible = [false, false]; // Reset buttons visibility
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _isAnimated = true;
       });
+
       for (int i = 0; i < _buttonVisible.length; i++) {
-        Future.delayed(Duration(milliseconds: 300 * i), () {
+        Future.delayed(Duration(milliseconds: 500 * i), () {
           setState(() {
-            _buttonVisible[i] = true; // Make each button visible sequentially
+            _buttonVisible[i] = true; // Re-trigger button visibility sequentially
           });
         });
       }
     });
   }
 
-  // Pages corresponding to each tab
+  void nextQuestion(BuildContext context) {
+    final userData = Provider.of<UserData>(context, listen: false);
+
+    if (currentQuestionIndex < userData.questions.length - 1) {
+      setState(() {
+        currentQuestionIndex++;
+      });
+      _triggerAnimation(); // Re-trigger animations for new question
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ReportScreen()),
+      );
+    }
+  }
+
   static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
+    Icon(Icons.home, size: 150),
+    Icon(Icons.person, size: 150),
+    Icon(Icons.settings, size: 150),
   ];
 
-  // Method to handle bottom navigation tab changes
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Update the selected index
+      _selectedIndex = index;
     });
   }
 
@@ -52,6 +76,8 @@ class QoneScreenState extends State<QoneScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userData = Provider.of<UserData>(context);
+    final questions = userData.questions;
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -60,7 +86,6 @@ class QoneScreenState extends State<QoneScreen> {
           if (_selectedIndex == 0)
             Stack(
               children: [
-                // Back Button
                 Positioned(
                   top: screenHeight * 0.03,
                   left: screenWidth * 0.01,
@@ -78,7 +103,6 @@ class QoneScreenState extends State<QoneScreen> {
                     ),
                   ),
                 ),
-                // Animated Header
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
@@ -102,50 +126,38 @@ class QoneScreenState extends State<QoneScreen> {
                     ],
                   ),
                 ),
-                // Title Section
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
-                        "Have you noticed any unusual",
+                      const Text(
+                        "Question",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-
-                       Text(
-                        "substances, like blood or mucus,",
-                        style: TextStyle(
+                      const SizedBox(height: 10),
+                      Text(
+                        questions.isNotEmpty
+                            ? questions[currentQuestionIndex]
+                            : "No questions available",
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-
-                       Text(
-                        "in your pet’s vomit or stools",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      SizedBox(height: 50),
+                      const SizedBox(height: 50),
                     ],
                   ),
                 ),
-                // Animated Buttons
-                buildAnimatedButton(
-                    screenHeight, screenWidth,  0.8, "Yes", const QtwoScreen(), 0),
-                buildAnimatedButton(
-                    screenHeight, screenWidth, 0.87, "No", const QtwoScreen(),1),
-              
+                // Yes/No Buttons with Re-Triggered Animation
+                buildAnimatedButton(screenHeight, screenWidth, 0.8, "Yes", context, 0),
+                buildAnimatedButton(screenHeight, screenWidth, 0.87, "No", context, 1),
               ],
             ),
           if (_selectedIndex != 0)
@@ -177,58 +189,50 @@ class QoneScreenState extends State<QoneScreen> {
     );
   }
 
-  // Method to create an animated button
-  Widget buildAnimatedButton(double screenHeight, double screenWidth,
-      double topPosition,String label, Widget destination, int index) {
+  // Yes/No Buttons with Re-Triggered Animation
+  Widget buildAnimatedButton(
+      double screenHeight, double screenWidth, double topPosition, String label, BuildContext context, int index) {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
       left: screenWidth * 0.75,
       child: ElevatedButton(
-        onPressed: () {
-          
-         Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => destination),
-      );
-        },
+        onPressed: () => nextQuestion(context),
         style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return Colors.black; // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
-                  ),
-              child: Text(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color.fromARGB(255, 0, 0, 0);
+              }
+              return Colors.transparent;
+            },
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color.fromARGB(255, 255, 255, 255);
+              }
+              return Colors.black;
+            },
+          ),
+          shadowColor: WidgetStateProperty.all(Colors.transparent),
+          side: WidgetStateProperty.all(
+            const BorderSide(
+              color: Colors.black,
+              width: 2.0,
+            ),
+          ),
+          shape: WidgetStateProperty.all(
+            const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(100)),
+            ),
+          ),
+          fixedSize: WidgetStateProperty.all(
+            const Size(100, 55),
+          ),
+        ),
+        child: Text(
           label,
           style: const TextStyle(
             fontSize: 22.0,

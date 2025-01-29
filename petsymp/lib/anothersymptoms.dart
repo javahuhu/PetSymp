@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
-import 'package:petsymp/anothersearchsymptoms.dart';
+import 'package:petsymp/mentionsymptoms.dart';
 
 
 class AnothersympScreen extends StatefulWidget {
+
   const AnothersympScreen({super.key});
 
   @override
@@ -132,7 +133,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                 ),
                 // Animated Buttons
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.35, "Yes", const AnothersearchsymptomsScreen(), 0),
+                    screenHeight, screenWidth, 0.35, "Yes", const MentionsympScreen(), 0),
                 buildAnimatedButton(
                     screenHeight, screenWidth, 0.42, "No", const QoneScreen(),1),
               

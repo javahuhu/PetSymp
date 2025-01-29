@@ -1,9 +1,9 @@
  import 'package:flutter/material.dart';
-import 'package:petsymp/anothersearchsymptoms.dart';
+import 'package:petsymp/Homepage.dart';
 
 
 class RecommendationtwoScreen extends StatefulWidget {
-  const RecommendationtwoScreen({super.key});
+  const RecommendationtwoScreen({super.key,});
 
   @override
   RecommendationtwoScreenState createState() =>RecommendationtwoScreenState();
@@ -151,7 +151,7 @@ class RecommendationtwoScreenState extends State<RecommendationtwoScreen> {
                 // Animated Buttons
                 
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.8, "Proceed", const AnothersearchsymptomsScreen(),1),
+                    screenHeight, screenWidth, 0.8, "Proceed", const HomePageScreen(),1),
               
               ],
             ),
