@@ -213,7 +213,6 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
               onPressed: () {
                  final userData = Provider.of<UserData>(context, listen: false);
 
-                // Store the selected symptom
                 userData.setSelectedSymptom(title);
                 userData.addPetSymptom(title);
 

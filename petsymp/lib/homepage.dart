@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'assesment.dart';
+import 'profile.dart';
 
 class HomePageScreen extends StatefulWidget {
    const HomePageScreen({super.key});
@@ -18,7 +19,7 @@ class HomePageScreenState extends State<HomePageScreen> {
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
     Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
+    ProfileScreen(), // Second page content
     Icon(Icons.settings, size: 150), // Third page content
   ];
 
@@ -26,7 +27,7 @@ class HomePageScreenState extends State<HomePageScreen> {
   void initState() {
     super.initState();
     // Start the animation after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       setState(() {
         _isAnimated = true; // Trigger animation
       });

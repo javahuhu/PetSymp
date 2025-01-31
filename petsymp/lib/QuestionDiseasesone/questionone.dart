@@ -29,13 +29,13 @@ class QoneScreenState extends State<QoneScreen> {
       _buttonVisible = [false, false]; // Reset buttons visibility
     });
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
         _isAnimated = true;
       });
 
       for (int i = 0; i < _buttonVisible.length; i++) {
-        Future.delayed(Duration(milliseconds: 500 * i), () {
+        Future.delayed(Duration(milliseconds: 200 * i), () {
           setState(() {
             _buttonVisible[i] = true; // Re-trigger button visibility sequentially
           });
@@ -59,6 +59,18 @@ class QoneScreenState extends State<QoneScreen> {
       );
     }
   }
+
+    void previousQuestion() {
+    if (currentQuestionIndex > 0) {
+      setState(() {
+        currentQuestionIndex--;
+      });
+      _triggerAnimation();
+    } else {
+     Navigator.of(context).pop();
+    }
+  }
+
 
   static const List<Widget> _pages = <Widget>[
     Icon(Icons.home, size: 150),
@@ -90,7 +102,10 @@ class QoneScreenState extends State<QoneScreen> {
                   top: screenHeight * 0.03,
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      // Navigate to the previous question instead of exiting
+                      previousQuestion();
+                    },
                     icon: const Icon(
                       Icons.arrow_back_sharp,
                       color: Color.fromRGBO(61, 47, 40, 1),

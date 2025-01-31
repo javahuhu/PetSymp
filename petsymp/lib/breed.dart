@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:petsymp/Prevmedication.dart';
-
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -36,7 +37,7 @@ const BreedScreen({super.key});
 class BreedScreenState extends State<BreedScreen> {
   bool _isAnimated = false; // Animation toggle
   int _selectedIndex = 0; // State to track the selected tab
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _breedcontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -52,6 +53,7 @@ class BreedScreenState extends State<BreedScreen> {
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
+      Provider.of<UserData>(context, listen: false).setpetBreed(_breedcontroller.text);
       // Navigate only if the input is valid
       Navigator.push(
         context,
@@ -146,7 +148,7 @@ class BreedScreenState extends State<BreedScreen> {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
-                            controller: _controller,
+                            controller: _breedcontroller,
                             autofillHints: const [AutofillHints.name],
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),

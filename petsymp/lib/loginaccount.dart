@@ -394,13 +394,13 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
 
           Positioned(
             top: screenHeight * 0.2, // Adjust to control how high it is at the top
-            left: (MediaQuery.of(context).size.width - screenWidth * 0.85) / 2, // Center horizontally
+            left: (MediaQuery.of(context).size.width - screenWidth * 0.68) / 2, // Center horizontally
             child: Container(
               height: screenHeight * 0.3, // Adjust size as needed
               width: screenWidth * 0.7,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/goldenpet.png'),
+                  image: AssetImage('assets/hidog.png'),
                   fit: BoxFit.cover, // Adjust as needed
                 ),
               ),

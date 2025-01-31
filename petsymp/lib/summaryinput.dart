@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/recommendationone.dart';
-
+import 'userdata.dart';
+import 'package:provider/provider.dart';
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
 
   @override
-  SummaryScreenState createState() =>SummaryScreenState();
+  SummaryScreenState createState() => SummaryScreenState();
 }
 
 class SummaryScreenState extends State<SummaryScreen> {
-  bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  bool _isAnimated = false;
+  int _selectedIndex = 0;
 
-  // Control the visibility of buttons
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation for each button with a delay
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -27,24 +26,10 @@ class SummaryScreenState extends State<SummaryScreen> {
       for (int i = 0; i < _buttonVisible.length; i++) {
         Future.delayed(Duration(milliseconds: 300 * i), () {
           setState(() {
-            _buttonVisible[i] = true; // Make each button visible sequentially
+            _buttonVisible[i] = true;
           });
         });
       }
-    });
-  }
-
-  // Pages corresponding to each tab
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
-  ];
-
-  // Method to handle bottom navigation tab changes
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index; // Update the selected index
     });
   }
 
@@ -52,6 +37,11 @@ class SummaryScreenState extends State<SummaryScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userData = Provider.of<UserData>(context);
+    String allSymptoms = [
+  if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom, 
+  if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom
+  ].where((element) => element.isNotEmpty).join(" + ");
 
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
@@ -60,99 +50,142 @@ class SummaryScreenState extends State<SummaryScreen> {
           if (_selectedIndex == 0)
             Stack(
               children: [
-                // Back Button
+                // 🦴 Bones Background Image - **Placed at the Bottom**
                 Positioned(
-                  top: screenHeight * 0.03,
-                  left: screenWidth * 0.01,
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      color: Color.fromRGBO(61, 47, 40, 1),
-                      size: 40.0,
-                    ),
-                    label: const Text(''),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
+                  top: screenHeight * 0.2, // Adjusted so it's below yellow background
+                  left: -screenWidth * 0.2,
+                  child: Image.asset(
+                    'assets/bonesbg.png',
+                    height: 700,
+                    width: 750,
+                    fit: BoxFit.fill,
                   ),
                 ),
-                // Animated Header
-                AnimatedPositioned(
-                  duration: const Duration(seconds: 1),
-                  curve: Curves.easeInOut,
-                  top: _isAnimated ? screenHeight * 0.13 : -100,
-                  left: screenWidth * 0.1,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: screenWidth * 0.15,
-                        height: screenWidth * 0.15,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          'assets/paw.png',
-                          fit: BoxFit.contain,
-                        ),
+
+                // 🟡 Yellow Background - Positioned **Above the Bones**
+                Positioned(
+                  top: 0, // Set at the **topmost** of the screen
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    width: screenWidth,
+                    height: screenHeight * 0.25,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFDB58),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(100.0),
+                        bottomRight: Radius.circular(100.0),
                       ),
-                      SizedBox(width: screenWidth * 0.05),
-                      Padding(
-                        padding: EdgeInsets.only(top: screenHeight * 0.03), // Relative padding
-                        child: const Text(
-                          "Summary of input",
-                          style: TextStyle(
-                            fontSize: 27, // Fixed font size for readability
-                            fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                    child: Stack(
+                      children: [
+                        // 🐾 Paw Image Inside Yellow Background
+                        Positioned(
+                          top: 40,
+                          left: screenWidth * 0.17,
+                          child: AnimatedOpacity(
+                            duration: const Duration(seconds: 1),
+                            opacity: _isAnimated ? 1.0 : 0.0,
+                            child: Container(
+                              width: screenWidth * 0.12,
+                              height: screenWidth * 0.12,
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
+                              child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+
+                        // 📌 "Summary of Input" Title Inside Yellow Background
+                        Positioned(
+                          top: 60,
+                          left: screenWidth * 0.35,
+                          child: const Text(
+                            "Summary of Input",
+                            style: TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                // Title Section
+
+                // ⚫ Username Box - Positioned Above the Bones
                 Positioned(
-                  top: screenHeight * 0.22,
+                  top: screenHeight * 0.13,
                   left: screenWidth * 0.12,
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                       Text(
-                        "",
-                        style: TextStyle(
-                          fontSize: 22,
+                  child: Container(
+                    width: screenWidth * 0.76,
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(223, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 25,
+                          offset: const Offset(0, 20),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        userData.userName,
+                        style: const TextStyle(
+                          fontSize: 35,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       ),
-
-                       Text(
-                        "",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                    
-                      
-                      
-
-                      
-
-                      SizedBox(height: 50),
-                    ],
+                    ),
                   ),
                 ),
-                
-                // Animated Buttons
-                
+
+                 Positioned(
+                  top: screenHeight * 0.25,
+                  left: screenWidth * 0.085,
+                  child: Container(
+                    width: 400,
+                    height: screenHeight * 0.58,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(131, 255, 255, 255), // Set Background Color
+                      borderRadius: BorderRadius.circular(15), // Optional rounded corners
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1), // Light shadow
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10), // Add padding inside container
+                      child: ListView(
+                        children: [
+                          _buildInputCard("🎂", "Age", ""),
+                          _buildInputCard("📏", "Height", userData.height.toString()),
+                          _buildInputCard("⚖️", "Weight", userData.weight.toString()),
+                          _buildInputCard("🐶", "Breed", userData.breed),
+                          _buildInputCard("🤕", "Symptoms", allSymptoms),
+                        ],
+                      ),
+                    ),
+                  ),
+),
+
+
+                // ✅ Proceed Button (Same Style & Position)
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.8, "Proceed", const RecommendationoneScreen(),1),
-              
+                  screenHeight * 1.02,
+                  screenWidth,
+                  0.85,
+                  "Proceed",
+                  const RecommendationoneScreen(),
+                  1,
+                ),
               ],
             ),
           if (_selectedIndex != 0)
@@ -161,20 +194,12 @@ class SummaryScreenState extends State<SummaryScreen> {
             ),
         ],
       ),
+      
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
@@ -183,6 +208,58 @@ class SummaryScreenState extends State<SummaryScreen> {
       ),
     );
   }
+
+  static const List<Widget> _pages = <Widget>[
+    Icon(Icons.home, size: 150),
+    Icon(Icons.person, size: 150),
+    Icon(Icons.settings, size: 150),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _buildInputCard(String emoji, String label, String value) {
+  return Card(
+    elevation: 3,
+    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
+        children: [
+          // Leading Icon & Text
+          Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          // **Trailing Icon (Example: Edit Icon)**
+          const Icon(Icons.check, color:  Color.fromARGB(255, 21, 180, 0)),
+        ],
+      ),
+    ),
+  );
+}
+
 
   // Method to create an animated button
   Widget buildAnimatedButton(double screenHeight, double screenWidth,

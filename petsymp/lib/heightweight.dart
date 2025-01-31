@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/breed.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
-
+import 'userdata.dart';
+import 'package:provider/provider.dart';
 class MeasureinputScreen extends StatefulWidget {
 const MeasureinputScreen({super.key});
   @override
@@ -53,18 +54,26 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
       throw Exception('Could not launch $url');
     }
   }
-
+  
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
+      final height = int.tryParse(_heightController.text);
+      final weight = int.tryParse(_weightController.text); 
+
+  if (height != null && weight != null ) {
+    Provider.of<UserData>(context, listen: false).setpetHeight(height);
+     Provider.of<UserData>(context, listen: false).setpetWeight(weight); 
       // Navigate only if the input is valid
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const  BreedScreen()),
       );
+    }
     }
   }
 
@@ -210,49 +219,49 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
-                          controller: _heightController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                          ],
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            
-
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: const BorderSide(
-                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
-                                  width: 2.0, // Thickness when not focused
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: const BorderSide(
-                                  color:  Color.fromRGBO(72, 38, 163, 1),// Border color when focused
-                                  width: 2.0, // Thickness when focused
-                                ),
-                              ),
-
-                            hintText: 'Enter pet height (cm)',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15.0,
-                              horizontal: 15.0,
+                        controller: _heightController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^[0-9]{0,2}$')), // ✅ Only allows max 2 digits
+                        ],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                              width: 2.0, // Thickness when not focused
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter height of the pet';
-                            }
-
-                            if (value.length !=2) {
-                              return 'Please enter 2 digit numbers only';
-                            }
-                            return null;
-                          },
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(72, 38, 163, 1), // Border color when focused
+                              width: 2.0, // Thickness when focused
+                            ),
+                          ),
+                          hintText: 'Enter pet height (cm)',
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15.0,
+                            horizontal: 15.0,
+                          ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter height of the pet';
+                          }
+
+                          // ✅ Ensure input is exactly 2 digits
+                          if (!RegExp(r'^\d{2}$').hasMatch(value)) {
+                            return 'Please enter exactly 2 digits (e.g., 12)';
+                          }
+
+                          return null;
+                        },
+                      ),
+
                       ],
                     ),
                   ),

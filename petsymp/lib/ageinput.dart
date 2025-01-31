@@ -137,7 +137,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                                   color: Colors.black, // Circle color
                                 ),
                                 child: Center(
-                                  child: Text(
+                                  child: Text( 
                                     "$value", // Display value inside the circle
                                     style: const TextStyle(
                                       fontSize: 18,

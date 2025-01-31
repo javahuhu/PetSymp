@@ -66,7 +66,11 @@ class ReportScreenState extends State<ReportScreen> {
                   top: screenHeight * 0.03,
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context); // ✅ Only pops if there's a previous route
+                    } 
+                  },
                     icon: const Icon(
                       Icons.arrow_back_sharp,
                       color: Color.fromRGBO(61, 47, 40, 1),
