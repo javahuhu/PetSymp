@@ -51,16 +51,7 @@ class SummaryScreenState extends State<SummaryScreen> {
             Stack(
               children: [
                 // 🦴 Bones Background Image - **Placed at the Bottom**
-                Positioned(
-                  top: screenHeight * 0.2, // Adjusted so it's below yellow background
-                  left: -screenWidth * 0.2,
-                  child: Image.asset(
-                    'assets/bonesbg.png',
-                    height: 700,
-                    width: 750,
-                    fit: BoxFit.fill,
-                  ),
-                ),
+                
 
                 // 🟡 Yellow Background - Positioned **Above the Bones**
                 Positioned(
@@ -69,9 +60,16 @@ class SummaryScreenState extends State<SummaryScreen> {
                   right: 0,
                   child: Container(
                     width: screenWidth,
-                    height: screenHeight * 0.25,
+                    height: screenHeight * 1.5,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFFFDB58),
+                       gradient: LinearGradient(
+              begin: Alignment.topCenter,  // Starts from top
+              end: Alignment.bottomCenter, // Ends at bottom
+              colors: [
+                Color.fromARGB(255, 235, 234, 233), // Light color (top)
+                 Color.fromRGBO(95, 93, 93, 1) // Darker shade (bottom)
+              ],
+            ),
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(100.0),
                         bottomRight: Radius.circular(100.0),
@@ -113,13 +111,24 @@ class SummaryScreenState extends State<SummaryScreen> {
                   ),
                 ),
 
+                Positioned(
+                  top: screenHeight * 0.2, // Adjusted so it's below yellow background
+                  left: -screenWidth * 0.2,
+                  child: Image.asset(
+                    'assets/bonesbg.png',
+                    height: 700,
+                    width: 750,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+
                 // ⚫ Username Box - Positioned Above the Bones
                 Positioned(
-                  top: screenHeight * 0.13,
-                  left: screenWidth * 0.12,
+                  top: screenHeight * 0.17,
+                  left: screenWidth * 0.25,
                   child: Container(
-                    width: screenWidth * 0.76,
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                    width: screenWidth * 0.5,
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                     decoration: BoxDecoration(
                       color: const Color.fromARGB(223, 255, 255, 255),
                       borderRadius: BorderRadius.circular(20),
@@ -135,7 +144,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                       child: Text(
                         userData.userName,
                         style: const TextStyle(
-                          fontSize: 35,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
                           color: Color.fromARGB(255, 0, 0, 0),
                         ),
@@ -145,17 +154,17 @@ class SummaryScreenState extends State<SummaryScreen> {
                 ),
 
                  Positioned(
-                  top: screenHeight * 0.25,
+                  top: screenHeight * 0.27,
                   left: screenWidth * 0.085,
                   child: Container(
                     width: 400,
                     height: screenHeight * 0.58,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(131, 255, 255, 255), // Set Background Color
-                      borderRadius: BorderRadius.circular(15), // Optional rounded corners
+                      color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
+                      borderRadius: BorderRadius.circular(25), // Optional rounded corners
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1), // Light shadow
+                          color: Colors.black.withOpacity(0.0), // Light shadow
                           blurRadius: 10,
                           spreadRadius: 2,
                         ),
@@ -165,7 +174,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                       padding: const EdgeInsets.all(10), // Add padding inside container
                       child: ListView(
                         children: [
-                          _buildInputCard("🎂", "Age", ""),
+                          _buildInputCard("🎂", "Age", userData.age.toString()),
                           _buildInputCard("📏", "Height", userData.height.toString()),
                           _buildInputCard("⚖️", "Weight", userData.weight.toString()),
                           _buildInputCard("🐶", "Breed", userData.breed),
@@ -179,7 +188,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
                 // ✅ Proceed Button (Same Style & Position)
                 buildAnimatedButton(
-                  screenHeight * 1.02,
+                  screenHeight * 1.0,
                   screenWidth,
                   0.85,
                   "Proceed",
@@ -245,7 +254,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                   ),
                   Text(
                     value,
-                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ],
               ),
@@ -296,13 +305,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                         return const Color.fromARGB(255, 255, 255, 255); // Default text color
                       },
                     ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Colors.black,
-                        width: 2.0,
-                      ),
-                    ),
+                   
                     shape: WidgetStateProperty.all(
                       const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(100)),

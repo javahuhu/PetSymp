@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/heightweight.dart';
-
+import 'userdata.dart';
+import 'package:provider/provider.dart';
 
 class AgeinputScreen extends StatefulWidget {
  
@@ -160,7 +161,8 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (value < 10) value++; // Increment value and move circle right
+                                if (value < 10) value++; 
+                                Provider.of<UserData>(context, listen: false).setpetAge(value);// Increment value and move circle right
                               });
                             },
                             child: const CircleAvatar(
@@ -177,7 +179,8 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (value > 0) value--; // Decrement value and move circle left
+                                if (value > 0) value--;
+                              Provider.of<UserData>(context, listen: false).setpetAge(value); // Decrement value and move circle left
                               });
                             },
                             child: const CircleAvatar(
