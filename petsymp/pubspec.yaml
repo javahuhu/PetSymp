@@ -86,6 +86,20 @@ flutter:
       - assets/goldenpet.png
       - assets/hidog.png
       - assets/bonesbg.png
+      - assets/profile.jpg
+      - assets/basicinfo.png
+      - assets/language.png
+      - assets/location.png
+      - assets/security.png
+      - assets/support.png
+      - assets/condition.png
+      - assets/editprofile.png
+      - assets/logout.png
+      - assets/arrowright.png
+      - assets/email1.png
+      - assets/phone.png
+      - assets/pawhistory.png
+      - assets/favourite.png
       
       
 

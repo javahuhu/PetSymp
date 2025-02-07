@@ -19,7 +19,7 @@ class HomePageScreenState extends State<HomePageScreen> {
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
     Icon(Icons.home, size: 150), // First page content
-    ProfileScreen(), // Second page content
+    Profilescreen(), // Second page content
     Icon(Icons.settings, size: 150), // Third page content
   ];
 

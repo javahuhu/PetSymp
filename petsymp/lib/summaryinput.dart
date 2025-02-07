@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/recommendationone.dart';
 import 'userdata.dart';
 import 'package:provider/provider.dart';
-
+import 'profile.dart';
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
 
@@ -33,6 +33,13 @@ class SummaryScreenState extends State<SummaryScreen> {
     });
   }
 
+  static const List<Widget> _pages = <Widget>[
+    Icon(Icons.home, size: 150),
+    Profilescreen(),
+    Icon(Icons.settings, size: 150),
+  ];
+
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -44,13 +51,13 @@ class SummaryScreenState extends State<SummaryScreen> {
   ].where((element) => element.isNotEmpty).join(" + ");
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color.fromARGB(255, 233, 233, 232),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
             Stack(
               children: [
-                // 🦴 Bones Background Image - **Placed at the Bottom**
+               
                 
 
                 // 🟡 Yellow Background - Positioned **Above the Bones**
@@ -75,39 +82,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                         bottomRight: Radius.circular(100.0),
                       ),
                     ),
-                    child: Stack(
-                      children: [
-                        // 🐾 Paw Image Inside Yellow Background
-                        Positioned(
-                          top: 40,
-                          left: screenWidth * 0.17,
-                          child: AnimatedOpacity(
-                            duration: const Duration(seconds: 1),
-                            opacity: _isAnimated ? 1.0 : 0.0,
-                            child: Container(
-                              width: screenWidth * 0.12,
-                              height: screenWidth * 0.12,
-                              decoration: const BoxDecoration(shape: BoxShape.circle),
-                              child: Image.asset('assets/paw.png', fit: BoxFit.contain),
-                            ),
-                          ),
-                        ),
-
-                        // 📌 "Summary of Input" Title Inside Yellow Background
-                        Positioned(
-                          top: 60,
-                          left: screenWidth * 0.35,
-                          child: const Text(
-                            "Summary of Input",
-                            style: TextStyle(
-                              fontSize: 27,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    
                   ),
                 ),
 
@@ -124,14 +99,17 @@ class SummaryScreenState extends State<SummaryScreen> {
 
                 // ⚫ Username Box - Positioned Above the Bones
                 Positioned(
-                  top: screenHeight * 0.17,
-                  left: screenWidth * 0.25,
+                  top: screenHeight * 0,
+                  left: screenWidth * -0.00,
                   child: Container(
-                    width: screenWidth * 0.5,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    height:screenHeight * 0.25,
+                    width: screenWidth * 1,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(223, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(20),
+                      color: const Color(0xFFFFDB58),
+                      borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(100),
+                    bottomRight: Radius.circular(100),
+                  ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.5),
@@ -140,21 +118,63 @@ class SummaryScreenState extends State<SummaryScreen> {
                         ),
                       ],
                     ),
-                    child: Center(
+                    child: Stack(
+                      children: [
+                        // 🐾 Paw Image Inside Yellow Background
+                        Positioned(
+                          top: screenHeight * 0.030,
+                          left: screenWidth * 0.17,
+                          child: AnimatedOpacity(
+                            duration: const Duration(seconds: 1),
+                            opacity: _isAnimated ? 1.0 : 0.0,
+                            child: Container(
+                              width: screenWidth * 0.12,
+                              height: screenWidth * 0.12,
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
+                              child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                            ),
+                          ),
+                        ),
+
+                        // 📌 "Summary of Input" Title Inside Yellow Background
+                        Positioned(
+                          top: 52,
+                          left: screenWidth * 0.33,
+                          child: const Text(
+                            "Summary of Input",
+                            style: TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                       Positioned(
+                        top: screenHeight * 0.13,
+                        left: screenWidth * 0.36,
+                        child: 
+                         Center(
                       child: Text(
                         userData.userName,
                         style: const TextStyle(
-                          fontSize: 30,
+                          fontSize: 35,
                           fontWeight: FontWeight.bold,
                           color: Color.fromARGB(255, 0, 0, 0),
                         ),
                       ),
+                    )),
+                      ],
                     ),
+                    
+                    
+                    
+                    
+                   
                   ),
                 ),
 
                  Positioned(
-                  top: screenHeight * 0.27,
+                  top: screenHeight * 0.28,
                   left: screenWidth * 0.085,
                   child: Container(
                     width: 400,
@@ -173,6 +193,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(10), // Add padding inside container
                       child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
                         children: [
                           _buildInputCard("🎂", "Age", userData.age.toString()),
                           _buildInputCard("📏", "Height", userData.height.toString()),
@@ -218,12 +239,7 @@ class SummaryScreenState extends State<SummaryScreen> {
     );
   }
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Icon(Icons.person, size: 150),
-    Icon(Icons.settings, size: 150),
-  ];
-
+  
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -232,7 +248,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   Widget _buildInputCard(String emoji, String label, String value) {
   return Card(
-    elevation: 3,
+    elevation: 30,
     margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     child: Padding(
