@@ -3,6 +3,7 @@ import 'package:petsymp/recommendationone.dart';
 import 'userdata.dart';
 import 'package:provider/provider.dart';
 import 'profile.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
 
@@ -13,6 +14,7 @@ class SummaryScreen extends StatefulWidget {
 class SummaryScreenState extends State<SummaryScreen> {
   bool _isAnimated = false;
   int _selectedIndex = 0;
+  bool isHovering = false;
 
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
@@ -173,43 +175,267 @@ class SummaryScreenState extends State<SummaryScreen> {
                   ),
                 ),
 
-                 Positioned(
-                  top: screenHeight * 0.28,
-                  left: screenWidth * 0.085,
+                Positioned(
+                top: screenHeight * 0.36, // Centers it vertically
+                left: screenWidth * 0.05 , // Centers it horizontally
+                child: InkWell(
                   child: Container(
-                    width: 400,
-                    height: screenHeight * 0.58,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
-                      borderRadius: BorderRadius.circular(25), // Optional rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.0), // Light shadow
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                    width: screenWidth * 0.43,
+                    height: screenHeight * 0.263,
+                    decoration:   const BoxDecoration(
+                      color:  Color.fromRGBO(61, 47, 40, 0.89),
+                       borderRadius:  BorderRadius.all(Radius.circular(10)),
+                       
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10), // Add padding inside container
-                      child: ListView(
-                        physics: const NeverScrollableScrollPhysics(),
+
+                    child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                    _buildInputCardclone("🎂", "Age", userData.age.toString()),
+                                    _buildInputCardclone("📏", "Height", userData.height.toString()),
+                                    _buildInputCardclone("⚖️", "Weight", userData.weight.toString()),
+                                    _buildInputCardclone("🐶", "Breed", userData.breed),
+                                    _buildInputCardclone("🤕", "Symptoms",allSymptoms),
+                              ],
+                            ), 
+                  ),
+                  onTap: () {
+                    showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: const Color.fromARGB(255, 243, 242, 240),
+                        contentPadding: EdgeInsets.zero, // Removes extra padding
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170), // Adjusts padding
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Rounded corners
+                        title: const Text('Input', textAlign: TextAlign.center, style: TextStyle(color:  Colors.black), ),
+                        content: SizedBox(
+                          width: screenWidth * 2, // 80% of screen width
+                          height: screenHeight * 0.55, // 50% of screen height
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0), // Internal padding
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                    _buildInputCard("🎂", "Age", userData.age.toString()),
+                                    _buildInputCard("📏", "Height", userData.height.toString()),
+                                    _buildInputCard("⚖️", "Weight", userData.weight.toString()),
+                                    _buildInputCard("🐶", "Breed", userData.breed),
+                                    _buildInputCard("🤕", "Symptoms", allSymptoms),
+                              ],
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("Close",style: TextStyle(color: Colors.black),),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  },
+
+                
+                  
+
+                
+                ),
+              ),
+
+
+
+               Positioned(
+                  top: screenHeight * 0.36, // Centers it vertically
+                  left: screenWidth * 0.5, // Centers it horizontally
+                  child: InkWell(
+                    child: Container(
+                      width: screenWidth * 0.43,
+                      height: screenHeight * 0.42,
+                      decoration: const BoxDecoration(
+                        color:  Color.fromRGBO(61, 47, 40, 0.89),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, 
                         children: [
-                          _buildInputCard("🎂", "Age", userData.age.toString()),
-                          _buildInputCard("📏", "Height", userData.height.toString()),
-                          _buildInputCard("⚖️", "Weight", userData.weight.toString()),
-                          _buildInputCard("🐶", "Breed", userData.breed),
-                          _buildInputCard("🤕", "Symptoms", allSymptoms),
+                          const Padding(padding: EdgeInsets.only(top: 30)),
+                          CircularPercentIndicator(
+                            radius: 45.0,
+                            lineWidth: 15.0,
+                            percent: 0.10,
+                            animation: true,
+                            center: const Text("10%", style: TextStyle(color: Colors.green),),
+                            progressColor: const Color.fromARGB(255, 36, 143, 26),
+                            footer: const Padding(
+                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
+                            child:  Text(
+                              "Vomiting",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                            ),
+                          ),
+                          ),
+                          SizedBox(height: screenHeight * 0.015), 
+
+                          CircularPercentIndicator(
+                            radius: 45.0,
+                            lineWidth: 15.0,
+                            percent: 0.30,
+                            animation: true,
+                            center: const Text("30%", style: TextStyle(color: Colors.orange),),
+                            progressColor: Colors.orange,
+                            footer: const Padding(
+                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
+                            child:  Text(
+                              "Lethargy",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                            ),
+                          ),
+                          ),
+                          SizedBox(height: screenHeight * 0.015), 
+
+                          CircularPercentIndicator(
+                            radius: 45.0,
+                            lineWidth: 15.0,
+                            percent: 0.90,
+                            animation: true,
+                            center: const Text("90%",style: TextStyle(color: Colors.red,),),
+                            progressColor: const Color.fromARGB(255, 214, 39, 16),
+                            footer: const Padding(
+                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
+                            child:  Text(
+                              "Acid",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                            ),
+                          ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
+                    onTap: () {
+                      showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: const Color.fromARGB(255, 243, 240, 240),
+                      contentPadding: EdgeInsets.zero, // Removes extra padding
+                      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170), // Adjusts padding
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Rounded corners
+                      title: const Text(
+                        'Symptoms Accuracy',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      content: Padding(
+                        padding: const EdgeInsets.only(top: 20), // ✅ Adds 10px top space
+                        child: CircularPercentIndicator(
+                          radius: 100.0,
+                          lineWidth: 20.0,
+                          animation: true,
+                          percent: 0.9,
+                          center: const Text(
+                            "90.0%",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                          ),
+                          footer: const Padding(
+                            padding:  EdgeInsets.only(top: 20), // ✅ Adds 10px space above footer
+                            child:  Text(
+                              "Acidic",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                            ),
+                          ),
+                          circularStrokeCap: CircularStrokeCap.round,
+                          progressColor: const Color.fromARGB(255, 214, 39, 16),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Close", style: TextStyle(color: Colors.black)),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+    },
+  ),
 ),
+
+
+
+
+Positioned(
+                top: screenHeight * 0.63, // Centers it vertically
+                left: screenWidth * 0.05 , // Centers it horizontally
+                child: InkWell(
+                  child: Container(
+                    width: screenWidth * 0.43,
+                    height: screenHeight * 0.15,
+                    decoration:   const BoxDecoration(
+                      color:  Color.fromRGBO(61, 47, 40, 0.89),
+                       borderRadius:  BorderRadius.all(Radius.circular(10)),
+                       
+                    ),
+
+                    
+                  ),
+                  onTap: () {
+                    showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: const Color.fromARGB(255, 243, 242, 240),
+                        contentPadding: EdgeInsets.zero, // Removes extra padding
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170), // Adjusts padding
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Rounded corners
+                        title: const Text('Input', textAlign: TextAlign.center, style: TextStyle(color:  Colors.black), ),
+                        content: SizedBox(
+                          width: screenWidth * 2, // 80% of screen width
+                          height: screenHeight * 0.55, // 50% of screen height
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0), // Internal padding
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                    _buildInputCard("🎂", "Age", userData.age.toString()),
+                                    _buildInputCard("📏", "Height", userData.height.toString()),
+                                    _buildInputCard("⚖️", "Weight", userData.weight.toString()),
+                                    _buildInputCard("🐶", "Breed", userData.breed),
+                                    _buildInputCard("🤕", "Symptoms", allSymptoms),
+                              ],
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("Close",style: TextStyle(color: Colors.black),),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  },
+
+                
+                  
+
+                
+                ),
+              ),
+
+
+
+                
 
 
                 // ✅ Proceed Button (Same Style & Position)
                 buildAnimatedButton(
-                  screenHeight * 1.0,
+                  screenHeight * 1.03,
                   screenWidth,
                   0.85,
                   "Proceed",
@@ -249,7 +475,7 @@ class SummaryScreenState extends State<SummaryScreen> {
   Widget _buildInputCard(String emoji, String label, String value) {
   return Card(
     elevation: 30,
-    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     child: Padding(
       padding: const EdgeInsets.all(16.0),
@@ -272,6 +498,47 @@ class SummaryScreenState extends State<SummaryScreen> {
                     value,
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
+                ],
+              ),
+            ],
+          ),
+          
+          // **Trailing Icon (Example: Edit Icon)**
+          const Icon(Icons.check, color:  Color.fromARGB(255, 21, 180, 0)),
+        ],
+      ),
+    ),
+  );
+}
+
+
+Widget _buildInputCardclone(String emoji, String label, String value) {
+  return Card(
+    elevation: 3,
+    margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    child: Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
+        children: [
+          // Leading Icon & Text
+          Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  
                 ],
               ),
             ],
