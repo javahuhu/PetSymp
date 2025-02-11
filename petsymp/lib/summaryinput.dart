@@ -89,15 +89,114 @@ class SummaryScreenState extends State<SummaryScreen> {
                 ),
 
                 Positioned(
-                  top: screenHeight * 0.2, // Adjusted so it's below yellow background
+                  top: -screenHeight * 0.15, // Adjusted so it's below yellow background
                   left: -screenWidth * 0.2,
                   child: Image.asset(
                     'assets/bonesbg.png',
                     height: 700,
                     width: 750,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+
+                 Positioned(
+                  top: screenHeight * 0.3, // Adjusted so it's below yellow background
+                  left: -screenWidth * 0.15,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ), 
+
+                Positioned(
+                  top: screenHeight * 0.5, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.1,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ), 
+
+                Positioned(
+                  top: screenHeight * 0.65, // Adjusted so it's below yellow background
+                  left: -screenWidth * 0.06,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
                     fit: BoxFit.fill,
                   ),
                 ),
+
+                Positioned(
+                  top: screenHeight * 0.6, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.6,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+
+                Positioned(
+                  top: screenHeight * 0.73, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.3,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+
+                Positioned(
+                  top: screenHeight * 0.87, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.1,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+
+                Positioned(
+                  top: screenHeight * 0.8, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.8,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+
+                Positioned(
+                  top: screenHeight * 0.4, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.35,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ), 
+
+                Positioned(
+                  top: screenHeight * 0.45, // Adjusted so it's below yellow background
+                  left: screenWidth * 0.73,
+                  child: Image.asset(
+                    'assets/floatball.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.fill,
+                  ),
+                ), 
 
                 // ⚫ Username Box - Positioned Above the Bones
                 Positioned(
@@ -106,32 +205,26 @@ class SummaryScreenState extends State<SummaryScreen> {
                   child: Container(
                     height:screenHeight * 0.25,
                     width: screenWidth * 1,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFDB58),
-                      borderRadius: const BorderRadius.only(
+                    decoration: const BoxDecoration(
+                      color:  Color.fromARGB(0, 255, 219, 88),
+                      borderRadius:  BorderRadius.only(
                     bottomLeft: Radius.circular(100),
                     bottomRight: Radius.circular(100),
                   ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 25,
-                          offset: const Offset(0, 20),
-                        ),
-                      ],
+                     
                     ),
                     child: Stack(
                       children: [
                         // 🐾 Paw Image Inside Yellow Background
                         Positioned(
-                          top: screenHeight * 0.030,
-                          left: screenWidth * 0.17,
+                          top: screenHeight * 0.08,
+                          left: screenWidth * 0.41,
                           child: AnimatedOpacity(
                             duration: const Duration(seconds: 1),
                             opacity: _isAnimated ? 1.0 : 0.0,
                             child: Container(
-                              width: screenWidth * 0.12,
-                              height: screenWidth * 0.12,
+                              width: screenWidth * 0.2,
+                              height: screenWidth * 0.2,
                               decoration: const BoxDecoration(shape: BoxShape.circle),
                               child: Image.asset('assets/paw.png', fit: BoxFit.contain),
                             ),
@@ -140,31 +233,18 @@ class SummaryScreenState extends State<SummaryScreen> {
 
                         // 📌 "Summary of Input" Title Inside Yellow Background
                         Positioned(
-                          top: 52,
-                          left: screenWidth * 0.33,
+                          top: screenHeight * 0.2,
+                          left: screenWidth * 0.385,
                           child: const Text(
-                            "Summary of Input",
+                            "Results",
                             style: TextStyle(
-                              fontSize: 27,
+                              fontSize: 35,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
                         ),
-                       Positioned(
-                        top: screenHeight * 0.13,
-                        left: screenWidth * 0.36,
-                        child: 
-                         Center(
-                      child: Text(
-                        userData.userName,
-                        style: const TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
-                    )),
+                       
                       ],
                     ),
                     
@@ -177,13 +257,13 @@ class SummaryScreenState extends State<SummaryScreen> {
 
                 Positioned(
                 top: screenHeight * 0.36, // Centers it vertically
-                left: screenWidth * 0.05 , // Centers it horizontally
+                left: screenWidth * 0.06 , // Centers it horizontally
                 child: InkWell(
                   child: Container(
                     width: screenWidth * 0.43,
-                    height: screenHeight * 0.263,
+                    height: screenHeight * 0.248,
                     decoration:   const BoxDecoration(
-                      color:  Color.fromRGBO(61, 47, 40, 0.89),
+                      color:   Color.fromRGBO(0, 0, 0, 0.904),
                        borderRadius:  BorderRadius.all(Radius.circular(10)),
                        
                     ),
@@ -249,13 +329,13 @@ class SummaryScreenState extends State<SummaryScreen> {
 
                Positioned(
                   top: screenHeight * 0.36, // Centers it vertically
-                  left: screenWidth * 0.5, // Centers it horizontally
+                  left: screenWidth * 0.515, // Centers it horizontally
                   child: InkWell(
                     child: Container(
                       width: screenWidth * 0.43,
                       height: screenHeight * 0.42,
                       decoration: const BoxDecoration(
-                        color:  Color.fromRGBO(61, 47, 40, 0.89),
+                        color:   Color.fromRGBO(0, 0, 0, 0.904),
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       child: Column(
@@ -273,7 +353,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                             padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
                             child:  Text(
                               "Vomiting",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
                             ),
                           ),
                           ),
@@ -290,7 +370,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                             padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
                             child:  Text(
                               "Lethargy",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
                             ),
                           ),
                           ),
@@ -307,7 +387,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                             padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
                             child:  Text(
                               "Acid",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.0, color: Colors.white),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
                             ),
                           ),
                           ),
@@ -337,7 +417,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                           percent: 0.9,
                           center: const Text(
                             "90.0%",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0),
                           ),
                           footer: const Padding(
                             padding:  EdgeInsets.only(top: 20), // ✅ Adds 10px space above footer
@@ -368,14 +448,14 @@ class SummaryScreenState extends State<SummaryScreen> {
 
 
 Positioned(
-                top: screenHeight * 0.63, // Centers it vertically
-                left: screenWidth * 0.05 , // Centers it horizontally
+                top: screenHeight * 0.615, // Centers it vertically
+                left: screenWidth * 0.06 , // Centers it horizontally
                 child: InkWell(
                   child: Container(
                     width: screenWidth * 0.43,
-                    height: screenHeight * 0.15,
+                    height: screenHeight * 0.165,
                     decoration:   const BoxDecoration(
-                      color:  Color.fromRGBO(61, 47, 40, 0.89),
+                      color:   Color.fromRGBO(0, 0, 0, 0.904),
                        borderRadius:  BorderRadius.all(Radius.circular(10)),
                        
                     ),
@@ -387,7 +467,7 @@ Positioned(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        backgroundColor: const Color.fromARGB(255, 243, 242, 240),
+                        backgroundColor: const Color.fromRGBO(255, 255, 255, 0.945),
                         contentPadding: EdgeInsets.zero, // Removes extra padding
                         insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170), // Adjusts padding
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Rounded corners
@@ -402,9 +482,7 @@ Positioned(
                               children: [
                                     _buildInputCard("🎂", "Age", userData.age.toString()),
                                     _buildInputCard("📏", "Height", userData.height.toString()),
-                                    _buildInputCard("⚖️", "Weight", userData.weight.toString()),
-                                    _buildInputCard("🐶", "Breed", userData.breed),
-                                    _buildInputCard("🤕", "Symptoms", allSymptoms),
+                                    
                               ],
                             ),
                           ),
@@ -486,8 +564,8 @@ Positioned(
           Row(
             children: [
               Text(emoji, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 15),
-              Column(
+    const SizedBox(width: 15),
+              Column(          
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -522,7 +600,7 @@ Widget _buildInputCardclone(String emoji, String label, String value) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
         children: [
-          // Leading Icon & Text
+          
           Row(
             children: [
               Text(emoji, style: const TextStyle(fontSize: 16)),
@@ -536,7 +614,7 @@ Widget _buildInputCardclone(String emoji, String label, String value) {
                   ),
                   Text(
                     value,
-                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: const TextStyle(fontSize: 7, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                   
                 ],

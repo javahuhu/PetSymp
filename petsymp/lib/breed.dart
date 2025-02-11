@@ -185,6 +185,10 @@ class BreedScreenState extends State<BreedScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the breed of pet';
                               }
+
+                              if (value.length > 20){
+                                return 'Please Enter less than 20 characters';
+                              }
                               return null;
                             },
                           ),
