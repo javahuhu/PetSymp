@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/getstarted.dart';
 import 'package:petsymp/signup.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'progress.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -225,35 +225,33 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                      SizedBox(height: screenHeight * 0.05),
                     // Login button
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                         Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const GetstartedScreen(),
-                    ),
-                    );
-
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProgressScreen(
+                              username: _usernameController.text,
+                              password: _passwordController.text,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      child: const Text(
-                        "Log In",
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      
+                      fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
                     ),
+                    child: const Text(
+                      "Log In",
+                      style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
                     Row( children: [
                       SizedBox(height: screenHeight * 0.04, width: screenWidth * 0.0),
                     TextButton(

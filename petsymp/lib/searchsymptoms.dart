@@ -46,10 +46,11 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFCFCFCC),
       body: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: 10),
         child: Column(
           children: [
             SizedBox(
-              height: screenHeight + 25,
+              height: screenHeight + 35,
               width: screenWidth,
               child: Stack(
                 children: [
@@ -128,6 +129,18 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                     ),
                     Positioned(
                       top: screenHeight * 0.65,
+                      left: screenWidth * 0.05,
+                      right: screenWidth * 0.05,
+                      child: buildSymptomsContainer(
+                        screenWidth,
+                        "Low Energy",
+                        ["Less attentive to stimuli such as food, toys,", "or your own voice."],
+                        context,
+                      ),
+                    ),
+
+                    Positioned(
+                      top: screenHeight * 0.85,
                       left: screenWidth * 0.05,
                       right: screenWidth * 0.05,
                       child: buildSymptomsContainer(

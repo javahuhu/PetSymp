@@ -17,17 +17,29 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _triggerAnimation();
+  }
+
+  void _triggerAnimation() {
+    setState(() {
+      _isAnimated = false;
+      _buttonVisible.fillRange(0, _buttonVisible.length, false);
+    });
+
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
       });
+
       for (int i = 0; i < _buttonVisible.length; i++) {
         Future.delayed(Duration(milliseconds: 300 * i), () {
-          setState(() {
-            _buttonVisible[i] = true;
-          });
+          if (mounted) {
+            setState(() {
+              _buttonVisible[i] = true;
+            });
+          }
         });
       }
     });
@@ -47,52 +59,38 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
 
   final List<ListItem> items = [
     const ListItem(
-        title: 'Go to 1',
+        title: 'Provide Medicine for Lethargy',
+        subtitle: 'techniques on how can dog drink a vitamins quickly',
         route: HomePageScreen(),
         isExternal: false,
-        imageUrl: 'assets/pethiscatttt.jpg'),
+        imageUrl: 'assets/youtube1.jpg'),
     const ListItem(
-        title: 'Go to 2',
+        title: 'How to Easily Give Your Pet Medicine Without Stress!',
+         subtitle: "Learn simple and stress-free techniques to give your pet medicine, whether it's a pill, liquid, or injection, ensuring their health and comfort",
         route: Profilescreen(),
         isExternal: false,
-        imageUrl: 'assets/catanddog.jpg'),
+        imageUrl: 'assets/youtube1.jpg'),
     const ListItem(
-        title: 'Open YouTube',
-        url: 'https://www.youtube.com/results?search_query=how+to+make+a+list+with+images+beside+at+flutter',
+        title: 'ricks to Give Your Pet Medicine Without a Fight!',
+         subtitle: 'Discover easy and effective ways to give your pet medicine without stress, making it a smooth experience for both of you.',
+        url: 'https://www.youtube.com/results?search_query=flutter+list+with+images',
         isExternal: true,
-        imageUrl: 'assets/dogshock.png'),
+        imageUrl: 'assets/youtube1.jpg'),
+
 
     const ListItem(
-        title: 'Go to 3',
+        title: 'How to Hide Medicine in Treats for Your Pet!',
+        subtitle: 'Learn sneaky yet safe ways to hide pills in treats and food so your pet takes their medicine without even noticing.',
         route: HomePageScreen(),
         isExternal: false,
-        imageUrl: 'assets/pethiscatttt.jpg'),
+        imageUrl: 'assets/youtube1.jpg'),
     const ListItem(
-        title: 'Go to 4',
+        title: 'The Right Way to Give Your Pet Liquid Medicine!',
+         subtitle: "Master the best techniques to give your pet liquid medicine without mess or resistance.",
         route: Profilescreen(),
         isExternal: false,
-        imageUrl: 'assets/catanddog.jpg'),
-    const ListItem(
-        title: 'Open YouTube',
-        url: 'https://www.youtube.com/results?search_query=how+to+make+a+list+with+images+beside+at+flutter',
-        isExternal: true,
-        imageUrl: 'assets/dogshock.png'),
-
-    const ListItem(
-        title: 'Go to 5',
-        route: HomePageScreen(),
-        isExternal: false,
-        imageUrl: 'assets/pethiscatttt.jpg'),
-    const ListItem(
-        title: 'Go to 6',
-        route: Profilescreen(),
-        isExternal: false,
-        imageUrl: 'assets/catanddog.jpg'),
-    const ListItem(
-        title: 'Open YouTube',
-        url: 'https://www.youtube.com/results?search_query=how+to+make+a+list+with+images+beside+at+flutter',
-        isExternal: true,
-        imageUrl: 'assets/dogshock.png'),
+        imageUrl: 'assets/youtube1.jpg'),
+    
   ];
 
   @override
@@ -112,10 +110,6 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      setState(() {
-                        _isAnimated = false;
-                        _buttonVisible.fillRange(0, _buttonVisible.length, false);
-                      });
                       Navigator.of(context).pop();
                     },
                     icon: const Icon(
@@ -133,7 +127,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
-                  top: _isAnimated ? screenHeight * 0.13 : -100,
+                  top: _isAnimated ? screenHeight * 0.09 : -100,
                   left: screenWidth * 0.1,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -162,30 +156,24 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.2,
+                  top: screenHeight * 0.17,
                   left: screenWidth * 0.03,
                   child: SizedBox(
                     width: screenWidth * 0.95,
-                    height: screenHeight * 0.68,
+                    height: screenHeight * 0.64,
                     child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0),
+                          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white, // Background color for each tile
+                              color: const Color.fromARGB(0, 255, 255, 255), // Background color for each tile
                               borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 5,
-                                  offset: const Offset(2, 2),
-                                ),
-                              ],
                             ),
                             child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
+                              contentPadding: const EdgeInsets.all(5),
                               leading: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.asset(
@@ -197,8 +185,15 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                               ),
                               title: Text(
                                 items[index].title,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                               ),
+
+                              subtitle: Text(
+                                items[index].subtitle,
+                                style: const TextStyle(fontWeight: FontWeight.normal),
+                              ),
+
+                              
                               onTap: () async {
                                 if (items[index].isExternal) {
                                   await _launchURL(items[index].url!);
@@ -217,7 +212,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                   ),
                 ),
                 buildAnimatedButton(
-                  screenHeight * 1.105, screenWidth, 0.8, "Proceed", const RecommendationtwoScreen(), 1,
+                  screenHeight * 1.07, screenWidth, 0.8, "Proceed", const RecommendationtwoScreen(), 1,
                 ),
               ],
             ),
@@ -250,9 +245,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
       left: screenWidth * 0.45 - 50,
       child: ElevatedButton(
         onPressed: () {
-          setState(() {
-            _isAnimated = false;
-          });
+         
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => destination),
@@ -301,7 +294,6 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
       ),
     );
   }
-
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -310,8 +302,10 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
   }
 }
 
+
 class ListItem {
   final String title;
+  final String subtitle;
   final Widget? route;
   final String? url;
   final bool isExternal;
@@ -323,5 +317,6 @@ class ListItem {
     this.url,
     required this.isExternal,
     required this.imageUrl,
+    required this.subtitle,
   });
 }

@@ -593,7 +593,7 @@ Positioned(
 Widget _buildInputCardclone(String emoji, String label, String value) {
   return Card(
     elevation: 3,
-    margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+    margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 25),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     child: Padding(
       padding: const EdgeInsets.all(5.0),
