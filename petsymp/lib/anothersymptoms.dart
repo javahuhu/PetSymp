@@ -56,7 +56,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
@@ -116,7 +116,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       Text(
@@ -124,7 +124,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       SizedBox(height: 50),
@@ -161,9 +161,10 @@ class AnothersympScreenState extends State<AnothersympScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
         onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }
@@ -200,13 +201,13 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
                         }
-                        return Colors.black; // Default text color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
                     side: WidgetStateProperty.all(
                       const BorderSide(
-                        color: Colors.black,
+                        color: Color.fromRGBO(82, 170, 164, 1),
                         width: 2.0,
                       ),
                     ),

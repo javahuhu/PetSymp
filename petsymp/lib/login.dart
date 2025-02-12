@@ -58,7 +58,7 @@ class LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 35.0,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 0, 0, 0),
+                    color: Color.fromRGBO(29, 29, 44, 1.0),
                   ),
                 ),
               ),
@@ -74,10 +74,10 @@ class LoginScreenState extends State<LoginScreen> {
                           );
                   } ,// Validation is handled here
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:  const Color.fromARGB(255, 0, 0, 0),  
+                    backgroundColor:  const Color.fromRGBO(66, 134, 130, 1.0),  
                     foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(50),
                       
                     ),
                     fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
@@ -103,10 +103,10 @@ class LoginScreenState extends State<LoginScreen> {
                       );
                   } ,// Validation is handled here
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:  const Color.fromARGB(255, 0, 0, 0),
+                    backgroundColor:  const Color.fromRGBO(66, 134, 130, 1.0),
                     foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(50),
                     ),
                     fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
                   ),

@@ -99,7 +99,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
@@ -149,6 +149,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                           style: TextStyle(
                             fontSize: 27,
                             fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(29, 29, 44, 1.0),
                           ),
                         ),
                       ),
@@ -185,12 +186,12 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                               ),
                               title: Text(
                                 items[index].title,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20 ,color: Color.fromRGBO(66, 134, 130, 1.0)),
                               ),
 
                               subtitle: Text(
                                 items[index].subtitle,
-                                style: const TextStyle(fontWeight: FontWeight.normal),
+                                style: const TextStyle(fontWeight: FontWeight.normal, color: Color.fromRGBO(29, 29, 44, 1.0)),
                               ),
 
                               
@@ -257,7 +258,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
               if (states.contains(WidgetState.pressed)) {
                 return const Color.fromARGB(255, 255, 255, 255);
               }
-              return const Color.fromRGBO(61, 47, 40, 1);
+              return const Color.fromRGBO(29, 29, 44, 1.0);
             },
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
@@ -271,7 +272,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
           shadowColor: WidgetStateProperty.all(Colors.transparent),
           side: WidgetStateProperty.all(
             const BorderSide(
-              color: Colors.black,
+              color: Color.fromRGBO(82, 170, 164, 0),
               width: 2.0,
             ),
           ),

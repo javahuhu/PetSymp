@@ -92,7 +92,7 @@ class QoneScreenState extends State<QoneScreen> {
     final questions = userData.questions;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
@@ -152,7 +152,7 @@ class QoneScreenState extends State<QoneScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -163,7 +163,7 @@ class QoneScreenState extends State<QoneScreen> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       const SizedBox(height: 50),
@@ -197,9 +197,10 @@ class QoneScreenState extends State<QoneScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
         onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }
@@ -228,13 +229,14 @@ class QoneScreenState extends State<QoneScreen> {
               if (states.contains(WidgetState.pressed)) {
                 return const Color.fromARGB(255, 255, 255, 255);
               }
-              return Colors.black;
+              return const Color.fromRGBO(29, 29, 44, 1.0)
+;
             },
           ),
           shadowColor: WidgetStateProperty.all(Colors.transparent),
           side: WidgetStateProperty.all(
             const BorderSide(
-              color: Colors.black,
+              color: Color.fromRGBO(82, 170, 164, 1),
               width: 2.0,
             ),
           ),

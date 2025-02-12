@@ -48,7 +48,7 @@ class HomePageScreenState extends State<HomePageScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-       backgroundColor: const Color(0xFFCFCFCC),
+       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           // Circular Image and Texts
@@ -83,7 +83,8 @@ class HomePageScreenState extends State<HomePageScreen> {
                           "Hi, I’m Etsy",
                           style: TextStyle(
                             fontSize: 27, // Fixed font size for readability
-                            fontWeight: FontWeight.bold, // Make the text bold
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(29, 29, 44, 1.0) // Make the text bold
                           ),
                         ),
                       ),
@@ -97,13 +98,13 @@ class HomePageScreenState extends State<HomePageScreen> {
                     style: TextStyle(
                       fontSize: 22, // Adjust font size
                       fontWeight: FontWeight.normal,
-                      color: Colors.black, // Normal font weight for description
+                      color: Color.fromRGBO(29, 29, 44, 1.0), // Normal font weight for description
                     ),
                   ),
                   const Text(
                     "health issues.",
                     style: TextStyle(
-                      color: Colors.black, // Text color
+                      color: Color.fromRGBO(29, 29, 44, 1.0), // Text color
                       fontSize: 22, // Adjust font size
                       fontWeight: FontWeight.bold, // Normal font weight for description
                     ),
@@ -122,7 +123,7 @@ class HomePageScreenState extends State<HomePageScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3D2F28),
+                          backgroundColor: const Color(0xFF428682),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100),
@@ -191,7 +192,7 @@ class HomePageScreenState extends State<HomePageScreen> {
           ),
         ],
         currentIndex: _selectedIndex, // Highlights the selected tab
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1), // Highlight color for the selected item
+        selectedItemColor: const Color.fromRGBO(29, 29, 44, 1.0), // Highlight color for the selected item
         unselectedItemColor: Colors.grey, // Unselected tab color
         onTap: _onItemTapped, // Handles tab selection
       ),

@@ -47,7 +47,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           // Custom Background with Chubby Curves
@@ -161,7 +161,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3D2F28),
+                        backgroundColor: const Color(0xFF1D1D2C),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
@@ -217,7 +217,7 @@ class CurvedBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = const Color(0xFF3D2F28) // Brownish color
+      ..color = const Color(0xFF1D1D2C)
       ..style = PaintingStyle.fill;
 
     // Bottom-Left Chubby Curve

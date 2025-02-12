@@ -57,7 +57,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       //backgroundColor: const Color.fromARGB(255, 173, 173, 80),
-      backgroundColor: const Color(0xFFFFDB58),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
 
@@ -86,7 +86,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               width: screenWidth,
               height: screenHeight * 0.5,
               decoration: const BoxDecoration(
-                color: Color.fromRGBO(255, 255, 255, 1),
+                color: Color.fromRGBO(29, 29, 44, 1.0),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
@@ -124,14 +124,14 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
                               borderSide: const BorderSide(
-                                color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                color: Color.fromARGB(255, 255, 255, 255), // Border color when not focused
                                 width: 2.0, // Thickness when not focused
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12.0),
                               borderSide: const BorderSide(
-                                color: Color.fromRGBO(61, 47, 40, 1), // Border color when focused
+                                color:  Color.fromRGBO(82, 170, 164, 1), // Border color when focused
                                 width: 3.0, // Thickness when focused
                               ),
                             ),
@@ -180,14 +180,14 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                                 borderSide: const BorderSide(
-                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                  color:  Color.fromRGBO(255, 255, 255, 1), // Border color when not focused
                                   width: 2.0, // Thickness when not focused
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                                 borderSide: const BorderSide(
-                                  color:  Color.fromRGBO(61, 47, 40, 1),// Border color when focused
+                                  color:  Color.fromRGBO(82, 170, 164, 1),// Border color when focused
                                   width: 3.0, // Thickness when focused
                                 ),
                               ),
@@ -239,7 +239,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
                       foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -263,7 +263,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                     },
                     child: const Text(
                       "Sign Up",
-                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(61, 47, 40, 1),),
+                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1),),
                     ),
                   ),
 
@@ -274,7 +274,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                     },
                     child: const Text(
                       "Recovery Password",
-                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(61, 47, 40, 1),),
+                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1),),
                     ),
                   ),
 
@@ -288,7 +288,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                 children: [
                   Expanded(
                     child: Divider(
-                      color: Colors.black,
+                      color: const Color.fromRGBO(82, 170, 164, 1),
                       thickness: 2,
                       indent: screenWidth * 0.05,
                       endIndent: screenWidth * 0.02,
@@ -299,13 +299,13 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color:  Color.fromRGBO(82, 170, 164, 1),
                       letterSpacing: 1.0,
                     ),
                   ),
                   Expanded(
                     child: Divider(
-                      color: Colors.black,
+                      color: const Color.fromRGBO(82, 170, 164, 1),
                       thickness: 2,
                       indent: screenWidth * 0.02,
                       endIndent: screenWidth * 0.05,

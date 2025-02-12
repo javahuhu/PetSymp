@@ -50,7 +50,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
  // Avoid empty strings
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -104,6 +104,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(29, 29, 44, 1.0),
                               ),
                             ),
                           ),
@@ -172,9 +173,10 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
         onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }
@@ -184,7 +186,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 250, 249, 249),
+        color: const Color.fromRGBO(29, 29, 44, 1.0),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
@@ -202,7 +204,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Color.fromARGB(255, 255, 255, 255),
             ),
           ),
           const SizedBox(height: 8),
@@ -211,7 +213,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
               detail,
               style: const TextStyle(
                 fontSize: 18,
-                color: Colors.black,
+                color: Color.fromRGBO(210, 216, 216, 1),
               ),
             ),
           const SizedBox(height: 16),
@@ -228,7 +230,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 backgroundColor: WidgetStateProperty.resolveWith(
                   (states) {
                     if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromARGB(255, 0, 0, 0);
+                      return const Color.fromRGBO(66, 134, 130, 1.0);
                     }
                     return Colors.transparent;
                   },
@@ -238,13 +240,13 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                     if (states.contains(WidgetState.pressed)) {
                       return const Color.fromARGB(255, 255, 255, 255);
                     }
-                    return Colors.black;
+                    return const Color.fromARGB(255, 255, 255, 255);
                   },
                 ),
                 shadowColor: WidgetStateProperty.all(Colors.transparent),
                 side: WidgetStateProperty.all(
                   const BorderSide(
-                    color: Colors.black,
+                    color: Color.fromRGBO(82, 170, 164, 1),
                     width: 2.0,
                   ),
                 ),

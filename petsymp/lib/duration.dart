@@ -53,7 +53,7 @@ class DurationScreenState extends State<DurationScreen> {
   
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
@@ -113,7 +113,7 @@ class DurationScreenState extends State<DurationScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       Text(
@@ -121,7 +121,7 @@ class DurationScreenState extends State<DurationScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       SizedBox(height: 50),
@@ -207,13 +207,13 @@ class DurationScreenState extends State<DurationScreen> {
               if (states.contains(WidgetState.pressed)) {
                 return const Color.fromARGB(255, 255, 255, 255);
               }
-              return Colors.black;
+              return const Color.fromRGBO(29, 29, 44, 1.0);
             },
           ),
           shadowColor: WidgetStateProperty.all(Colors.transparent),
           side: WidgetStateProperty.all(
             const BorderSide(
-              color: Colors.black,
+              color: Color.fromRGBO(82, 170, 164, 1),
               width: 2.0,
             ),
           ),

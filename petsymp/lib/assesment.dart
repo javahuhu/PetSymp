@@ -81,7 +81,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0) // Show this layout only on the first tab
@@ -121,13 +121,13 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       const Text(
                         "input your USERNAME first.",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
@@ -151,7 +151,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                                 borderSide: const BorderSide(
-                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  color: Color.fromRGBO(66, 134, 130, 1.0),
                                   width: 2.0,
                                 ),
                               ),
@@ -192,7 +192,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                   child: ElevatedButton(
                     onPressed: () => navigateToNextPage(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100),
@@ -233,9 +233,10 @@ class AssesmentScreenState extends State<AssesmentScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
         onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }

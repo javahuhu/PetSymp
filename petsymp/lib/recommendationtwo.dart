@@ -70,7 +70,7 @@ class RecommendationtwoScreenState extends State<RecommendationtwoScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           Stack(
@@ -122,6 +122,7 @@ class RecommendationtwoScreenState extends State<RecommendationtwoScreen> {
                         style: TextStyle(
                           fontSize: 27,
                           fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                     ),
@@ -140,7 +141,7 @@ class RecommendationtwoScreenState extends State<RecommendationtwoScreen> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
                       ),
                     ),
                     SizedBox(height: 50),
@@ -205,7 +206,7 @@ class RecommendationtwoScreenState extends State<RecommendationtwoScreen> {
           });
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromRGBO(61, 47, 40, 1),
+          backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
           ),

@@ -65,7 +65,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFDB58),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack( 
         children: [
       Center(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:petsymp/profile.dart';
 import 'package:petsymp/symptoms.dart';
 
 // Custom TextInputFormatter to capitalize only the first letter
@@ -62,7 +63,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
   // Pages corresponding to each tab
   static const List<Widget> _pages = <Widget>[
     Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
+    Profilescreen(), // Second page content
     Icon(Icons.settings, size: 150), // Third page content
   ];
 
@@ -79,7 +80,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFCFCFCC),
+      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           if (_selectedIndex == 0)
@@ -136,7 +137,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
                       
@@ -161,7 +162,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0),
                                 borderSide: const BorderSide(
-                                  color: Color.fromARGB(255, 0, 0, 0), // Border color when not focused
+                                  color: Color.fromRGBO(82, 170, 164, 1), // Border color when not focused
                                   width: 2.0, // Thickness when not focused
                                 ),
                               ),
@@ -214,13 +215,13 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
                         }
-                        return Colors.black; // Default text color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
                     side: WidgetStateProperty.all(
                       const BorderSide(
-                        color: Colors.black,
+                        color: Color.fromRGBO(82, 170, 164, 1),
                         width: 2.0,
                       ),
                     ),
@@ -266,9 +267,10 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromARGB(255, 108, 223, 215),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
         onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }

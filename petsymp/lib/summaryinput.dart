@@ -75,7 +75,7 @@ class SummaryScreenState extends State<SummaryScreen> {
               begin: Alignment.topCenter,  // Starts from top
               end: Alignment.bottomCenter, // Ends at bottom
               colors: [
-                Color.fromARGB(255, 235, 234, 233), // Light color (top)
+                Color.fromRGBO(232, 242, 245, 1.0), // Light color (top)
                  Color.fromRGBO(95, 93, 93, 1) // Darker shade (bottom)
               ],
             ),
@@ -240,7 +240,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                             style: TextStyle(
                               fontSize: 35,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Color.fromRGBO(29, 29, 44, 1.0),
                             ),
                           ),
                         ),
@@ -263,7 +263,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                     width: screenWidth * 0.43,
                     height: screenHeight * 0.248,
                     decoration:   const BoxDecoration(
-                      color:   Color.fromRGBO(0, 0, 0, 0.904),
+                      color:   Color.fromRGBO(29, 29, 44, 0.89),
                        borderRadius:  BorderRadius.all(Radius.circular(10)),
                        
                     ),
@@ -335,7 +335,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                       width: screenWidth * 0.43,
                       height: screenHeight * 0.42,
                       decoration: const BoxDecoration(
-                        color:   Color.fromRGBO(0, 0, 0, 0.904),
+                        color:   Color.fromRGBO(29, 29, 44, 0.897),
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       child: Column(
@@ -455,7 +455,7 @@ Positioned(
                     width: screenWidth * 0.43,
                     height: screenHeight * 0.165,
                     decoration:   const BoxDecoration(
-                      color:   Color.fromRGBO(0, 0, 0, 0.904),
+                      color:   Color.fromRGBO(29, 29, 44, 0.911),
                        borderRadius:  BorderRadius.all(Radius.circular(10)),
                        
                     ),
@@ -654,7 +654,7 @@ Widget _buildInputCardclone(String emoji, String label, String value) {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Background color when pressed
                         }
-                        return const Color.fromRGBO(61, 47, 40, 1); // Default background color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default background color
                       },
                     ),
                     // Dynamic text color based on button state
