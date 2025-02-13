@@ -191,10 +191,11 @@ class HomePageScreenState extends State<HomePageScreen> {
             label: 'Settings',
           ),
         ],
-        currentIndex: _selectedIndex, // Highlights the selected tab
-        selectedItemColor: const Color.fromRGBO(29, 29, 44, 1.0), // Highlight color for the selected item
-        unselectedItemColor: Colors.grey, // Unselected tab color
-        onTap: _onItemTapped, // Handles tab selection
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
+        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
+        onTap: _onItemTapped,
+        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
     );
   }

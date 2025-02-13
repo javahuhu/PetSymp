@@ -61,22 +61,20 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
       body: Stack(
         children: [
 
-           
-          
           // Logo at the top
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: EdgeInsets.only(top: screenHeight * 0.00),
-                child: Center(
-                  child: Image.asset(
-                    'assets/logo.png',
-                    width: screenWidth * 0.6,
-                    height: screenHeight * 0.3,
-                  ),
+              Transform.translate(
+              offset: Offset(0, -screenHeight * 0.035), // Moves up but prevents cutting
+              child: Center(
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: screenWidth * 0.6,
+                  height: screenHeight * 0.3,
                 ),
               ),
+            ),
             ],
           ),
           // Rounded container for input fields and button
@@ -94,7 +92,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               ),
               child: Padding(
               padding: EdgeInsets.only(
-                top: screenHeight * 0.046, // Add more space at the top
+                top: screenHeight * 0.03, // Add more space at the top
                 left: screenWidth * 0.08,
                 right: screenWidth * 0.08,
                 bottom: screenHeight * 0.00, // Maintain bottom padding
@@ -251,34 +249,37 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                       style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
                     ),
                   ),
+  // Add spacing
 
-                    Row( children: [
-                      SizedBox(height: screenHeight * 0.04, width: screenWidth * 0.0),
-                    TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignupScreen()),
-                      );
-                    },
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1),),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,  // ✅ Ensures proper spacing
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SignupScreen()),
+                            );
+                          },
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1)),
+                          ),
+                        ),
+
+                        // ✅ Recovery Password Button (properly positioned)
+                        TextButton(
+                          onPressed: () {
+                            // Handle button press
+                          },
+                          child: const Text(
+                            "Recovery Password",
+                            style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1)),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
 
-                SizedBox(width: screenWidth * 0.325),
-                  TextButton(
-                    onPressed: () {
-                      // Handle button press
-                    },
-                    child: const Text(
-                      "Recovery Password",
-                      style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1),),
-                    ),
-                  ),
-
-                  ],),
 
                   
 

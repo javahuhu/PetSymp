@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/recommendationone.dart';
 import 'userdata.dart';
 import 'package:provider/provider.dart';
-import 'profile.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -13,7 +12,6 @@ class SummaryScreen extends StatefulWidget {
 
 class SummaryScreenState extends State<SummaryScreen> {
   bool _isAnimated = false;
-  int _selectedIndex = 0;
   bool isHovering = false;
 
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
@@ -35,12 +33,7 @@ class SummaryScreenState extends State<SummaryScreen> {
     });
   }
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Profilescreen(),
-    Icon(Icons.settings, size: 150),
-  ];
-
+  
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +49,7 @@ class SummaryScreenState extends State<SummaryScreen> {
       backgroundColor: const Color.fromARGB(255, 233, 233, 232),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
+          
             Stack(
               children: [
                
@@ -513,7 +506,7 @@ Positioned(
 
                 // ✅ Proceed Button (Same Style & Position)
                 buildAnimatedButton(
-                  screenHeight * 1.03,
+                  screenHeight * 1.05,
                   screenWidth,
                   0.85,
                   "Proceed",
@@ -522,34 +515,16 @@ Positioned(
                 ),
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+         
         ],
       ),
       
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
+      
     );
   }
 
   
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+ 
   Widget _buildInputCard(String emoji, String label, String value) {
   return Card(
     elevation: 30,
@@ -638,7 +613,7 @@ Widget _buildInputCardclone(String emoji, String label, String value) {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.45 - 50,
+      left: screenWidth * 0.44 - 50,
       child: ElevatedButton(
         onPressed: () {
           

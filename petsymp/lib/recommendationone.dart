@@ -13,7 +13,6 @@ class RecommendationoneScreen extends StatefulWidget {
 
 class RecommendationoneScreenState extends State<RecommendationoneScreen> {
   bool _isAnimated = false;
-  int _selectedIndex = 0;
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
@@ -45,17 +44,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
     });
   }
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Icon(Icons.person, size: 150),
-    Icon(Icons.settings, size: 150),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  
 
   final List<ListItem> items = [
     const ListItem(
@@ -102,7 +91,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
+        
             Stack(
               children: [
                 Positioned(
@@ -213,27 +202,14 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
                   ),
                 ),
                 buildAnimatedButton(
-                  screenHeight * 1.07, screenWidth, 0.8, "Proceed", const RecommendationtwoScreen(), 1,
+                  screenHeight * 1.07, screenWidth, 0.85, "Proceed", const RecommendationtwoScreen(), 1,
                 ),
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+         
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
+      
     );
   }
 
@@ -243,7 +219,7 @@ class RecommendationoneScreenState extends State<RecommendationoneScreen> {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.45 - 50,
+      left: screenWidth * 0.44 - 50,
       child: ElevatedButton(
         onPressed: () {
          

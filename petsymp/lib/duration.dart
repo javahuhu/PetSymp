@@ -12,7 +12,6 @@ class DurationScreen extends StatefulWidget {
 
 class DurationScreenState extends State<DurationScreen> {
   bool _isAnimated = false;
-  int _selectedIndex = 0;
 
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
@@ -33,18 +32,7 @@ class DurationScreenState extends State<DurationScreen> {
     });
   }
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Icon(Icons.person, size: 150),
-    Icon(Icons.settings, size: 150),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -56,7 +44,6 @@ class DurationScreenState extends State<DurationScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
             Stack(
               children: [
                 // Back Button
@@ -143,32 +130,10 @@ class DurationScreenState extends State<DurationScreen> {
                     screenHeight, screenWidth, 0.706, "One month", context, 5),
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+         
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(61, 47, 40, 1),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
+      
     );
   }
 

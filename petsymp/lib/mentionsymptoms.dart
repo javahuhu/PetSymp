@@ -37,7 +37,7 @@ class MentionsympScreen extends StatefulWidget {
 
 class MentionsympScreenState extends State<MentionsympScreen> {
   bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+   // State to track the selected tab
   final TextEditingController _anothersymptomscontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -62,19 +62,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
     }
   }
 
-  // Pages corresponding to each tab
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
-  ];
-
-  // Method to handle bottom navigation tab changes
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index; // Update the selected index
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +73,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
+         
           
           Positioned(
             top: screenHeight * 0.03,
@@ -207,7 +195,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                 ),
                 // Next Button at the previous position
                 Positioned(
-                  top: screenHeight * 0.87,
+                  top: screenHeight * 0.9,
                   left: screenWidth * 0.75,
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
@@ -258,33 +246,10 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                 ),
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+         
         ],
       ),
-       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
-        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-        onTap: _onItemTapped,
-        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      ),
+       
     );
   }
 }

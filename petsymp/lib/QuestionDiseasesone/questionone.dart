@@ -12,7 +12,7 @@ class QoneScreen extends StatefulWidget {
 
 class QoneScreenState extends State<QoneScreen> {
   bool _isAnimated = false;
-  int _selectedIndex = 0;
+  
   int currentQuestionIndex = 0;
 
   List<bool> _buttonVisible = [false, false];
@@ -72,17 +72,7 @@ class QoneScreenState extends State<QoneScreen> {
   }
 
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Icon(Icons.person, size: 150),
-    Icon(Icons.settings, size: 150),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +85,7 @@ class QoneScreenState extends State<QoneScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
+        
             Stack(
               children: [
                 Positioned(
@@ -171,37 +161,14 @@ class QoneScreenState extends State<QoneScreen> {
                   ),
                 ),
                 // Yes/No Buttons with Re-Triggered Animation
-                buildAnimatedButton(screenHeight, screenWidth, 0.8, "Yes", context, 0),
-                buildAnimatedButton(screenHeight, screenWidth, 0.87, "No", context, 1),
+                buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.8, "Yes", context, 0),
+                buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.87, "No", context, 1),
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+          
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
-        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-        onTap: _onItemTapped,
-        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      ),
+     
     );
   }
 

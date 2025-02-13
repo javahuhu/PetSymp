@@ -11,7 +11,7 @@ class ReportScreen extends StatefulWidget {
 
 class ReportScreenState extends State<ReportScreen> {
   bool _isAnimated = false; // Animation toggle
-  int _selectedIndex = 0; // State to track the selected tab
+  // State to track the selected tab
 
   // Control the visibility of buttons
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
@@ -34,19 +34,7 @@ class ReportScreenState extends State<ReportScreen> {
     });
   }
 
-  // Pages corresponding to each tab
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150), // First page content
-    Icon(Icons.person, size: 150), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
-  ];
-
-  // Method to handle bottom navigation tab changes
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index; // Update the selected index
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +46,7 @@ class ReportScreenState extends State<ReportScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-          if (_selectedIndex == 0)
+          
             Stack(
               children: [
                 // Back Button
@@ -145,37 +133,14 @@ class ReportScreenState extends State<ReportScreen> {
                 // Animated Buttons
                 
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.87, "Continue", const SummaryScreen(),1),
+                    screenHeight * 1.03, screenWidth, 0.87, "Continue", const SummaryScreen(),1),
               
               ],
             ),
-          if (_selectedIndex != 0)
-            Center(
-              child: _pages.elementAt(_selectedIndex),
-            ),
+         
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
-        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-        onTap: _onItemTapped,
-        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      ),
+      
     );
   }
 

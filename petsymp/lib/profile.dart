@@ -11,6 +11,7 @@ class Profilescreen extends StatefulWidget {
 
 class ProfilescreenState extends State<Profilescreen> {
   // State to track the selected tab
+  // State to track the selected tab
    // Animation toggle
 
 
@@ -25,6 +26,9 @@ Map<String, String> hashmap = {
   "img8": "assets/logout.png",
 };
 
+
+
+
   
 
   @override
@@ -34,7 +38,7 @@ Map<String, String> hashmap = {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-       backgroundColor: const Color(0xFFCFCFCC),
+       backgroundColor:const Color.fromRGBO(29, 29, 44, 1.0),
       body: Stack(
 
         
@@ -52,9 +56,10 @@ Map<String, String> hashmap = {
                     children: [
                       // Circular Image
                         Container(
-                        width: screenWidth * 3, // 15% of screen width
-                        height: screenWidth * 0.8, // Equal height for circular image
-                        color: const Color.fromRGBO(61, 47, 40, 1),
+                        width: screenWidth * 1, // 15% of screen width
+                        height: screenWidth * 0.8, // Equal height for circular image 
+                        decoration: const BoxDecoration(color: Color.fromARGB(255, 219, 230, 233), 
+                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(100), bottomLeft: Radius.circular(100))),
 
                         child: Stack(
                            fit: StackFit.expand,
@@ -94,7 +99,7 @@ Map<String, String> hashmap = {
                       style:  TextStyle(
                         fontSize: 28, // Adjust size if needed
                         fontWeight: FontWeight.normal,
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
                       ),
                     ),
                   ),
@@ -121,7 +126,7 @@ Map<String, String> hashmap = {
                       style:  TextStyle(
                         fontSize: 20, // Adjust size if needed
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
                       ),
                     ),
                   ),
@@ -142,7 +147,7 @@ Map<String, String> hashmap = {
                       height: screenWidth * 0.1,
                       decoration: const BoxDecoration(
                       image: DecorationImage(
-                      image: AssetImage("assets/email1.png"),
+                      image: AssetImage("assets/email.png"),
                   fit: BoxFit.contain,
                   
                   ),
@@ -169,7 +174,7 @@ Map<String, String> hashmap = {
                 SizedBox(
                   height: screenWidth * 0.1, 
                   child: const VerticalDivider(
-                    color: Colors.white,
+                    color: Color.fromRGBO(29, 29, 44, 1.0),
                     thickness: 3,
                     width: 20, 
                   ),
@@ -267,13 +272,7 @@ Map<String, String> hashmap = {
                     decoration: BoxDecoration(
                       color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
                       borderRadius: BorderRadius.circular(25), // Optional rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.0), // Light shadow
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                     
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(10), // Add padding inside container
@@ -300,12 +299,18 @@ Map<String, String> hashmap = {
 
           // Placeholder for other tabs
           // Display corresponding content for other tabs
-            
+             
         ],
         
       ),
+
+      
+
+      
       
     );
+
+    
 
     
   }
@@ -330,6 +335,7 @@ Map<String, String> hashmap = {
                   width: 30, // Adjust as needed
                   height: 30,
                   fit: BoxFit.contain,
+                  color: const Color.fromRGBO(82, 170, 164, 1),
                 ),
               const SizedBox(width: 15),
               Column(
@@ -338,7 +344,7 @@ Map<String, String> hashmap = {
                   
                   Text(
                     value,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Colors.black),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Color.fromRGBO(82, 170, 164, 1)),
                   ),
                 ],
               ),
@@ -351,11 +357,16 @@ Map<String, String> hashmap = {
                   width: 30, // Adjust as needed
                   height: 30,
                   fit: BoxFit.contain,
+                  color: const Color.fromRGBO(82, 170, 164, 1),
                 ),
         ],
       ),
     ),
+    
   );
-}
-}
 
+  
+
+  
+}
+}

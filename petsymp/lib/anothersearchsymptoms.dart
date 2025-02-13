@@ -13,7 +13,6 @@ class AnothersearchsymptomsScreen extends StatefulWidget {
 
 class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen> {
   bool _isAnimated = false;
-  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -25,17 +24,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     });
   }
 
-  static const List<Widget> _pages = <Widget>[
-    Icon(Icons.home, size: 150),
-    Icon(Icons.person, size: 150),
-    Icon(Icons.settings, size: 150),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +47,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
               width: screenWidth,
               child: Stack(
                 children: [
-                  if (_selectedIndex == 0) ...[
+               
                     Positioned(
                       top: screenHeight * 0.03,
                       left: screenWidth * 0.01,
@@ -147,37 +135,14 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                       ),
                     ),
                   ],
-                  if (_selectedIndex != 0)
-                    Center(
-                      child: _pages.elementAt(_selectedIndex),
-                    ),
-                ],
+                 
+               
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromRGBO(82, 170, 164, 1),
-        unselectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-        onTap: _onItemTapped,
-        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      ),
+      
     );
   }
 
