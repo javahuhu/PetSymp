@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "149494599473",
+    "project_id": "petsymp-594e7",
+    "storage_bucket": "petsymp-594e7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149494599473:android:71b4bf4e98807baa9d6a10",
+        "android_client_info": {
+          "package_name": "com.example.petsymp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_Z6Kz-33lBEDHgXtHZBQ95jkH6eZFas0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

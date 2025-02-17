@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:petsymp/loginaccount.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -41,12 +43,51 @@ class SignupScreenState extends State<SignupScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
 
   Future<void> gotoPage(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
+  }
+
+  Future<void> _signUpUser() async {
+
+    try {
+
+      var querySnapshot = await FirebaseFirestore.instance.collection('Users').where("Email", isEqualTo: _emailController.text.trim()).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text("Email already in use")));
+      }
+
+       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(), 
+        password: _passwordController.text.trim(),
+        );
+
+        await _firestore.collection("Users").doc(userCredential.user!.uid).set({
+        "Username": _usernameController.text.trim(),
+        "Email": _emailController.text.trim(),
+        "CreatedTime": Timestamp.now(),
+
+        });
+
+        Navigator.push(context, 
+        MaterialPageRoute(builder: (context) => const LoginaccountScreen()));
+
+
+    }  catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}")),
+        );
+      }
+    
+
   }
 
   Widget _buildPasswordField({
@@ -332,15 +373,7 @@ class SignupScreenState extends State<SignupScreen> {
                     ),
                      SizedBox(height: screenHeight * 0.15),
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginaccountScreen()),
-                          );
-                        }
-                      },
+                      onPressed: _signUpUser,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
                         foregroundColor: const Color.fromARGB(255, 255, 255, 255),
