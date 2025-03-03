@@ -135,7 +135,7 @@ Map<String, String> hashmap = {
                         ),
 
                     Positioned(
-                top: 315, // Adjust position
+                top: screenHeight * 0.3, // Adjust position
                 left: screenWidth * 0.05,
                 child:  Row(
                   mainAxisAlignment: MainAxisAlignment.center,

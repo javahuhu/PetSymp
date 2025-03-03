@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:petsymp/loginaccount.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // Custom TextInputFormatter to capitalize only the first letter
@@ -72,6 +71,7 @@ class SignupScreenState extends State<SignupScreen> {
         await _firestore.collection("Users").doc(userCredential.user!.uid).set({
         "Username": _usernameController.text.trim(),
         "Email": _emailController.text.trim(),
+        "Password": _passwordController.text.trim(),
         "CreatedTime": Timestamp.now(),
 
         });

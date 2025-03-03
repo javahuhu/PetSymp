@@ -24,6 +24,8 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
       selection: newValue.selection,
     );
   }
+
+  
 }
 
 class LoginaccountScreen extends StatefulWidget {
@@ -47,6 +49,8 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +99,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                 top: screenHeight * 0.03, // Add more space at the top
                 left: screenWidth * 0.08,
                 right: screenWidth * 0.08,
-                bottom: screenHeight * 0.00, // Maintain bottom padding
+                bottom: screenHeight * 0.0, // Maintain bottom padding
               ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
