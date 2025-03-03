@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
+import 'homepage.dart';
 
 class Profilescreen extends StatefulWidget {
    const Profilescreen({super.key});
@@ -15,21 +16,20 @@ class ProfilescreenState extends State<Profilescreen> {
    // Animation toggle
 
 
-Map<String, String> hashmap = {
-  "img1": "assets/basicinfo.png",
-  "img2": "assets/language.png",
-  "img3": "assets/location.png",
-  "img4": "assets/security.png",
-  "img5": "assets/support.png",
-  "img6": "assets/condition.png",
-  "img7": "assets/editprofile.png",
-  "img8": "assets/logout.png",
+Map<String, Map<String, dynamic>> hashmap = {
+  "img1": {
+    "image": "assets/basicinfo.png",
+    "screen": (BuildContext context) => const HomePageScreen(),
+  },
+  "img7": {
+    "image": "assets/editprofile.png",
+    "screen": (BuildContext context) => const HomePageScreen(),
+  },
+  "img2": {
+    "image": "assets/restore.png",
+    "screen": (BuildContext context) => const HomePageScreen(),
+  },
 };
-
-
-
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -280,13 +280,9 @@ Map<String, String> hashmap = {
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
                           _buildInputCard("img1", "Basic Information"),
-                          _buildInputCard("img2",  "Language"),
-                          _buildInputCard("img3", "Location"),
-                          _buildInputCard("img4", "Security"),
-                          _buildInputCard("img5", "Help and Support"),
-                          _buildInputCard("img6",  "Terms and Conditions"),
                           _buildInputCard("img7",  "Edit Profile"),
-                           _buildInputCard("img8",  "Log out"),
+                          _buildInputCard("img2",  "History"),
+                          
                         ],
                       ),
                     ),
@@ -316,57 +312,64 @@ Map<String, String> hashmap = {
   }
 
   Widget _buildInputCard(String index, String value) {
-  return Card(
-    elevation: 0,
-    margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-    color: Colors.transparent,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-    child: Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
-        children: [
-          // Leading Icon & Text
-          Row(
-            children: [
-               if (hashmap.containsKey(index))
-                Image.asset(
-                  hashmap[index]!, // Fetch image path from hashmap
-                  width: 30, // Adjust as needed
-                  height: 30,
-                  fit: BoxFit.contain,
-                  color: const Color.fromRGBO(82, 170, 164, 1),
-                ),
-              const SizedBox(width: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  
-                  Text(
-                    value,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Color.fromRGBO(82, 170, 164, 1)),
+  return GestureDetector(
+    onTap: () {
+      if (hashmap.containsKey(index)) {
+        var screenFunction = hashmap[index]!["screen"];
+        if (screenFunction is Widget Function(BuildContext)) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => screenFunction(context)),
+          );
+        } 
+      }
+    },
+    child: Card(
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
+          children: [
+            // Leading Icon & Text
+            Row(
+              children: [
+                if (hashmap.containsKey(index))
+                  Image.asset(
+                    hashmap[index]!["image"], // Fetch image path from hashmap
+                    width: 30, // Adjust as needed
+                    height: 30,
+                    fit: BoxFit.contain,
+                    color: const Color.fromRGBO(82, 170, 164, 1),
                   ),
-                ],
-              ),
-            ],
-          ),
-          
-          // **Trailing Icon (Example: Edit Icon)**
-          Image.asset(
-                  "assets/arrowright.png", // Fetch image path from hashmap
-                  width: 30, // Adjust as needed
-                  height: 30,
-                  fit: BoxFit.contain,
-                  color: const Color.fromRGBO(82, 170, 164, 1),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Color.fromRGBO(82, 170, 164, 1)),
+                    ),
+                  ],
                 ),
-        ],
+              ],
+            ),
+            // **Trailing Icon (Example: Arrow Icon)**
+            Image.asset(
+              "assets/arrowright.png",
+              width: 30,
+              height: 30,
+              fit: BoxFit.contain,
+              color: const Color.fromRGBO(82, 170, 164, 1),
+            ),
+          ],
+        ),
       ),
     ),
-    
   );
-
-  
-
-  
 }
+
 }

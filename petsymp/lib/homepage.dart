@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/settings.dart';
 import 'assesment.dart';
 import 'profile.dart';
 
@@ -20,7 +21,7 @@ class HomePageScreenState extends State<HomePageScreen> {
   static const List<Widget> _pages = <Widget>[
     Icon(Icons.home, size: 150), // First page content
     Profilescreen(), // Second page content
-    Icon(Icons.settings, size: 150), // Third page content
+    Settingscreen(), // Third page content
   ];
 
   @override
