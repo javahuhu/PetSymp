@@ -54,6 +54,12 @@ class SignupScreenState extends State<SignupScreen> {
 
  Future<void> _signUpUser() async {
   try {
+
+    if (!_formKey.currentState!.validate()) {
+    // If form validation fails, do not proceed
+    return;
+  }
+  
     // ✅ Step 1: Check if the username already exists
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection("Users")
