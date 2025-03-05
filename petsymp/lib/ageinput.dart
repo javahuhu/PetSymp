@@ -149,7 +149,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (value < 10) value++; 
+                                if (value > 0) value--; 
                                 Provider.of<UserData>(context, listen: false).setpetAge(value);// Increment value and move circle right
                               });
                             },
@@ -157,7 +157,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                               radius: 25,
                               backgroundColor: Color.fromRGBO(29, 29, 44, 1.0),
                               child:  Icon(
-                                Icons.add,
+                                Icons.remove,
                                 color: Colors.white,
                                 size: 30,
                               ),
@@ -167,7 +167,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (value > 0) value--;
+                                if (value < 10) value++;
                               Provider.of<UserData>(context, listen: false).setpetAge(value); // Decrement value and move circle left
                               });
                             },
@@ -175,7 +175,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                               radius: 25,
                               backgroundColor: Color.fromRGBO(29, 29, 44, 1.0),
                               child:  Icon(
-                                Icons.remove,
+                                Icons.add,
                                 color: Colors.white,
                                 size: 30,
                               ),

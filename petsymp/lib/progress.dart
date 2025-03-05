@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:petsymp/getstarted.dart';
-import 'package:petsymp/loginaccount.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -41,54 +40,72 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
     _progressController.forward(); // Start animation
   }
 
+
   Future<void> _loginuser() async {
-    try {
-      QuerySnapshot query = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("Username", isEqualTo: widget.username)
-          .limit(1)
-          .get();
+  try {
+    // ✅ Find the user by Username in Firestore
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection("Users")
+        .where("Username", isEqualTo: widget.username)
+        .limit(1)
+        .get();
 
-      if (query.docs.isEmpty) {
-        setState(() {
-          _isSuccessful = false; 
-        });
-      } else {
-        firestorePassword = query.docs.first["Password"];
-        setState(() {
-          _isSuccessful = _checkLoginCredentials(); 
-        });
-      }
-
-      _rotationController.stop(); 
-
-      Future.delayed(const Duration(seconds: 1), () {
-        if (_isSuccessful) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const GetstartedScreen()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
-          );
-        }
+    if (query.docs.isEmpty) {
+      setState(() {
+        _isSuccessful = false;
       });
-    } on FirebaseAuthException catch (e) {
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Log in Failed")),
+        const SnackBar(content: Text("Username not found")),
       );
-    } catch (e) {
+
+      return;
+    }
+
+    // ✅ Get the user's email and UID from Firestore
+    var userDoc = query.docs.first;
+    String email = userDoc["Email"];
+    String userId = userDoc.id; // This is the UID stored in Firestore
+
+    // ✅ Authenticate with Firebase Authentication using email
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: widget.password,
+    );
+
+    // ✅ Ensure the authenticated user matches the Firestore user
+    if (userCredential.user != null && userCredential.user!.uid == userId) {
+      setState(() {
+        _isSuccessful = true;
+      });
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GetstartedScreen()),
+      );
+    } else {
+      setState(() {
+        _isSuccessful = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
+        const SnackBar(content: Text("Invalid login credentials")),
       );
     }
-  }
+  } on FirebaseAuthException catch (e) {
+    setState(() {
+      _isSuccessful = false;
+    });
 
-  bool _checkLoginCredentials() {
-    return firestorePassword != null && widget.password == firestorePassword;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.message ?? "Login failed")),
+    );
   }
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

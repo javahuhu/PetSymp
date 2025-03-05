@@ -42,8 +42,6 @@ class SignupScreenState extends State<SignupScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 
   Future<void> gotoPage(String urlString) async {
@@ -52,43 +50,59 @@ class SignupScreenState extends State<SignupScreen> {
       throw Exception('Could not launch $url');
     }
   }
+ 
 
-  Future<void> _signUpUser() async {
+ Future<void> _signUpUser() async {
+  try {
+    // ✅ Step 1: Check if the username already exists
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection("Users")
+        .where("Username", isEqualTo: _usernameController.text.trim())
+        .get();
 
-    try {
+    if (query.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username already in use")),
+      );
+      return;
+    }
 
-      var querySnapshot = await FirebaseFirestore.instance.collection('Users').where("Email", isEqualTo: _emailController.text.trim()).get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text("Email already in use")));
-      }
-
-       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(), 
-        password: _passwordController.text.trim(),
-        );
-
-        await _firestore.collection("Users").doc(userCredential.user!.uid).set({
-        "Username": _usernameController.text.trim(),
-        "Email": _emailController.text.trim(),
-        "Password": _passwordController.text.trim(),
-        "CreatedTime": Timestamp.now(),
-
-        });
-
-        Navigator.push(context, 
-        MaterialPageRoute(builder: (context) => const LoginaccountScreen()));
-
-
-    }  catch (e) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.toString()}")),
-        );
-      }
+    // ✅ Step 2: Generate a fake email for Firebase Auth
     
 
+    // ✅ Step 3: Create user in Firebase Authentication
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    if (userCredential.user != null) {
+      String userId = userCredential.user!.uid; // ✅ Get UID from Firebase
+
+      // ✅ Step 4: Store user details in Firestore
+      await FirebaseFirestore.instance.collection("Users").doc(userId).set({
+        "Username": _usernameController.text.trim(),
+        "Email": _emailController.text.trim(), 
+        "Password": _passwordController.text.trim(), // ⚠ Storing passwords in Firestore is not secure
+        "CreatedTime": Timestamp.now(),
+      });
+
+      // ✅ Step 5: Navigate to Login Screen after successful signup
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
+      );
+    }
+  } catch (e) {
+    // 🔥 Debugging: Print the error
+    print("Signup Error: ${e.toString()}");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: ${e.toString()}")),
+    );
   }
+}
+
 
   Widget _buildPasswordField({
     required TextEditingController controller,

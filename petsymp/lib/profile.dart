@@ -1,6 +1,8 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'homepage.dart';
+
 
 class Profilescreen extends StatefulWidget {
    const Profilescreen({super.key});
@@ -11,25 +13,55 @@ class Profilescreen extends StatefulWidget {
 }
 
 class ProfilescreenState extends State<Profilescreen> {
-  // State to track the selected tab
-  // State to track the selected tab
-   // Animation toggle
+  String nickname = "Loading...";
+  String email = "Loading...";
+
+  @override
+  void initState(){
+    super.initState();
+    fetchUserNickname();
+  }
+
+ Future<void> fetchUserNickname() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      String userId = user.uid; // ✅ Use Firebase Auth UID as the document ID
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId) // ✅ Fetch by UID (document ID)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          nickname = userDoc.get('Username') ?? "No Username"; 
+          email = userDoc.get('Email') ?? "No Email";
+        });
+      } else {
+        setState(() {
+          nickname = "User Not Found";
+          email = "Email Not Found";
+        });
+      }
+    } else {
+      setState(() {
+        nickname = "Not Logged In";
+        email = "Not Logged In";
+      });
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+}
 
 
-Map<String, Map<String, dynamic>> hashmap = {
-  "img1": {
-    "image": "assets/basicinfo.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img7": {
-    "image": "assets/editprofile.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img2": {
-    "image": "assets/restore.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-};
+  
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +124,11 @@ Map<String, Map<String, dynamic>> hashmap = {
                       borderRadius: BorderRadius.circular(20),
                      
                     ),
-                     child:const  Center(
+                     child:  Center(
                     child: Text(
-                      "Saul ArmStrong", // ✅ Longer text will still be centered
+                      nickname, // ✅ Longer text will still be centered
                       textAlign: TextAlign.center, // ✅ Ensures center alignment
-                      style:  TextStyle(
+                      style:  const TextStyle(
                         fontSize: 28, // Adjust size if needed
                         fontWeight: FontWeight.normal,
                         color: Color.fromRGBO(29, 29, 44, 1.0),
@@ -119,11 +151,11 @@ Map<String, Map<String, dynamic>> hashmap = {
                       borderRadius: BorderRadius.circular(20),
                      
                     ),
-                     child:const  Center(
+                     child:  Center(
                     child: Text(
-                      "Saul@gmail.com", // ✅ Longer text will still be centered
+                      email, // ✅ Longer text will still be centered
                       textAlign: TextAlign.center, // ✅ Ensures center alignment
-                      style:  TextStyle(
+                      style: const TextStyle(
                         fontSize: 20, // Adjust size if needed
                         fontWeight: FontWeight.bold,
                         color: Color.fromRGBO(29, 29, 44, 1.0),
@@ -134,85 +166,10 @@ Map<String, Map<String, dynamic>> hashmap = {
 
                         ),
 
-                    Positioned(
-                top: screenHeight * 0.3, // Adjust position
-                left: screenWidth * 0.05,
-                child:  Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                      
 
-                    SizedBox(width: screenWidth * 0.1),
-                     Container(
-                      width: screenWidth * 0.1, // Set a width
-                      height: screenWidth * 0.1,
-                      decoration: const BoxDecoration(
-                      image: DecorationImage(
-                      image: AssetImage("assets/email.png"),
-                  fit: BoxFit.contain,
+
                   
-                  ),
-                  ),
-                  
-                  ),
-                  SizedBox(width: screenWidth * 0.07),
-                  Container(
-                    width: screenWidth * 0.1, // Set a width
-                      height: screenWidth * 0.1,
-                      decoration: const BoxDecoration(
-                        
-                      image: DecorationImage(
-                      image: AssetImage("assets/phone.png"),
-                  fit: BoxFit.contain,
-                  alignment: Alignment.topCenter,
-                  ),
-                  ),
-                  
-                  ),
-               SizedBox(width: screenWidth * 0.065), 
-
-    
-                SizedBox(
-                  height: screenWidth * 0.1, 
-                  child: const VerticalDivider(
-                    color: Color.fromRGBO(29, 29, 44, 1.0),
-                    thickness: 3,
-                    width: 20, 
-                  ),
-                ),
-
-                  SizedBox(width: screenWidth * 0.06),
-                  Container(
-                     width: screenWidth * 0.1, // Set a width
-                      height: screenWidth * 0.1,
-                      decoration: const BoxDecoration(
-                       
-                      image: DecorationImage(
-                      image: AssetImage("assets/pawhistory.png"),
-                  fit: BoxFit.contain,
-                  alignment: Alignment.topCenter,
-                  ),
-                  ),
-                  
-                  ),
-
-                  SizedBox(width: screenWidth * 0.07),
-                  Container(
-                     width: screenWidth * 0.1, // Set a width
-                      height: screenWidth * 0.1,
-                      decoration: const BoxDecoration(
-                        
-                      image: DecorationImage(
-                      image: AssetImage("assets/favourite.png"),
-                  fit: BoxFit.contain,
-                  alignment: Alignment.topCenter,
-                  ),
-                  ),
-                  
-                  ),
-
-
-                  ],
-                )),
                         
 
 
@@ -255,6 +212,8 @@ Map<String, Map<String, dynamic>> hashmap = {
 
                   
 
+                  
+
                  
                 ],
               ),
@@ -263,31 +222,7 @@ Map<String, Map<String, dynamic>> hashmap = {
             
 
 
-             Positioned(
-                  top: screenHeight * 0.350,
-                  left: screenWidth * -0.04,
-                  child: Container(
-                    width: 510,
-                    height: screenHeight * 0.6,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
-                      borderRadius: BorderRadius.circular(25), // Optional rounded corners
-                     
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10), // Add padding inside container
-                      child: ListView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          _buildInputCard("img1", "Basic Information"),
-                          _buildInputCard("img7",  "Edit Profile"),
-                          _buildInputCard("img2",  "History"),
-                          
-                        ],
-                      ),
-                    ),
-                  ),
-),
+           
 
               
 
@@ -295,6 +230,34 @@ Map<String, Map<String, dynamic>> hashmap = {
 
           // Placeholder for other tabs
           // Display corresponding content for other tabs
+
+           Stack( children: [
+                      
+                      Positioned( top:screenHeight * 0.4, left: screenWidth * 0.05, width: screenWidth * 5,
+                        child:  Text("Nickname: $nickname", 
+                        style: const TextStyle(fontSize: 26, 
+                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),),
+                        ),
+
+                        const Column(children: [
+                           Divider(height: 20, thickness: 5, indent: 0, endIndent: 0, color: Color.fromARGB(255, 219, 230, 233),)
+                        ],),
+                        
+                        Positioned( top:screenHeight * 0.5, left: screenWidth * 0.05, width: screenWidth * 5,
+                        child:  const Text("Age:", 
+                        style:  TextStyle(fontSize: 26, 
+                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
+
+                        Positioned( top:screenHeight * 0.6, left: screenWidth * 0.05, width: screenWidth * 5,
+                        child:  const Text("Number:", 
+                        style:  TextStyle(fontSize: 26, 
+                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
+
+                        Positioned( top:screenHeight * 0.7, left: screenWidth * 0.05, width: screenWidth * 5,
+                        child:  const Text("Gender:", 
+                        style:  TextStyle(fontSize: 26, 
+                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
+                   ],)
              
         ],
         
@@ -310,66 +273,5 @@ Map<String, Map<String, dynamic>> hashmap = {
 
     
   }
-
-  Widget _buildInputCard(String index, String value) {
-  return GestureDetector(
-    onTap: () {
-      if (hashmap.containsKey(index)) {
-        var screenFunction = hashmap[index]!["screen"];
-        if (screenFunction is Widget Function(BuildContext)) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screenFunction(context)),
-          );
-        } 
-      }
-    },
-    child: Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      color: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
-          children: [
-            // Leading Icon & Text
-            Row(
-              children: [
-                if (hashmap.containsKey(index))
-                  Image.asset(
-                    hashmap[index]!["image"], // Fetch image path from hashmap
-                    width: 30, // Adjust as needed
-                    height: 30,
-                    fit: BoxFit.contain,
-                    color: const Color.fromRGBO(82, 170, 164, 1),
-                  ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      value,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Color.fromRGBO(82, 170, 164, 1)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // **Trailing Icon (Example: Arrow Icon)**
-            Image.asset(
-              "assets/arrowright.png",
-              width: 30,
-              height: 30,
-              fit: BoxFit.contain,
-              color: const Color.fromRGBO(82, 170, 164, 1),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
 
 }

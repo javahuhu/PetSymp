@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:petsymp/signup.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'progress.dart';
+import 'recovery.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -274,7 +275,10 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                         // ✅ Recovery Password Button (properly positioned)
                         TextButton(
                           onPressed: () {
-                            // Handle button press
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const RecoveryScreen()),
+                            );
                           },
                           child: const Text(
                             "Recovery Password",

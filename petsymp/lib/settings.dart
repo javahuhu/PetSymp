@@ -18,22 +18,31 @@ class SettingscreenState extends State<Settingscreen> {
 
 
 Map<String, Map<String, dynamic>> hashmap = {
-  "img4": {
+  "img1": {
     "image": "assets/security.png",
     "screen": (BuildContext context) => const HomePageScreen(),
   },
-  "img5": {
+  "img2": {
     "image": "assets/support.png",
     "screen": (BuildContext context) => const HomePageScreen(),
   },
-  "img6": {
+  "img3": {
     "image": "assets/condition.png",
     "screen": (BuildContext context) => const HomePageScreen(),
   },
-  "img8": {
+  "img4": {
+    "image": "assets/editprofile.png",
+    "screen": (BuildContext context) => const HomePageScreen(),
+  },
+  "img5": {
+    "image": "assets/restore.png",
+    "screen": (BuildContext context) => const HomePageScreen(),
+  },
+  "img6": {
     "image": "assets/logout.png",
     "screen": (BuildContext context) => const HomePageScreen(), // Call logout function
   },
+  
 };
 
 
@@ -56,7 +65,7 @@ Map<String, Map<String, dynamic>> hashmap = {
         children: [
 
              Positioned(
-                  top: screenHeight * 0.03,
+                  top: screenHeight * 0.04,
                   left: screenWidth * -0.04,
                   child: Container(
                     width: 510,
@@ -71,10 +80,13 @@ Map<String, Map<String, dynamic>> hashmap = {
                       child: ListView(
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          _buildInputCard("img4", "Security"),
-                          _buildInputCard("img5", "Help and Support"),
-                          _buildInputCard("img6",  "Terms and Conditions"),
-                           _buildInputCard("img8",  "Log out"),
+                          _buildInputCard("img1", "Security"),
+                          _buildInputCard("img2", "Help and Support"),
+                          _buildInputCard("img3",  "Terms and Conditions"),
+                          _buildInputCard("img4",  "Edit Profile"),
+                          _buildInputCard("img5",  "History"),
+                           _buildInputCard("img6",  "Log out"),
+                           
                         ],
                       ),
                     ),
@@ -119,7 +131,7 @@ Map<String, Map<String, dynamic>> hashmap = {
     child: Card(
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      color: Colors.transparent,
+      color: const Color.fromARGB(0, 179, 16, 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
