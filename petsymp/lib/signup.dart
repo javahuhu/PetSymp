@@ -4,6 +4,7 @@ import 'package:petsymp/loginaccount.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -54,57 +55,67 @@ class SignupScreenState extends State<SignupScreen> {
 
  Future<void> _signUpUser() async {
   try {
+    if (!_formKey.currentState!.validate()) return;
 
-    if (!_formKey.currentState!.validate()) {
-    // If form validation fails, do not proceed
-    return;
-  }
-  
-    // ✅ Step 1: Check if the username already exists
+    // Username check
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection("Users")
         .where("Username", isEqualTo: _usernameController.text.trim())
         .get();
 
     if (query.docs.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Username already in use")),
+      Fluttertoast.showToast(
+        msg: "Username is already used",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
       );
       return;
     }
 
-    // ✅ Step 2: Generate a fake email for Firebase Auth
-    
-
-    // ✅ Step 3: Create user in Firebase Authentication
-    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    // Create user
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
     );
 
     if (userCredential.user != null) {
-      String userId = userCredential.user!.uid; // ✅ Get UID from Firebase
+      String userId = userCredential.user!.uid;
 
-      // ✅ Step 4: Store user details in Firestore
+      // Store user data (remove password storage!)
       await FirebaseFirestore.instance.collection("Users").doc(userId).set({
         "Username": _usernameController.text.trim(),
-        "Email": _emailController.text.trim(), 
-        "Password": _passwordController.text.trim(), // ⚠ Storing passwords in Firestore is not secure
+        "Email": _emailController.text.trim(),
         "CreatedTime": Timestamp.now(),
       });
 
-      // ✅ Step 5: Navigate to Login Screen after successful signup
+      // Show success toast
+      Fluttertoast.showToast(
+        msg: "Account Successfully Created",
+        toastLength: Toast.LENGTH_LONG,  // Changed to LONG
+        gravity: ToastGravity.CENTER,
+        backgroundColor: const Color.fromARGB(255, 54, 244, 114),
+        textColor: Colors.white,
+      );
+
+      // Navigate after toast has time to display
+      await Future.delayed(const Duration(seconds: 1));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
       );
     }
-  } catch (e) {
-    // 🔥 Debugging: Print the error
-    print("Signup Error: ${e.toString()}");
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: ${e.toString()}")),
+  } catch (e) {
+    print("Signup Error: $e");
+    Fluttertoast.showToast(
+      msg: "Error: ${e.toString()}",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
     );
   }
 }
@@ -163,7 +174,7 @@ class SignupScreenState extends State<SignupScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+    resizeToAvoidBottomInset: false,
      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [

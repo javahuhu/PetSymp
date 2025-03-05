@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:petsymp/getstarted.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import 'loginaccount.dart';
 class ProgressScreen extends StatefulWidget {
   final String username;
   final String password;
@@ -43,66 +44,96 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
 
   Future<void> _loginuser() async {
   try {
-    // ✅ Find the user by Username in Firestore
+    // ✅ Step 1: Find the user by Username in Firestore
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection("Users")
-        .where("Username", isEqualTo: widget.username)
+        .where("Username", isEqualTo: widget.username.trim()) // Trim for safety
         .limit(1)
         .get();
 
     if (query.docs.isEmpty) {
-      setState(() {
-        _isSuccessful = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Username not found")),
+      Fluttertoast.showToast(
+        msg: "Username not found",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
       );
 
+      // ✅ Redirect back to login screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
+      );
       return;
     }
 
-    // ✅ Get the user's email and UID from Firestore
+    // ✅ Step 2: Get the user's email from Firestore
     var userDoc = query.docs.first;
     String email = userDoc["Email"];
-    String userId = userDoc.id; // This is the UID stored in Firestore
+    String userId = userDoc.id;
 
-    // ✅ Authenticate with Firebase Authentication using email
+    // ✅ Step 3: Authenticate using Firebase Auth
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
-      password: widget.password,
+      password: widget.password.trim(),
     );
 
-    // ✅ Ensure the authenticated user matches the Firestore user
+    // ✅ Step 4: Ensure authenticated user matches Firestore user
     if (userCredential.user != null && userCredential.user!.uid == userId) {
       setState(() {
         _isSuccessful = true;
       });
 
+      // ✅ Redirect to GetStartedScreen after successful login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const GetstartedScreen()),
       );
-    } else {
-      setState(() {
-        _isSuccessful = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid login credentials")),
-      );
-    }
+    } 
   } on FirebaseAuthException catch (e) {
     setState(() {
       _isSuccessful = false;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.message ?? "Login failed")),
+    // ✅ Handle Wrong Password
+    if (e.code == 'wrong-password') {
+      Fluttertoast.showToast(
+        msg: "Incorrect password",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } 
+    // ✅ Handle User Not Found (Email not in Firebase Auth)
+    else if (e.code == 'user-not-found') {
+      Fluttertoast.showToast(
+        msg: "User not found",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } 
+    // ✅ Handle Other FirebaseAuth Errors
+    else {
+      Fluttertoast.showToast(
+        msg: "Login Failed ${"Wrong Username or Password"}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+
+    // ✅ Redirect back to login screen after failed login
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
     );
   }
 }
-
 
 
 
