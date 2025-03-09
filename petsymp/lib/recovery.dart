@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 
 
@@ -29,7 +30,7 @@ class RecoveryScreenState extends State<RecoveryScreen> {
 
           Positioned(
               top: screenHeight * 0.037,
-              left: screenWidth * 0.25,
+              left: screenWidth * 0.2,
               width: screenWidth * 5,
               child: const Text('Recovery Password', style: TextStyle(
                           fontSize: 28,
@@ -55,46 +56,56 @@ class RecoveryScreenState extends State<RecoveryScreen> {
             Stack(
               children: [
               
-                Positioned(
-                  top: screenHeight * 0.22, // Text and input below the paw
-                  left: screenWidth * 0.321,
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                       Text(
-                        "OTP Verification",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
+               Positioned(
+              top: screenHeight * 0.22, // Keeps text below the paw image
+              left: 0, // Remove fixed left positioning
+              right: 0, // Ensures centering
+              child: const Center( // ✅ Ensures the column stays in the center
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center, // ✅ Center text properly
+                  children: [
+                     Text(
+                      "OTP Verification",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
                       ),
-                      
-                   
-                     
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
+            ),
+
 
 
                 
                  // OTP Input Field
-        Positioned(top: screenHeight *0.35, left: screenWidth * 0.1325, child: 
-          Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(6, (index) => _buildOtpBox(index)),
-        ),
-      )),
+        // OTP Input Field
+Positioned(
+  top: screenHeight * 0.35,
+  left: 0, // Remove left positioning (center via Row instead)
+  right: 0, // Align to center properly
+  child: Center( // ✅ Ensure centering
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center, // ✅ Center OTP boxes
+      children: List.generate(6, (index) => _buildOtpBox(index)),
+    ),
+  ),
+),
+
 
 
 
                 // Next Button at the previous position
                 Positioned(
                   top: screenHeight * 0.7,
-                  left: screenWidth * 0.380,
-                
-                  child: ElevatedButton(
+                  left: 0,
+                  right: 0,
+                  child: Center( child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+
+                    ElevatedButton(
                      onPressed: () {
                               Navigator.push(
                               context,
@@ -144,6 +155,10 @@ class RecoveryScreenState extends State<RecoveryScreen> {
                       ),
                     ),
                   ),
+                  ],
+                  ),)
+                
+                  
                 ),
               ],
             ),

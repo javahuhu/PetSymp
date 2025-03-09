@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/duration.dart';
 import 'package:petsymp/userdata.dart'; // Import UserData Provider
-
+import 'package:auto_size_text/auto_size_text.dart';
 class SearchsymptomsScreen extends StatefulWidget {
   final String petSymptom;
 
@@ -14,7 +14,6 @@ class SearchsymptomsScreen extends StatefulWidget {
 
 class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   bool _isAnimated = false;
- 
 
   @override
   void initState() {
@@ -26,8 +25,6 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
     });
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -37,119 +34,100 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
       backgroundColor: const Color(0xFFE8F2F5),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          children: [
-            SizedBox(
-              height: screenHeight + 35,
-              width: screenWidth,
-              child: Stack(
-                children: [
-                 
-                    Positioned(
-                      top: screenHeight * 0.03,
-                      left: screenWidth * 0.01,
-                      child: ElevatedButton.icon(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(
-                          Icons.arrow_back_sharp,
-                          color: Color.fromRGBO(61, 47, 40, 1),
-                          size: 40.0,
-                        ),
-                        label: const Text(''),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: Colors.transparent,
-                        ),
-                      ),
-                    ),
-                    AnimatedPositioned(
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.easeInOut,
-                      top: _isAnimated ? screenHeight * 0.13 : -100,
-                      left: screenWidth * 0.1,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: screenWidth * 0.15,
-                            height: screenWidth * 0.15,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            child: Image.asset(
-                              'assets/paw.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.05),
-                          Padding(
-                            padding: EdgeInsets.only(top: screenHeight * 0.03),
-                            child: const Text(
-                              "Select Symptoms",
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(29, 29, 44, 1.0),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: screenHeight * 0.25,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        widget.petSymptom,
-                        ["Unwillingness into activity, recreation, or", "movement."],
-                        context, // Pass context for Provider
-                      ),
-                    ),
-                    Positioned(
-                      top: screenHeight * 0.45,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        "Reduced Appetite",
-                        ["Consuming little or having little appetite for", "food or treats."],
-                        context,
-                      ),
-                    ),
-                    Positioned(
-                      top: screenHeight * 0.65,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        "Low Energy",
-                        ["Less attentive to stimuli such as food, toys,", "or your own voice."],
-                        context,
-                      ),
-                    ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
 
-                    Positioned(
-                      top: screenHeight * 0.85,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        "Low Energy",
-                        ["Less attentive to stimuli such as food, toys,", "or your own voice."],
-                        context,
+            Container(
+            height: screenHeight * 0.1, // Make sure the Stack has a defined height
+            child: Stack(
+              children: [
+                Positioned(
+                  top: screenHeight * 0.03,
+                  left: -screenWidth * 0.05,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Icons.arrow_back_sharp,
+                      color: Color.fromRGBO(61, 47, 40, 1),
+                      size: 40.0,
+                    ),
+                    label: const Text(''),
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+              // Animated Headerw
+              SizedBox(height: screenHeight * 0.03,),
+              AnimatedOpacity(
+                duration: const Duration(seconds: 1),
+                opacity: _isAnimated ? 1 : 0,
+                child: 
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.asset(
+                        'assets/paw.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.05),
+                    
+                    // ✅ Use Expanded so the text takes available space
+                    Expanded(
+                      child: AutoSizeText(
+                        "Select Symptoms",
+                        maxLines: 1, // Prevents multiple lines
+                        minFontSize: 12, // Ensures readability on small screens
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.08, // Adjusts dynamically
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
                       ),
                     ),
                   ],
-                 
-                
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: screenHeight * 0.05),
+              // Symptoms List
+              buildSymptomsContainer(
+                screenWidth,
+                widget.petSymptom,
+                ["Unwillingness into activity, recreation, or", "movement."],
+                context,
+              ),
+              SizedBox(height: screenHeight * 0.03),
+              buildSymptomsContainer(
+                screenWidth,
+                "Reduced Appetite",
+                ["Consuming little or having little appetite for", "food or treats."],
+                context,
+              ),
+              SizedBox(height: screenHeight * 0.03),
+              buildSymptomsContainer(
+                screenWidth,
+                "Low Energy",
+                ["Less attentive to stimuli such as food, toys,", "or your own voice."],
+                context,
+              ),
+            ],
+          ),
         ),
       ),
-      
     );
   }
 
@@ -193,8 +171,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                 final userData = Provider.of<UserData>(context, listen: false);
-
+                final userData = Provider.of<UserData>(context, listen: false);
                 userData.setSelectedSymptom(title);
                 userData.addPetSymptom(title);
 

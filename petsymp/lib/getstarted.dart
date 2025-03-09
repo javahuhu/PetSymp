@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'homepage.dart';
 
 class GetstartedScreen extends StatefulWidget {
@@ -25,24 +26,23 @@ class GetstartedScreenState extends State<GetstartedScreen> {
     _resetAndAnimateImages();
   }
 
-  // Method to reset visibility and restart the animation
+  // Reset visibility and restart animation
   void _resetAndAnimateImages() {
     setState(() {
-      _visibleImages = [false, false, false, false, false, false]; // Reset button visibility
+      _visibleImages = [false, false, false, false, false, false];
     });
     Future.delayed(const Duration(milliseconds: 50), _animateImages);
   }
 
-  // Method to animate visibility of images sequentially
+  // Animate visibility of images sequentially
   void _animateImages() async {
     for (int i = 0; i < _visibleImages.length; i++) {
-      await Future.delayed(const Duration(milliseconds: 1000)); // Delay for each image
+      await Future.delayed(const Duration(milliseconds: 1000));
       setState(() {
-        _visibleImages[i] = true; // Make the current element visible
+        _visibleImages[i] = true;
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
         children: [
           // Custom Background with Chubby Curves
           CustomPaint(
-            size: MediaQuery.of(context).size,
+            size: Size(1.sw, 1.sh), // Screen width and height
             painter: CurvedBackgroundPainter(),
           ),
 
@@ -61,29 +61,27 @@ class GetstartedScreenState extends State<GetstartedScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 15.0),
+                padding: EdgeInsets.only(left: 15.w, top: 15.h), // Responsive padding
                 child: Image.asset(
                   'assets/logo.png',
-                  width: 300,
-                  height: 300,
+                  width: 250.w,
+                  height: 250.h,
                 ),
               ),
               Expanded(
                 child: Center(
                   child: SizedBox(
-                    width: 400, // Provide enough space for the images
-                    height: 400, // Adjust based on layout
+                    width: 350.w, // Responsive width
+                    height: 350.h, // Responsive height
                     child: Stack(
-                      clipBehavior: Clip.none, // Prevent clipping
+                      clipBehavior: Clip.none,
                       alignment: Alignment.center,
                       children: [
                         // Outer Large Circle
                         Container(
-                          width: 350,
-                          height: 350,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
+                          width: 320.w,
+                          height: 320.h,
+                          decoration: const BoxDecoration(shape: BoxShape.circle),
                           child: ClipOval(
                             child: Image.asset(
                               'assets/dogfirstaidkit.jpg',
@@ -94,47 +92,47 @@ class GetstartedScreenState extends State<GetstartedScreen> {
 
                         // Inner Small Circles (Overlapping)
                         Positioned(
-                          top: -5,
-                          left: -5,
+                          top: -5.h,
+                          left: -5.w,
                           child: _buildAnimatedImage(
                             visible: _visibleImages[0],
-                            size: 130,
+                            size: 110.r,
                             assetPath: 'assets/getstartedpet.jpg',
                           ),
                         ),
                         Positioned(
-                          top: -95,
-                          left: 170,
+                          top: -90.h,
+                          left: 170.w,
                           child: _buildAnimatedImage(
                             visible: _visibleImages[1],
-                            size: 105,
+                            size: 95.r,
                             assetPath: 'assets/veetveet.jpg',
                           ),
                         ),
                         Positioned(
-                          top: -110,
-                          left: 75,
+                          top: -110.h,
+                          left: 75.w,
                           child: _buildAnimatedImage(
                             visible: _visibleImages[2],
-                            size: 52,
+                            size: 50.r,
                             assetPath: 'assets/catanddog.jpg',
                           ),
                         ),
                         Positioned(
-                          bottom: 0,
-                          left: -10,
+                          bottom: 0.h,
+                          left: -10.w,
                           child: _buildAnimatedImage(
                             visible: _visibleImages[3],
-                            size: 78,
+                            size: 70.r,
                             assetPath: 'assets/takingcareofpets.jpg',
                           ),
                         ),
                         Positioned(
-                          bottom: -40,
-                          right: -10,
+                          bottom: -35.h,
+                          right: -10.w,
                           child: _buildAnimatedImage(
                             visible: _visibleImages[4],
-                            size: 52,
+                            size: 50.r,
                             assetPath: 'assets/pethiscatttt.jpg',
                           ),
                         ),
@@ -146,10 +144,10 @@ class GetstartedScreenState extends State<GetstartedScreen> {
 
               // Button at the Bottom with Animation
               Padding(
-                padding: const EdgeInsets.only(bottom: 50.0),
+                padding: EdgeInsets.only(bottom: 15.h),
                 child: Center(
                   child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 500), // Animation duration
+                    duration: const Duration(milliseconds: 500),
                     opacity: _visibleImages[5] ? 1.0 : 0.0, // Button visibility
                     child: ElevatedButton(
                       onPressed: () {
@@ -164,16 +162,13 @@ class GetstartedScreenState extends State<GetstartedScreen> {
                         backgroundColor: const Color(0xFF1D1D2C),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(100.r),
                         ),
-                        fixedSize: const Size(200, 65), // Button width and height
+                        fixedSize: Size(200.w, 60.h), // Responsive button size
                       ),
-                      child: const Text(
+                      child: Text(
                         "Get Started",
-                        style: TextStyle(
-                          fontSize: 22.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -193,19 +188,14 @@ class GetstartedScreenState extends State<GetstartedScreen> {
     required String assetPath,
   }) {
     return AnimatedOpacity(
-      duration: const Duration(milliseconds: 500), // Animation duration
+      duration: const Duration(milliseconds: 500),
       opacity: visible ? 1.0 : 0.0, // Fade in when visible
       child: Container(
         width: size,
         height: size,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
+        decoration: const BoxDecoration(shape: BoxShape.circle),
         child: ClipOval(
-          child: Image.asset(
-            assetPath,
-            fit: BoxFit.cover,
-          ),
+          child: Image.asset(assetPath, fit: BoxFit.cover),
         ),
       ),
     );
@@ -224,12 +214,12 @@ class CurvedBackgroundPainter extends CustomPainter {
     Path path1 = Path();
     path1.moveTo(0, size.height);
     path1.quadraticBezierTo(
-      size.width * 0.4, size.height * 0.9, // Control point for a rounded effect
-      size.width * 0.2, size.height * 0.7, // End point
+      size.width * 0.4, size.height * 0.9,
+      size.width * 0.2, size.height * 0.7,
     );
     path1.quadraticBezierTo(
-      size.width * 0.1, size.height * 0.75, // Secondary control point for smoothing
-      0, size.height * 0.6, // Bring the curve back to the left
+      size.width * 0.1, size.height * 0.75,
+      0, size.height * 0.6,
     );
     path1.close();
 
@@ -237,12 +227,12 @@ class CurvedBackgroundPainter extends CustomPainter {
     Path path2 = Path();
     path2.moveTo(size.width, 0);
     path2.quadraticBezierTo(
-      size.width * 0.7, size.height * 0.1, // Control point for the rounded effect
-      size.width * 0.8, size.height * 0.2, // End point
+      size.width * 0.7, size.height * 0.1,
+      size.width * 0.8, size.height * 0.2,
     );
     path2.quadraticBezierTo(
-      size.width * 0.9, size.height * 0.15, // Secondary control point
-      size.width, size.height * 0.3, // Smoothly bring it back to the right
+      size.width * 0.9, size.height * 0.15,
+      size.width, size.height * 0.3,
     );
     path2.close();
 

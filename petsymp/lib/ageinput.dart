@@ -68,6 +68,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -189,9 +190,11 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                 ),
 
                 // Next Button at the previous position
-                Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+                 Positioned(
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -243,6 +246,7 @@ class AgeinputScreenState extends State<AgeinputScreen> {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
           

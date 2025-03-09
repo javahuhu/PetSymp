@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
   const AnothersearchsymptomsScreen({super.key});
@@ -24,33 +25,34 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
 
-  String allSymptoms = [
-  if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom, // ✅ Correct: selectedSymptom is a string
-  if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom
-].where((element) => element.isNotEmpty).join(" + "); // ✅ Prevents empty strings
- // Avoid empty strings
+    String allSymptoms = [
+      if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
+      if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom
+    ].where((element) => element.isNotEmpty).join(" + "); // Avoid empty strings
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: screenHeight + 25,
-              width: screenWidth,
-              child: Stack(
-                children: [
-               
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Back Button in Stack
+              Container(
+                height: screenHeight * 0.1, // Ensure Stack has height
+                child: Stack(
+                  children: [
                     Positioned(
                       top: screenHeight * 0.03,
-                      left: screenWidth * 0.01,
+                      left: -screenWidth * 0.05,
                       child: ElevatedButton.icon(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(
@@ -65,84 +67,87 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         ),
                       ),
                     ),
-                    AnimatedPositioned(
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.easeInOut,
-                      top: _isAnimated ? screenHeight * 0.13 : -100,
-                      left: screenWidth * 0.1,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: screenWidth * 0.15,
-                            height: screenWidth * 0.15,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            child: Image.asset(
-                              'assets/paw.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Padding(
-                            padding: EdgeInsets.only(top: screenHeight * 0.03),
-                            child: const Text(
-                              "Select Another Symptoms",
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(29, 29, 44, 1.0),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.03),
 
-                    // Symptoms List
-                    Positioned(
-                      top: screenHeight * 0.25,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        allSymptoms.isNotEmpty ? allSymptoms : "Select Another Symptoms",
-                        ["Drooling or licking lips excessively before", "or after vomiting."],
-                        const QoneScreen(),
+              // Animated Header
+              AnimatedOpacity(
+                duration: const Duration(seconds: 1),
+                opacity: _isAnimated ? 1 : 0,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.asset(
+                        'assets/paw.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    Positioned(
-                      top: screenHeight * 0.45,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        "Frequent Bowel Movements",
-                        ["Loose, watery stools."],
-                        const QoneScreen(),
-                      ),
-                    ),
-                    Positioned(
-                      top: screenHeight * 0.628,
-                      left: screenWidth * 0.05,
-                      right: screenWidth * 0.05,
-                      child: buildSymptomsContainer(
-                        screenWidth,
-                        "Frequent Episodes",
-                        ["Repeated vomiting over a short period"],
-                        const QoneScreen(),
+                    SizedBox(width: screenWidth * 0.05),
+
+                    // ✅ Dynamic Resizable Text
+                    Expanded(
+                      child: AutoSizeText(
+                        "Select Another Symptoms",
+                        maxLines: 1,
+                        minFontSize: 12,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.08, // Dynamic Text Size
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
                       ),
                     ),
                   ],
-                 
-               
+                ),
               ),
-            ),
-          ],
+
+              SizedBox(height: screenHeight * 0.05),
+
+              // Symptoms List
+              buildSymptomsContainer(
+                screenWidth,
+                allSymptoms.isNotEmpty ? allSymptoms : "Select Another Symptoms",
+                ["Drooling or licking lips excessively before", "or after vomiting."],
+                const QoneScreen(),
+              ),
+              SizedBox(height: screenHeight * 0.03),
+
+              buildSymptomsContainer(
+                screenWidth,
+                "Frequent Bowel Movements",
+                ["Loose, watery stools."],
+                const QoneScreen(),
+              ),
+              SizedBox(height: screenHeight * 0.03),
+
+              buildSymptomsContainer(
+                screenWidth,
+                "Frequent Episodes",
+                ["Repeated vomiting over a short period"],
+                const QoneScreen(),
+              ),
+
+               SizedBox(height: screenHeight * 0.03),
+
+              buildSymptomsContainer(
+                screenWidth,
+                "Frequent Episodes",
+                ["Repeated vomiting over a short period"],
+                const QoneScreen(),
+              ),
+              
+            ],
+          ),
         ),
       ),
-      
     );
   }
 

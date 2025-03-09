@@ -4,6 +4,7 @@ import 'package:petsymp/getstarted.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'loginaccount.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 class ProgressScreen extends StatefulWidget {
   final String username;
   final String password;
@@ -119,7 +120,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
     // ✅ Handle Other FirebaseAuth Errors
     else {
       Fluttertoast.showToast(
-        msg: "Login Failed ${"Wrong Username or Password"}",
+        msg: "Login Failed Wrong Username or Password",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.red,
@@ -183,13 +184,21 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
             ),
           ),
            Positioned(
-            top: screenHeight * 0.62,
-            left: screenWidth  * 0.325,
-            child:  const 
+            top: screenHeight * 0.65, // Default height: 50% of screen height
+            left: 0,
+            right: 0,
+            child: const Center( 
+            child:  Column(mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               Text(
-              'Validating...',
+              'Validating',
               style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
             ),
+
+            ],))
+
+
+            
 
           ),
           

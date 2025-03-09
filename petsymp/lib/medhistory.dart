@@ -114,6 +114,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -180,8 +181,10 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                 ),
                 // Next Button at the previous position
                 Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
                     style: ButtonStyle(
@@ -228,6 +231,7 @@ class MedhistoryScreenState extends State<MedhistoryScreen> {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
          

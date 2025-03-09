@@ -117,6 +117,7 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -190,9 +191,11 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                   ),
                 ),
                 // Next Button at the previous position
-                Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+               Positioned(
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
                     style: ButtonStyle(
@@ -211,8 +214,7 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
                         }
-                        return const Color.fromRGBO(29, 29, 44, 1.0)
-; // Default text color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
@@ -240,6 +242,7 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
          

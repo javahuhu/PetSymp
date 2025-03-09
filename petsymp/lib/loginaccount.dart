@@ -4,6 +4,7 @@ import 'package:petsymp/signup.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'progress.dart';
 import 'recovery.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -75,8 +76,8 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               child: Center(
                 child: Image.asset(
                   'assets/logo.png',
-                  width: screenWidth * 0.6,
-                  height: screenHeight * 0.3,
+                  width:  0.7.sw,
+                  height: 0.3.sh,
                 ),
               ),
             ),
@@ -86,8 +87,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
           Positioned(
             bottom: 0,
             child: Container(
-              width: screenWidth,
-              height: screenHeight * 0.5,
+              width: 1.0.sw,
+              height: 0.56.sh,
+
               decoration: const BoxDecoration(
                 color: Color.fromRGBO(29, 29, 44, 1.0),
                 borderRadius: BorderRadius.only(
@@ -97,10 +99,10 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               ),
               child: Padding(
               padding: EdgeInsets.only(
-                top: screenHeight * 0.03, // Add more space at the top
-                left: screenWidth * 0.08,
-                right: screenWidth * 0.08,
-                bottom: screenHeight * 0.0, // Maintain bottom padding
+                top: 46.h, // Add more space at the top
+                left: 40.w,
+                right: 40.w,
+                bottom: 0.h, // Maintain bottom padding
               ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -109,7 +111,8 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Pet breed input
+                          SizedBox(
+                          width: 0.8.sw, child: 
                           TextFormField(
                           controller: _usernameController,
                           autofillHints: const [AutofillHints.name],
@@ -139,9 +142,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               ),
                             ),
                             hintText: 'Username',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0,
-                              horizontal: 15.0,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 15.0.h,
+                              horizontal: 15.0.w,
                             ),
                             // Clear Icon Logic
                             suffixIcon: _usernameController.text.isNotEmpty
@@ -163,12 +166,14 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                             }
                             return null;
                           },
-                        ),
+                          )),
 
 
                           
                           const SizedBox(height: 20),
                           // Password input
+                          SizedBox(
+                          width: 0.8.sw, child: 
                           TextFormField(
                             controller: _passwordController,
                             obscureText: !_isPasswordVisible,
@@ -195,9 +200,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                                 ),
                               ),
                               hintText: 'Password',
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20.0,
-                                horizontal: 15.0,
+                              contentPadding:  EdgeInsets.symmetric(
+                                 vertical: 15.0.h,
+                                  horizontal: 15.0.w,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -221,12 +226,13 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               }
                               return null;
                             },
-                          ),
+                          )),
                         ],
                       ),
                     ),
-                     SizedBox(height: screenHeight * 0.05),
+                     SizedBox(height: screenHeight * 0.04),
                     // Login button
+
                     ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -247,11 +253,11 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
+                      fixedSize: Size( 0.8.sw,  0.069.sh),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Log In",
-                      style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 22.0.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
   // Add spacing
@@ -266,9 +272,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               MaterialPageRoute(builder: (context) => const SignupScreen()),
                             );
                           },
-                          child: const Text(
+                          child:  Text(
                             "Sign Up",
-                            style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1)),
+                            style: TextStyle(fontSize: 16.0.sp, color: const Color.fromRGBO(82, 170, 164, 1)),
                           ),
                         ),
 
@@ -280,9 +286,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               MaterialPageRoute(builder: (context) => const RecoveryScreen()),
                             );
                           },
-                          child: const Text(
+                          child:  Text(
                             "Recovery Password",
-                            style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(82, 170, 164, 1)),
+                            style: TextStyle(fontSize: 16.0.sp, color:const Color.fromRGBO(82, 170, 164, 1)),
                           ),
                         ),
                       ],
@@ -291,7 +297,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
 
                   
 
-                  SizedBox(height: screenHeight * 0.01),
+                  SizedBox(height: 0.01.sh),
 
                    Row(
                 children: [
@@ -299,16 +305,16 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                     child: Divider(
                       color: const Color.fromRGBO(82, 170, 164, 1),
                       thickness: 2,
-                      indent: screenWidth * 0.05,
-                      endIndent: screenWidth * 0.02,
+                      indent: 0.05.w,
+                      endIndent:  0.02.w,
                     ),
                   ),
-                  const Text(
+                   Text(
                     "OR",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
-                      color:  Color.fromRGBO(82, 170, 164, 1),
+                      color:  const Color.fromRGBO(82, 170, 164, 1),
                       letterSpacing: 1.0,
                     ),
                   ),
@@ -316,78 +322,90 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                     child: Divider(
                       color: const Color.fromRGBO(82, 170, 164, 1),
                       thickness: 2,
-                      indent: screenWidth * 0.02,
-                      endIndent: screenWidth * 0.05,
+                      indent: 0.02.w,
+                      endIndent: 0.05.w,
                     ),
                   ),
                 ],
               ),
 
-                  SizedBox(height: screenHeight * 0.02),
-
-              // Clickable Circle Image for external links
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                         Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 50.h, // ✅ Adjusted for safe area
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // ✅ Prevents unnecessary space usage
                 children: [
-                  SizedBox(width: screenWidth * 0.005),
-                  InkWell(
-                    onTap: () async {
-                      await gotoPage("https://accounts.google.com/");
-                    },
-                    child: Container(
-                      width: screenWidth * 0.10,
-                      height: screenWidth * 0.10,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/googlelogo.png',
-                          fit: BoxFit.cover,
+                  SizedBox(height: 17.5.h), // ✅ Adds space before icons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 🔹 Google Logo
+                      InkWell(
+                        onTap: () async {
+                          await gotoPage("https://accounts.google.com/");
+                        },
+                        child: Container(
+                          width: 40.w,  // ✅ Auto-scaled width
+                          height: 40.w, // ✅ Keep it square
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/googlelogo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.09),
-                  InkWell(
-                    onTap: () async {
-                      await gotoPage("https://www.facebook.com/");
-                    },
-                    child: Container(
-                      width: screenWidth * 0.135,
-                      height: screenWidth * 0.135,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/facebooklogo.png',
-                          fit: BoxFit.cover,
+                      SizedBox(width: 20.w), // ✅ Scaled spacing between icons
+                      
+                      // 🔹 Facebook Logo
+                      InkWell(
+                        onTap: () async {
+                          await gotoPage("https://www.facebook.com/");
+                        },
+                        child: Container(
+                          width: 50.w, // ✅ Slightly bigger than Google for proportion
+                          height: 50.w,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/facebooklogo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.09),
-                  InkWell(
-                    onTap: () async {
-                      await gotoPage("https://www.instagram.com/");
-                    },
-                    child: Container(
-                      width: screenWidth * 0.10,
-                      height: screenWidth * 0.10,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/instagramlogo.png',
-                          fit: BoxFit.cover,
+                      SizedBox(width: 20.w), // ✅ Scaled spacing between icons
+                      
+                      // 🔹 Instagram Logo
+                      InkWell(
+                        onTap: () async {
+                          await gotoPage("https://www.instagram.com/");
+                        },
+                        child: Container(
+                          width: 40.w,  // ✅ Same as Google size
+                          height: 40.w,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/instagramlogo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-              ), 
+              ),
+            ),
 
             
        
@@ -399,12 +417,12 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
             
           ),
 
-          Positioned(
-            top: screenHeight * 0.2, // Adjust to control how high it is at the top
-            left: (MediaQuery.of(context).size.width - screenWidth * 0.68) / 2, // Center horizontally
+           Positioned(
+            top: 114.5.h, // Move it higher to ensure visibility
+            left: 0.17.sw, // Adjusts for centering
             child: Container(
-              height: screenHeight * 0.3, // Adjust size as needed
-              width: screenWidth * 0.7,
+              height: 0.3.sh, // Increase size slightly for better visibility
+              width: 0.7.sw,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/hidog.png'),
@@ -413,6 +431,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               ),
             ),
           ),
+
         ],
       ),
     );

@@ -131,25 +131,19 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "What is the Height and Weight",
+                        "What is the Height and Weight of your pet?",
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
-                      Text(
-                        "of your pet?",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.normal,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
-                      ),
+                      
                     ],
                   ),
                 ),
@@ -255,8 +249,10 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                 ),
 
                  Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
                     style: ButtonStyle(
@@ -303,6 +299,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                     ),
                   ),
                 ),
+              ),
 
                
               ],

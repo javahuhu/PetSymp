@@ -120,25 +120,19 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Mention another sign or behavior that",
+                        "Mention another sign or behavior that unusual for your pet",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
-                      const Text(
-                        "unusual for your pet",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
-                      ),
+                      
                     
                       
                       const SizedBox(height: 50),
@@ -195,8 +189,10 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                 ),
                 // Next Button at the previous position
                 Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
                     style: ButtonStyle(
@@ -215,8 +211,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
                         }
-                        return const Color.fromRGBO(29, 29, 44, 1.0)
-; // Default text color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
@@ -244,6 +239,7 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
          

@@ -99,11 +99,12 @@ class ReportScreenState extends State<ReportScreen> {
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child:  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                        Text(
-                        "Thank you, $userName I have put",
+                        "Thank you, $userName I have put together a report to your inputs.",
                         style:const  TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -111,18 +112,7 @@ class ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
 
-                       const Text(
-                        "together a report to your inputs.",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
-                      ),
-
-                    
-                      
-                      
+                       
 
                       
 

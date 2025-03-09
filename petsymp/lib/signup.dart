@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -96,7 +97,7 @@ class SignupScreenState extends State<SignupScreen> {
         msg: "Account Successfully Created",
         toastLength: Toast.LENGTH_LONG,  // Changed to LONG
         gravity: ToastGravity.CENTER,
-        backgroundColor: const Color.fromARGB(255, 54, 244, 114),
+        backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
         textColor: Colors.white,
       );
 
@@ -153,9 +154,9 @@ class SignupScreenState extends State<SignupScreen> {
           ),
         ),
         hintText: hintText,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 20.0,
-          horizontal: 15.0,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 15.h,
+          horizontal: 15.w,
         ),
         suffixIcon: IconButton(
           icon: Icon(
@@ -180,14 +181,14 @@ class SignupScreenState extends State<SignupScreen> {
         children: [
           // Back Button
           Positioned(
-            top: screenHeight * 0.03,
-            left: screenWidth * 0.01,
+            top: 30.h,
+            left: 5.w,
             child: ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_sharp,
-                color: Color.fromRGBO(61, 47, 40, 1),
-                size: 40.0,
+                color: const Color.fromRGBO(61, 47, 40, 1),
+                size: 40.sp,
               ),
               label: const Text(''),
               style: ElevatedButton.styleFrom(
@@ -196,12 +197,15 @@ class SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
-          // Logo at the top
+          // 
+          
+
+          //Logo at the top
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.only(top: screenHeight * 0.037),
+                padding: EdgeInsets.only(top: 0.045.sh),
                 child: const Center(
                   child:  Text(
                         "Sign Up",
@@ -218,191 +222,201 @@ class SignupScreenState extends State<SignupScreen> {
           Positioned(
             bottom: 0,
             child: Container(
-              width: screenWidth,
-              height: screenHeight * 0.65,
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(29, 29, 44, 1.0),
+              width: 1.0.sw,
+              height: 0.65.sh,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(29, 29, 44, 1.0),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
+                  topLeft: Radius.circular(40.r),
+                  topRight: Radius.circular(40.r),
                 ),
               ),
               child: Padding(
                 padding: EdgeInsets.only(
-                  top: screenHeight * 0.046, // Add more space at the top
-                  left: screenWidth * 0.08,
-                  right: screenWidth * 0.08,
+                  top: 46.h, // Add more space at the top
+                  left: 8.w,
+                  right: 8.w,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          // Username Input
-                          TextFormField(
-                          controller: _usernameController,
-                          autofillHints: const [AutofillHints.name],
-                          inputFormatters: [
-                            FirstLetterUpperCaseTextFormatter(),
-                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                          ],
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color.fromARGB(255, 255, 255, 255),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromARGB(255, 255, 255, 255), // Border color when not focused
-                                width: 2.0, // Thickness when not focused
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1), // Border color when focused
-                                width: 3.0, // Thickness when focused
-                              ),
-                            ),
-                            hintText: 'Username',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0,
-                              horizontal: 15.0,
-                            ),
-                            // Clear Icon Logic
-                            suffixIcon: _usernameController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: () {
-                                      _usernameController.clear(); // Clear the input
-                                      setState(() {}); // Trigger a rebuild to hide the icon
-                                    },
-                                  )
-                                : null, // No icon if the field is empty
-                          ),
-                          onChanged: (value) {
-                            setState(() {}); // Trigger a rebuild to show/hide the clear icon
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your username';
-                            }
-                            return null;
-                          },
-                        ),
-                          const SizedBox(height: 20),
-
-                          TextFormField(
-                          controller: _emailController,
-                          autofillHints: const [AutofillHints.name],
-                          
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color.fromARGB(255, 255, 255, 255),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromARGB(255, 255, 255, 255), // Border color when not focused
-                                width: 2.0, // Thickness when not focused
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color:  Color.fromRGBO(82, 170, 164, 1), // Border color when focused
-                                width: 3.0, // Thickness when focused
-                              ),
-                            ),
-                            hintText: 'Email',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0,
-                              horizontal: 15.0,
-                            ),
-                            // Clear Icon Logic
-                            suffixIcon: _emailController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: () {
-                                      _emailController.clear(); // Clear the input
-                                      setState(() {}); // Trigger a rebuild to hide the icon
-                                    },
-                                  )
-                                : null, // No icon if the field is empty
-                          ),
-                          onChanged: (value) {
-                            setState(() {}); // Trigger a rebuild to show/hide the clear icon
-                          },
-                              validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-
-                              if(value.isEmpty || !value.contains('@') || !value.contains('.')){
-                                return 'Invalid Email';
-                              }
-                              return null;
-                            },
-                        ),
-                          
-                          
-                          const SizedBox(height: 20),
-
-                          // Password Input
-                          _buildPasswordField(
-                            controller: _passwordController,
-                            hintText: 'Password',
-                            isPasswordVisible: _isPasswordVisible,
-                            onVisibilityToggle: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Confirm Password Input
-                          _buildPasswordField(
-                            controller: _confirmPass,
-                            hintText: 'Confirm Password',
-                            isPasswordVisible: _isConfirmPasswordVisible,
-                            onVisibilityToggle: () {
-                              setState(() {
-                                _isConfirmPasswordVisible =
-                                    !_isConfirmPasswordVisible;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
+  key: _formKey,
+  child: Column(
+    children: [
+      // Username Input
+            SizedBox(
+              width: 0.8.sw, // Adjust width dynamically (85% of screen width)
+              child: TextFormField(
+                controller: _usernameController,
+                autofillHints: const [AutofillHints.name],
+                inputFormatters: [
+                  FirstLetterUpperCaseTextFormatter(),
+                  FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                ],
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.r), // Scaled radius
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 255, 255, 255), // Border color when not focused
+                      width: 2.0, // Thickness when not focused
                     ),
-                     SizedBox(height: screenHeight * 0.15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(
+                      color: Color.fromRGBO(82, 170, 164, 1), // Border color when focused
+                      width: 3.0, // Thickness when focused
+                    ),
+                  ),
+                  hintText: 'Username',
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 15.h,
+                    horizontal: 15.w,
+                  ),
+                  suffixIcon: _usernameController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _usernameController.clear(); // Clear the input
+                            setState(() {}); // Trigger a rebuild to hide the icon
+                          },
+                        )
+                      : null,
+                ),
+                onChanged: (value) {
+                  setState(() {}); // Trigger a rebuild to show/hide the clear icon
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your username';
+                  }
+                  return null;
+                },
+              ),
+            ),
+
+            SizedBox(height: 15.h),
+
+      // Email Input
+                  SizedBox(
+                    width: 0.8.sw, // Adjust width dynamically
+                    child: TextFormField(
+                      controller: _emailController,
+                      autofillHints: const [AutofillHints.email],
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color.fromARGB(255, 255, 255, 255),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            width: 2.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(82, 170, 164, 1),
+                            width: 3.0,
+                          ),
+                        ),
+                        hintText: 'Email',
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 15.h,
+                          horizontal: 15.w,
+                        ),
+                        suffixIcon: _emailController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _emailController.clear();
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!value.contains('@') || !value.contains('.')) {
+                          return 'Invalid Email';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+
+                  SizedBox(height: 15.h),
+
+                  // Password Input
+                  SizedBox(
+                    width: 0.8.sw, // Adjust width dynamically
+                    child: _buildPasswordField(
+                      controller: _passwordController,
+                      hintText: 'Password',
+                      isPasswordVisible: _isPasswordVisible,
+                      onVisibilityToggle: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+
+                  SizedBox(height: 15.h),
+
+                  // Confirm Password Input
+                  SizedBox(
+                    width: 0.8.sw, // Adjust width dynamically
+                    child: _buildPasswordField(
+                      controller: _confirmPass,
+                      hintText: 'Confirm Password',
+                      isPasswordVisible: _isConfirmPasswordVisible,
+                      onVisibilityToggle: () {
+                        setState(() {
+                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  ],
+                ),
+              ),
+
+                     SizedBox(height: 40.h),
                     ElevatedButton(
                       onPressed: _signUpUser,
                       style: ElevatedButton.styleFrom(
@@ -411,12 +425,12 @@ class SignupScreenState extends State<SignupScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        fixedSize: Size(screenWidth * 0.9, screenHeight * 0.06),
+                        fixedSize: Size( 0.8.sw,  0.069.sh),
                       ),
-                      child: const Text(
+                      child:  Text(
                         "Sign Up",
                         style: TextStyle(
-                          fontSize: 22.0,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -428,11 +442,11 @@ class SignupScreenState extends State<SignupScreen> {
           ),
 
           Positioned(
-            top: screenHeight * 0.15, // Adjust to control how high it is at the top
-            left: (MediaQuery.of(context).size.width - screenWidth * 0.85) / 2, // Center horizontally
+            top: 0.15.sh, // Adjust height dynamically
+            left: (1.sw - 0.85.sw) / 2, // Center horizontally
             child: Container(
-              height: screenHeight * 0.2, // Adjust size as needed
-              width: screenWidth * 0.85,
+              height: 0.2.sh, // Adjust height dynamically
+              width: 0.85.sw, // Adjust width dynamically
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/catsit.png'),
@@ -441,6 +455,7 @@ class SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
+
         ],
       ),
     );

@@ -83,35 +83,19 @@ class PermissionScreenState extends State<PermissionScreen> {
                 Positioned(
                   top: screenHeight * 0.22, // Text and input below the paw
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child:  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                        Text(
-                        "Please provide the",
+                        "Please provide the following basic information Regarding to your pet",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
-                       Text(
-                        "following basic information",
-                        style: TextStyle(
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    
-
-                      Text(
-                        "Regarding to your pet",
-                        style: TextStyle(
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                          fontSize: 22,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
+                      
                     ],
                   ),
                 ),
@@ -119,16 +103,18 @@ class PermissionScreenState extends State<PermissionScreen> {
                 // Next Button at the previous position
                 Positioned(
                 top: screenHeight * 0.9,
-                left: screenWidth * 0.65,
-                child: ElevatedButton(
-                  onPressed: () {
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 150, // Adjust as needed
+                  child: ElevatedButton(
+                    onPressed: () {
                    Navigator.push(
                     context,
                     MaterialPageRoute
                     (builder: (context) =>  const AgeinputScreen()),
                   );
                   },
-                  style: ButtonStyle(
+                    style: ButtonStyle(
                     // Dynamic background color based on button state
                     backgroundColor: WidgetStateProperty.resolveWith(
                       (states) {
@@ -144,8 +130,7 @@ class PermissionScreenState extends State<PermissionScreen> {
                         if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
                         }
-                        return const Color.fromRGBO(29, 29, 44, 1.0)
-; // Default text color
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
                       },
                     ),
                     shadowColor: WidgetStateProperty.all(Colors.transparent),
@@ -161,14 +146,15 @@ class PermissionScreenState extends State<PermissionScreen> {
                       ),
                     ),
                     fixedSize: WidgetStateProperty.all(
-                      const Size(150, 55),
+                      const Size(100, 55),
                     ),
                   ),
-                  child: const Text(
-                    "CONFIRM",
-                    style: TextStyle(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.bold,
+                    child: const Text(
+                      "CONFIRM",
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

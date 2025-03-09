@@ -104,25 +104,19 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Before we start your assessment,",
+                        "Before we start your assessment, input your USERNAME first.",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
-                      const Text(
-                        "input your USERNAME first.",
-                        style: TextStyle(
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                     
                       const SizedBox(height: 22),
                       SizedBox(
                         width: screenWidth * 0.8,
@@ -178,18 +172,47 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.9,
-                  left: screenWidth * 0.75,
+                top: screenHeight * 0.9,
+                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                  width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: () => navigateToNextPage(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      fixedSize: const Size(100, 55),
+                    style: ButtonStyle(
+                    // Dynamic background color based on button state
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
+                        }
+                        return Colors.transparent; // Default background color
+                      },
                     ),
+                    // Dynamic text color based on button state
+                    foregroundColor: WidgetStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
+                        }
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
+                      },
+                    ),
+                    shadowColor: WidgetStateProperty.all(Colors.transparent),
+                    side: WidgetStateProperty.all(
+                      const BorderSide(
+                        color: Color.fromRGBO(82, 170, 164, 1),
+                        width: 2.0,
+                      ),
+                    ),
+                    shape: WidgetStateProperty.all(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                      ),
+                    ),
+                    fixedSize: WidgetStateProperty.all(
+                      const Size(100, 55),
+                    ),
+                  ),
                     child: const Text(
                       "Next",
                       style: TextStyle(
@@ -199,6 +222,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
 

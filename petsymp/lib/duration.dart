@@ -92,25 +92,19 @@ class DurationScreenState extends State<DurationScreen> {
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "How long has this been",
+                        "How long has this been troubling your pet?",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
-                      Text(
-                        "troubling your pet?",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
-                      ),
+                      
                       SizedBox(height: 50),
                     ],
                   ),
