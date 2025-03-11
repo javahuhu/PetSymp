@@ -74,21 +74,21 @@ class UserData with ChangeNotifier {
   final Map<String, List<String>> _symptomQuestions = {
     "Vomiting": [
       "How often has your pet been vomiting?",
-      "Is your pet vomiting food, bile, or \nsomething unusual like blood?",
+      "Is your pet vomiting food, bile, or something unusual like blood?",
       "Has your pet eaten anything unusual?",
-      "Is your pet showing additional \nsymptoms?",
+      "Is your pet showing additional symptoms?",
       "How long has your pet been vomiting?"
     ],
     "Rabies": [
-      "Has your pet been bitten or scratched by \nanother animal recently?",
-      "What type of animal bit or scratched \nyour pet?",
-      "Is your pet showing symptoms like \ndrooling, aggression, or seizures?",
+      "Has your pet been bitten or scratched by another animal recently?",
+      "What type of animal bit or scratched your pet?",
+      "Is your pet showing symptoms like drooling, aggression, or seizures?",
       "Is your pet vaccinated against rabies?",
     ],
     "Lethargy": [
       "How long has your pet been lethargic?",
-      "Has your pet been eating and drinking \nnormally?",
-      "Is your pet experiencing any other \nsymptoms like vomiting or diarrhea?",
+      "Has your pet been eating and drinking normally?",
+      "Is your pet experiencing any other symptoms like vomiting or diarrhea?",
     ],
 
    

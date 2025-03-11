@@ -142,7 +142,7 @@ class DurationScreenState extends State<DurationScreen> {
       child: ElevatedButton(
         onPressed: () {
           // Store selected duration in Provider
-          Provider.of<UserData>(context, listen: false).setDuration(label);
+          
 
           // Navigate to AnothersympScreen
           Navigator.push(

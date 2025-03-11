@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:petsymp/report.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 class QoneScreen extends StatefulWidget {
   const QoneScreen({super.key});
 
@@ -13,7 +12,9 @@ class QoneScreen extends StatefulWidget {
 
 class QoneScreenState extends State<QoneScreen> {
   bool _isAnimated = false;
+  
   int currentQuestionIndex = 0;
+
   List<bool> _buttonVisible = [false, false];
 
   @override
@@ -25,7 +26,7 @@ class QoneScreenState extends State<QoneScreen> {
   void _triggerAnimation() {
     setState(() {
       _isAnimated = false;
-      _buttonVisible = [false, false]; // Reset button visibility
+      _buttonVisible = [false, false]; // Reset buttons visibility
     });
 
     Future.delayed(const Duration(milliseconds: 800), () {
@@ -34,9 +35,9 @@ class QoneScreenState extends State<QoneScreen> {
       });
 
       for (int i = 0; i < _buttonVisible.length; i++) {
-        Future.delayed(Duration(milliseconds: 800 * i), () {
+        Future.delayed(Duration(milliseconds: 200 * i), () {
           setState(() {
-            _buttonVisible[i] = true; // Show buttons sequentially
+            _buttonVisible[i] = true; // Re-trigger button visibility sequentially
           });
         });
       }
@@ -50,7 +51,7 @@ class QoneScreenState extends State<QoneScreen> {
       setState(() {
         currentQuestionIndex++;
       });
-      _triggerAnimation();
+      _triggerAnimation(); // Re-trigger animations for new question
     } else {
       Navigator.push(
         context,
@@ -79,138 +80,143 @@ class QoneScreenState extends State<QoneScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: screenHeight * 0.03),
-
-            // ✅ Back Button
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton.icon(
-                onPressed: previousQuestion,
-                icon: const Icon(
-                  Icons.arrow_back_sharp,
-                  color: Color.fromRGBO(61, 47, 40, 1),
-                  size: 40.0,
-                ),
-                label: const Text(''),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-            ),
-
-            // ✅ Animated Header (paw icon)
-            AnimatedOpacity(
-              duration: const Duration(seconds: 1),
-              opacity: _isAnimated ? 1 : 0,
-              child: Column(
-                children: [
-                  Container(
-                    width: screenWidth * 0.15,
-                    height: screenWidth * 0.15,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    child: Image.asset(
-                      'assets/paw.png',
-                      fit: BoxFit.contain,
-                    ),
+      body: Stack(
+        children: [
+          Stack(
+            children: [
+              Positioned(
+                top: screenHeight * 0.03,
+                left: screenWidth * 0.01,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Navigate to the previous question instead of exiting
+                    previousQuestion();
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_sharp,
+                    color: Color.fromRGBO(61, 47, 40, 1),
+                    size: 40.0,
                   ),
-                  SizedBox(height: screenHeight * 0.02),
-                ],
-              ),
-            ),
-
-            SizedBox(height: screenHeight * 0.03),
-
-            // ✅ Dynamic Question Text
-            Expanded(
-              child: Center(
-                child: AutoSizeText(
-                  questions.isNotEmpty
-                      ? questions[currentQuestionIndex]
-                      : "No questions available",
-                  maxLines: 3,
-                  minFontSize: 14,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.07,
-                    fontWeight: FontWeight.bold,
-                    color: const Color.fromRGBO(29, 29, 44, 1.0),
+                  label: const Text(''),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
                   ),
                 ),
               ),
-            ),
+              AnimatedPositioned(
+                duration: const Duration(seconds: 1),
+                curve: Curves.easeInOut,
+                top: _isAnimated ? screenHeight * 0.13 : -100,
+                left: screenWidth * 0.1,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.asset(
+                        'assets/paw.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.05),
+                  ],
+                ),
+              ),
+            Positioned(
+                top: screenHeight * 0.22,
+                left: screenWidth * 0.03,
+                right: screenWidth * 0.02,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Question",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      questions.isNotEmpty
+                          ? questions[currentQuestionIndex]
+                          : "No questions available",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              ),
 
-            SizedBox(height: screenHeight * 0.02),
-
-            // ✅ Buttons Row (Yes/No)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // ✅ Yes Button
-                buildAnimatedButton(screenWidth, "Yes", context, 0),
-                // ✅ No Button
-                buildAnimatedButton(screenWidth, "No", context, 1),
-              ],
-            ),
-
-            SizedBox(height: screenHeight * 0.05),
-          ],
-        ),
+              // Yes/No Buttons with Re-Triggered Animation
+              buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.8, "Yes", context, 0),
+              buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.87, "No", context, 1),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  // ✅ Yes/No Buttons with Animation
-  Widget buildAnimatedButton(double screenWidth, String label, BuildContext context, int index) {
-    return AnimatedOpacity(
+  // Yes/No Buttons with Re-Triggered Animation
+  Widget buildAnimatedButton(
+      double screenHeight, double screenWidth, double topPosition, String label, BuildContext context, int index) {
+    return AnimatedPositioned(
       duration: const Duration(milliseconds: 800),
-      opacity: _buttonVisible[index] ? 1 : 0,
+      curve: Curves.easeInOut,
+      top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
+      right: screenWidth * 0.02,
       child: ElevatedButton(
-        onPressed: () => nextQuestion(context),
+       onPressed: () => nextQuestion(context),
         style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.pressed)) {
-                return const Color.fromARGB(255, 0, 0, 0);
-              }
-              return Colors.transparent;
-            },
-          ),
-          foregroundColor: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.pressed)) {
-                return const Color.fromARGB(255, 255, 255, 255);
-              }
-              return const Color.fromRGBO(29, 29, 44, 1.0);
-            },
-          ),
-          shadowColor: WidgetStateProperty.all(Colors.transparent),
-          side: WidgetStateProperty.all(
-            const BorderSide(
-              color: Color.fromRGBO(82, 170, 164, 1),
-              width: 2.0,
-            ),
-          ),
-          shape: WidgetStateProperty.all(
-            const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-            ),
-          ),
-          fixedSize: WidgetStateProperty.all(
-            Size(screenWidth * 0.3, 55), // ✅ Button width is now dynamic
-          ),
-        ),
-        child: Text(
+                    // Dynamic background color based on button state
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
+                        }
+                        return Colors.transparent; // Default background color
+                      },
+                    ),
+                    // Dynamic text color based on button state
+                    foregroundColor: WidgetStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
+                        }
+                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
+                      },
+                    ),
+                    shadowColor: WidgetStateProperty.all(Colors.transparent),
+                    side: WidgetStateProperty.all(
+                      const BorderSide(
+                        color: Color.fromRGBO(82, 170, 164, 1),
+                        width: 2.0,
+                      ),
+                    ),
+                    shape: WidgetStateProperty.all(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                      ),
+                    ),
+                    fixedSize: WidgetStateProperty.all(
+                      const Size(100, 55),
+                    ),
+                  ),
+              child: Text(
           label,
-          style: TextStyle(
-            fontSize: screenWidth * 0.05, // ✅ Dynamic text size
+          style: const TextStyle(
+            fontSize: 22.0,
             fontWeight: FontWeight.bold,
           ),
         ),

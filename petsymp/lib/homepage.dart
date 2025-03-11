@@ -128,24 +128,29 @@ class HomePageScreenState extends State<HomePageScreen> {
 
           // Rotated Image Positioned at the Bottom with Animation
           if (_selectedIndex == 0)
-            AnimatedAlign(
-              alignment: _isAnimated ? const Alignment(0.5, 0.9) : const Alignment(5, 1),
-              duration: const Duration(seconds: 2),
-              curve: Curves.easeInOut,
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationZ(-6.3 / 4),
-                child: Container(
-                  height: 180.h, // Responsive height
-                  width: 0.8.sw, // 80% of screen width
-                  margin: EdgeInsets.only(top: 200.h), // Adjust margin dynamically
-                  child: FittedBox(
-                    fit: BoxFit.fill,
-                    child: Image.asset("assets/catpeeking.png"),
-                  ),
+              AnimatedAlign(
+            alignment: _isAnimated ? Alignment(1.0, 0.9) : Alignment(2, 1), 
+            // 🔹 Moves the image further right when animated
+            
+            duration: const Duration(seconds: 2),
+            curve: Curves.easeInOut,
+            child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationZ(-6.3 / 4),
+              child: Container(
+                height: 180.h, // Responsive height
+                width: 0.8.sw, // 80% of screen width
+                margin: EdgeInsets.only(top: 200.h, right: 5.w), 
+                // 🔹 Adds small right margin to prevent it from overflowing
+                
+                child: FittedBox(
+                  fit: BoxFit.fill,
+                  child: Image.asset("assets/catpeeking.png"),
                 ),
               ),
             ),
+          ),
+
 
           // Placeholder for other tabs
           if (_selectedIndex != 0)

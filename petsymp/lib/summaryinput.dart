@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/recommendationone.dart';
 import 'userdata.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -253,25 +254,42 @@ class SummaryScreenState extends State<SummaryScreen> {
                 left: screenWidth * 0.06 , // Centers it horizontally
                 child: InkWell(
                   child: Container(
-                    width: screenWidth * 0.43,
-                    height: screenHeight * 0.248,
-                    decoration:   const BoxDecoration(
-                      color:   Color.fromRGBO(29, 29, 44, 0.89),
-                       borderRadius:  BorderRadius.all(Radius.circular(10)),
-                       
+                    width: 0.43.sw, // 43% of screen width
+                    height: 0.25.sh, // Adjusted height for better scaling
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(29, 29, 44, 0.89),
+                      borderRadius: BorderRadius.all(Radius.circular(10.r)), // Responsive radius
                     ),
-
-                    child: Column(
+                    child: ClipRRect( // Prevents content from overflowing visually
+                      borderRadius: BorderRadius.all(Radius.circular(10.r)), 
+                      child: FittedBox( // Ensures content resizes properly without overflow
+                        fit: BoxFit.scaleDown, 
+                        alignment: Alignment.center, 
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: 0.6.sw,
+                            maxHeight: 0.4.sh, // Ensures width never exceeds 43% of screen
+                          ),
+                          child: SingleChildScrollView( // Prevents vertical overflow
+                            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 0.w), // Responsive padding
+                            child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                    _buildInputCardclone("🎂", "Age", userData.age.toString()),
-                                    _buildInputCardclone("📏", "Height", userData.height.toString()),
-                                    _buildInputCardclone("⚖️", "Weight", userData.weight.toString()),
-                                    _buildInputCardclone("🐶", "Breed", userData.breed),
-                                    _buildInputCardclone("🤕", "Symptoms",allSymptoms),
+                                _buildInputCardclone("🎂", "Age", userData.age.toString()),
+                                _buildInputCardclone("📏", "Height", userData.height.toString()),
+                                _buildInputCardclone("⚖️", "Weight", userData.weight.toString()),
+                                _buildInputCardclone("🐶", "Breed", userData.breed),
+                                _buildInputCardclone("🤕", "Symptoms", allSymptoms),
                               ],
-                            ), 
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
+
+
+
                   onTap: () {
                     showDialog(
                     context: context,
@@ -279,16 +297,17 @@ class SummaryScreenState extends State<SummaryScreen> {
                       return AlertDialog(
                         backgroundColor: const Color.fromARGB(255, 243, 242, 240),
                         contentPadding: EdgeInsets.zero, // Removes extra padding
-                        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170), // Adjusts padding
+                        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 160.h), // Adjusts padding
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), // Rounded corners
                         title: const Text('Input', textAlign: TextAlign.center, style: TextStyle(color:  Colors.black), ),
                         content: SizedBox(
-                          width: screenWidth * 2, // 80% of screen width
-                          height: screenHeight * 0.55, // 50% of screen height
+                          width: 1.sw, // 80% of screen width
+                          height:  1.sh,
+                          child: SingleChildScrollView(  // 50% of screen height
                           child: Padding(
-                            padding: const EdgeInsets.all(20.0), // Internal padding
+                            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w), // Internal padding
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                             mainAxisSize: MainAxisSize.min,
                               children: [
                                     _buildInputCard("🎂", "Age", userData.age.toString()),
                                     _buildInputCard("📏", "Height", userData.height.toString()),
@@ -297,8 +316,9 @@ class SummaryScreenState extends State<SummaryScreen> {
                                     _buildInputCard("🤕", "Symptoms", allSymptoms),
                               ],
                             ),
-                          ),
+                          )),
                         ),
+                        
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
@@ -325,67 +345,72 @@ class SummaryScreenState extends State<SummaryScreen> {
                   left: screenWidth * 0.515, // Centers it horizontally
                   child: InkWell(
                     child: Container(
-                      width: screenWidth * 0.43,
-                      height: screenHeight * 0.42,
-                      decoration: const BoxDecoration(
-                        color:   Color.fromRGBO(29, 29, 44, 0.897),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min, 
-                        children: [
-                          const Padding(padding: EdgeInsets.only(top: 30)),
-                          CircularPercentIndicator(
-                            radius: 45.0,
-                            lineWidth: 15.0,
-                            percent: 0.10,
-                            animation: true,
-                            center: const Text("10%", style: TextStyle(color: Colors.green),),
-                            progressColor: const Color.fromARGB(255, 36, 143, 26),
-                            footer: const Padding(
-                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
-                            child:  Text(
-                              "Vomiting",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
+                    width: 0.43.sw, // 43% of screen width
+                    height: 0.42.sh, // 42% of screen height
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(29, 29, 44, 0.897),
+                      borderRadius: BorderRadius.all(Radius.circular(10.r)), // Responsive radius
+                    ),
+                    child: SingleChildScrollView( // Prevents overflow
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(height: 15.h), // Responsive spacing
+                            CircularPercentIndicator(
+                              radius: 45.r, // Responsive radius
+                              lineWidth: 15.w, // Responsive line width
+                              percent: 0.10,
+                              animation: true,
+                              center: Text("10%", style: TextStyle(color: Colors.green, fontSize: 14.sp)), // Responsive font size
+                              progressColor: const Color.fromARGB(255, 36, 143, 26),
+                              footer: Padding(
+                                padding: EdgeInsets.only(top: 10.h), // Responsive padding
+                                child: Text(
+                                  "Vomiting",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp, color: Colors.white), // Responsive font
+                                ),
+                              ),
                             ),
-                          ),
-                          ),
-                          SizedBox(height: screenHeight * 0.015), 
+                            SizedBox(height: 15.h), // Responsive spacing
 
-                          CircularPercentIndicator(
-                            radius: 45.0,
-                            lineWidth: 15.0,
-                            percent: 0.30,
-                            animation: true,
-                            center: const Text("30%", style: TextStyle(color: Colors.orange),),
-                            progressColor: Colors.orange,
-                            footer: const Padding(
-                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
-                            child:  Text(
-                              "Lethargy",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
+                            CircularPercentIndicator(
+                              radius: 45.r,
+                              lineWidth: 15.w,
+                              percent: 0.30,
+                              animation: true,
+                              center: Text("30%", style: TextStyle(color: Colors.orange, fontSize: 14.sp)), 
+                              progressColor: Colors.orange,
+                              footer: Padding(
+                                padding: EdgeInsets.only(top: 10.h), 
+                                child: Text(
+                                  "Lethargy",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp, color: Colors.white),
+                                ),
+                              ),
                             ),
-                          ),
-                          ),
-                          SizedBox(height: screenHeight * 0.015), 
+                            SizedBox(height: 15.h), 
 
-                          CircularPercentIndicator(
-                            radius: 45.0,
-                            lineWidth: 15.0,
-                            percent: 0.90,
-                            animation: true,
-                            center: const Text("90%",style: TextStyle(color: Colors.red,),),
-                            progressColor: const Color.fromARGB(255, 214, 39, 16),
-                            footer: const Padding(
-                            padding:  EdgeInsets.only(top: 10), // ✅ Adds 10px space above footer
-                            child:  Text(
-                              "Acid",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.0, color: Color.fromARGB(255, 255, 255, 255)),
+                            CircularPercentIndicator(
+                              radius: 45.r,
+                              lineWidth: 15.w,
+                              percent: 0.90,
+                              animation: true,
+                              center: Text("90%", style: TextStyle(color: Colors.red, fontSize: 14.sp)), 
+                              progressColor: const Color.fromARGB(255, 214, 39, 16),
+                              footer: Padding(
+                                padding: EdgeInsets.only(top: 10.h),
+                                child: Text(
+                                  "Acid",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp, color: Colors.white),
+                                ),
+                              ),
                             ),
-                          ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                    ),
                     ),
                     onTap: () {
                       showDialog(
@@ -527,7 +552,7 @@ Positioned(
  
   Widget _buildInputCard(String emoji, String label, String value) {
   return Card(
-    elevation: 30,
+    elevation: 3,
     margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     child: Padding(

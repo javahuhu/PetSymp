@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:petsymp/email.dart';
 import 'package:petsymp/signup.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'progress.dart';
-import 'recovery.dart';
+
+import 'dart:ui'; // Import this for lerpDoub
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -59,9 +61,9 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
     // Use MediaQuery for responsive design
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       //backgroundColor: const Color.fromARGB(255, 173, 173, 80),
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
@@ -283,7 +285,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                           onPressed: () {
                               Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const RecoveryScreen()),
+                              MaterialPageRoute(builder: (context) => const EmailScreen()),
                             );
                           },
                           child:  Text(
@@ -336,7 +338,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min, // ✅ Prevents unnecessary space usage
                 children: [
-                  SizedBox(height: 17.5.h), // ✅ Adds space before icons
+                  SizedBox(height: 12.h), // ✅ Adds space before icons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -418,7 +420,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
           ),
 
            Positioned(
-            top: 114.5.h, // Move it higher to ensure visibility
+             top: lerpDouble(114.5.h, -700.h, keyboardHeight / screenHeight) ?? 114.5.h,// Move up when keyboard is open // Move it higher to ensure visibility
             left: 0.17.sw, // Adjusts for centering
             child: Container(
               height: 0.3.sh, // Increase size slightly for better visibility

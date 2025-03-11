@@ -172,7 +172,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
             child: ElevatedButton(
               onPressed: () {
                 final userData = Provider.of<UserData>(context, listen: false);
-                userData.setSelectedSymptom(title);
+               
                 userData.addPetSymptom(title);
 
                 // Navigate to DurationScreen

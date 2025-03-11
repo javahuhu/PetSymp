@@ -141,7 +141,7 @@ class ReportScreenState extends State<ReportScreen> {
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.65,
+      right: screenWidth * 0.02,
       child: ElevatedButton(
         onPressed: () {
           
