@@ -1,32 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class UserData with ChangeNotifier {
   String _userName = '';
-  int _petHeight = 0;
-  int _petWeight = 0;
+  String _petSize = '';
+  String _email = '';
   int _petAge = 0;
   String _breed = '';
   String _anotherSymptom = '';
-  String _duration = '';
+  Map<String, String> _symptomDurations = {};
   String _selectedSymptom = "";
-  final List<String> _petSymptoms = [];
+   List<String> _petSymptoms = [];
   List<String> _questions = [];
+  List<Map<String, dynamic>> _diagnosisResults = []; // ✅ Stores illness results
 
-  // Getter methods
+  // ✅ Getters
   String get userName => _userName;
+  String get email => _email;
   String get breed => _breed;
-  int get height => _petHeight;
-  int get weight => _petWeight;
+  String get size => _petSize;
   int get age => _petAge;
   String get anotherSymptom => _anotherSymptom;
-  String get duration => _duration;
+  Map<String, String> get symptomDurations => _symptomDurations;
   String get selectedSymptom => _selectedSymptom;
   List<String> get petSymptoms => _petSymptoms;
   List<String> get questions => _questions;
+  List<Map<String, dynamic>> get diagnosisResults => _diagnosisResults; // ✅ Diagnosis results
 
-  // ✅ Set user name
+  // ✅ Setters
   void setUserName(String name) {
     _userName = name;
+    notifyListeners();
+  }
+
+  void setOTPemail(String email){
+    _email = email;
     notifyListeners();
   }
 
@@ -35,39 +44,49 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
-  void setpetHeight(int height) {
-    _petHeight = height;
+  void setpetSize(String size) {
+    _petSize = size;
     notifyListeners();
   }
 
-  void setpetAge(int age ){
+
+  void setpetAge(int age) {
     _petAge = age;
-   notifyListeners();
-  }
-
-  void setpetWeight(int weight) {
-    _petWeight = weight;
     notifyListeners();
   }
 
-  // ✅ Add symptoms (avoiding duplicates)
   void addPetSymptom(String symptom) {
     if (!_petSymptoms.contains(symptom)) {
       _petSymptoms.add(symptom);
-      _updateQuestions(); // Update questions when a symptom is added
+      _updateQuestions();
     }
   }
 
-  // ✅ Set duration
-  void setDuration(String selectedDuration) {
-    _duration = selectedDuration;
+  void setAnotherSymptom(String symptom) {
+  if (!_petSymptoms.contains(symptom)) {
+    _petSymptoms.add(symptom);
+  }
+  notifyListeners();
+}
+
+
+
+  void setSelectedSymptom(String symptom) {
+    _selectedSymptom = symptom;
+    _updateQuestions();
+  }
+
+   void setSymptomDuration(String symptom, String duration) {
+    _symptomDurations[symptom] = duration; // ✅ Store duration per symptom
     notifyListeners();
   }
 
-  // ✅ Set additional symptom
-  void setAnotherSymptom(String symptom) {
-    _anotherSymptom = symptom;
-    _updateQuestions();
+  Map<String, String> getSymptomDurations() {
+    return _symptomDurations;
+  }
+  void setDiagnosisResults(List<Map<String, dynamic>> results) {
+    _diagnosisResults = results;
+    notifyListeners();
   }
 
   // 🔹 **Symptom-to-Questions Mapping**
@@ -90,38 +109,59 @@ class UserData with ChangeNotifier {
       "Has your pet been eating and drinking normally?",
       "Is your pet experiencing any other symptoms like vomiting or diarrhea?",
     ],
-
-   
   };
-
-  // ✅ **Updated function to handle single and multiple symptoms**
-  void setSelectedSymptom(String symptom) {
-    _selectedSymptom = symptom;
-    _updateQuestions();
-  }
 
   // ✅ **Detect & Combine Questions for Single or Multiple Symptoms**
   void _updateQuestions() {
-    // Get all selected symptoms dynamically
-    List<String> allSymptoms = [
-      if (_selectedSymptom.isNotEmpty) _selectedSymptom,
-      if (_anotherSymptom.isNotEmpty) _anotherSymptom,
-      ..._petSymptoms
-    ];
+  List<String> allSymptoms = [..._petSymptoms]; // ✅ Include all symptoms
 
-    // Remove duplicates in case the same symptom was added twice
-    allSymptoms = allSymptoms.toSet().toList();
-
-    // ✅ Collect all relevant questions
-    List<String> combinedQuestions = [];
-    for (String sym in allSymptoms) {
-      if (_symptomQuestions.containsKey(sym)) {
-        combinedQuestions.addAll(_symptomQuestions[sym]!);
-      }
+  List<String> combinedQuestions = [];
+  for (String sym in allSymptoms) {
+    if (_symptomQuestions.containsKey(sym)) {
+      combinedQuestions.addAll(_symptomQuestions[sym]!);
     }
-
-    // ✅ Remove duplicate questions and update the questions list
-    _questions = combinedQuestions.toSet().toList();
-    notifyListeners();
   }
+
+  _questions = combinedQuestions.toSet().toList(); // Remove duplicates
+  notifyListeners();
+}
+
+
+  // ✅ Fetch Diagnosis from FastAPI
+ Future<void> fetchDiagnosis() async {
+  final Uri url = Uri.parse("http://192.168.1.102:8000/diagnose");
+
+  // ✅ Ensure all symptoms are stored properly
+  if (_anotherSymptom.isNotEmpty && !_petSymptoms.contains(_anotherSymptom)) {
+    _petSymptoms.add(_anotherSymptom); // ✅ Merge before sending request
+  }
+
+  final Map<String, dynamic> requestData = {
+    "userName": _userName,
+    "symptoms": _petSymptoms.toSet().toList(),  // ✅ Only send `_petSymptoms`
+    "age": _petAge.toString(),
+    "breed": _breed,
+    "size": _petSize
+  };
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestData),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      List<Map<String, dynamic>> illnesses = List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
+      setDiagnosisResults(illnesses);  
+    } else {
+      print("❌ API Error: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("🚨 Failed to connect to API: $e");
+  }
+}
+
+
 }

@@ -26,13 +26,16 @@ class AnothersympScreenState extends State<AnothersympScreen> {
       setState(() {
         _isAnimated = true;
       });
+
       for (int i = 0; i < _buttonVisible.length; i++) {
-        Future.delayed(Duration(milliseconds: 300 * i), () {
-          setState(() {
-            _buttonVisible[i] = true; // Make each button visible sequentially
-          });
-        });
-      }
+  final int index = i; // ✅ Create a local copy of `i`
+  Future.delayed(Duration(milliseconds: 300 * index), () {
+    if (!mounted) return; // ✅ Prevents calling setState after dispose()
+    setState(() {
+      _buttonVisible[index] = true;
+    });
+  });
+}
     });
   }
 
@@ -51,22 +54,23 @@ class AnothersympScreenState extends State<AnothersympScreen> {
               children: [
                 // Back Button
                 Positioned(
-                  top: screenHeight * 0.03,
-                  left: screenWidth * 0.01,
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      color: Color.fromRGBO(61, 47, 40, 1),
-                      size: 40.0,
-                    ),
-                    label: const Text(''),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                ),
+            top: screenHeight * 0.03,
+            left: screenWidth * 0.01,
+            child: ElevatedButton(
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context); // ✅ Only pops if possible
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                shape: const CircleBorder(),
+                padding: const EdgeInsets.all(8),
+              ),
+              child: const Icon(Icons.arrow_back, size: 40, color: Colors.black),
+            ),
+          ),
                 // Animated Header
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
@@ -116,7 +120,8 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                 buildAnimatedButton(
                     screenHeight, screenWidth, 0.35, "Yes", const MentionsympScreen(), 0),
                 buildAnimatedButton(
-                    screenHeight, screenWidth, 0.42, "No", const QoneScreen(),1),
+                screenHeight, screenWidth, 0.42, "No", const QoneScreen(), 1, replace: true),
+
               
               ],
             ),
@@ -129,20 +134,26 @@ class AnothersympScreenState extends State<AnothersympScreen> {
 
   // Method to create an animated button
   Widget buildAnimatedButton(double screenHeight, double screenWidth,
-      double topPosition,String label, Widget destination, int index) {
+      double topPosition,String label, Widget destination, int index, {bool replace = false}) {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
       left: screenWidth * 0.29 - 50,
       child: ElevatedButton(
-        onPressed: () {
-          
-         Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => destination),
-      );
-        },
+       onPressed: () {
+        if (replace) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          ); // ✅ Replaces instead of pushing a new stack
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+        }
+      },
         style: ButtonStyle(
                     // Dynamic background color based on button state
                     backgroundColor: WidgetStateProperty.resolveWith(

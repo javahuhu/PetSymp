@@ -48,16 +48,27 @@ class SymptomsScreenState extends State<SymptomsScreen> {
     });
   }
 
-  void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-       String petSymptom = _symptomscontroller.text.trim();
-      // Navigate only if the input is valid
+ void navigateToNextPage() {
+  if (_formKey.currentState?.validate() ?? false) {
+    String inputText = _symptomscontroller.text.trim();
+
+    // ✅ Split symptoms while preserving multi-word symptoms
+    List<String> symptomsList = inputText.split(RegExp(r',\s*')) // Split by commas with optional spaces
+        .map((s) => s.trim()) // Remove extra spaces
+        .where((s) => s.isNotEmpty) // Remove empty entries
+        .toList();
+
+    if (symptomsList.isNotEmpty) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  SearchsymptomsScreen(petSymptom: petSymptom)),
+        MaterialPageRoute(
+          builder: (context) => SearchsymptomsScreen(symptoms: symptomsList), // ✅ Pass list correctly
+        ),
       );
     }
   }
+}
+
 
   
 

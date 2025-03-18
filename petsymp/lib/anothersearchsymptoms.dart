@@ -32,9 +32,10 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     final userData = Provider.of<UserData>(context);
 
     String allSymptoms = [
-      if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
-      if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom
-    ].where((element) => element.isNotEmpty).join(" + "); // Avoid empty strings
+  ...userData.petSymptoms,   // ✅ First inputted symptoms
+].where((symptom) => symptom.isNotEmpty).join(" + ");  // ✅ Format correctly
+
+// Avoid empty strings
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),

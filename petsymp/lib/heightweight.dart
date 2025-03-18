@@ -54,26 +54,19 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
     }
   }
   
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _sizeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
-      final height = int.tryParse(_heightController.text);
-      final weight = int.tryParse(_weightController.text); 
-
-  if (height != null && weight != null ) {
-    Provider.of<UserData>(context, listen: false).setpetHeight(height);
-     Provider.of<UserData>(context, listen: false).setpetWeight(weight); 
-      // Navigate only if the input is valid
+      Provider.of<UserData>(context, listen: false).setpetSize(_sizeController.text);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const  BreedScreen()),
       );
     }
-    }
+    
   }
 
   
@@ -136,7 +129,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "What is the Height and Weight of your pet?",
+                        "What is the size of your pet",
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
@@ -156,12 +149,15 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: _weightController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                          ],
+                      
+                        const SizedBox(height: 10),
+                       TextFormField(
+                          controller: _sizeController,
+                          autofillHints: const [AutofillHints.name],
+                            inputFormatters: [
+                              FirstLetterUpperCaseTextFormatter(),
+                              FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                            ],
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -182,66 +178,19 @@ class MeasureinputScreenState extends State<MeasureinputScreen> {
                                 ),
                               ),
 
-                            hintText: 'Enter pet weight (kg)',
+                            hintText: 'Enter the Size of the Pet',
                             contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15.0,
+                              vertical: 20.0,
                               horizontal: 15.0,
                             ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter weight of the pet';
-                            }
-                             if (value.length !=2) {
-                              return 'Please enter 2 digit numbers only';
+                              return 'Please enter size of the pet';
                             }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-                        TextFormField(
-                        controller: _heightController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^[0-9]{0,2}$')), // ✅ Only allows max 2 digits
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(
-                              color: Color.fromRGBO(82, 170, 164, 1), // Border color when not focused
-                              width: 2.0, // Thickness when not focused
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(
-                              color: Color.fromRGBO(72, 38, 163, 1), // Border color when focused
-                              width: 2.0, // Thickness when focused
-                            ),
-                          ),
-                          hintText: 'Enter pet height (cm)',
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 15.0,
-                            horizontal: 15.0,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter height of the pet';
-                          }
-
-                          // ✅ Ensure input is exactly 2 digits
-                          if (!RegExp(r'^\d{2}$').hasMatch(value)) {
-                            return 'Please enter exactly 2 digits (e.g., 12)';
-                          }
-
-                          return null;
-                        },
-                      ),
 
                       ],
                     ),

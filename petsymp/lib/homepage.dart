@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/newsummary.dart';
+import 'package:petsymp/petimage.dart';
 import 'package:petsymp/settings.dart';
 import 'assesment.dart';
 import 'profile.dart';

@@ -4,13 +4,14 @@ import 'package:petsymp/duration.dart';
 import 'package:petsymp/userdata.dart'; // Import UserData Provider
 import 'package:auto_size_text/auto_size_text.dart';
 class SearchsymptomsScreen extends StatefulWidget {
-  final String petSymptom;
+  final List<String> symptoms; // ✅ Ensure parameter is correctly named
 
-  const SearchsymptomsScreen({super.key, required this.petSymptom});
+  const SearchsymptomsScreen({super.key, required this.symptoms});
 
   @override
   SearchsymptomsScreenState createState() => SearchsymptomsScreenState();
 }
+
 
 class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   bool _isAnimated = false;
@@ -105,11 +106,11 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
               SizedBox(height: screenHeight * 0.05),
               // Symptoms List
               buildSymptomsContainer(
-                screenWidth,
-                widget.petSymptom,
-                ["Unwillingness into activity, recreation, or", "movement."],
-                context,
-              ),
+              screenWidth,
+              widget.symptoms.join(", "), // ✅ Join multiple symptoms into a readable string
+              ["Unwillingness to engage in activity or movement."],
+              context,
+            ),
               SizedBox(height: screenHeight * 0.03),
               buildSymptomsContainer(
                 screenWidth,

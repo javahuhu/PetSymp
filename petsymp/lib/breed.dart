@@ -131,7 +131,7 @@ class BreedScreenState extends State<BreedScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: screenWidth * 0.8,
                         child: Form(
@@ -142,6 +142,7 @@ class BreedScreenState extends State<BreedScreen> {
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),
                               FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                              FilteringTextInputFormatter.deny(RegExp(r'[!@#%^&*(),.?":{}|<>]')),
                             ],
                             textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
@@ -175,9 +176,14 @@ class BreedScreenState extends State<BreedScreen> {
                                 return 'Please enter the breed of pet';
                               }
 
-                              if (value.length > 20){
-                                return 'Please Enter less than 20 characters';
-                              }
+                               // ✅ Use directly in validation (fix warning)
+                                if (value.trim().length > 20) {
+                                  return 'Please enter less than 20 characters';
+                                }
+
+                                if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
+                                  return 'Only letters and spaces are allowed';
+                                }
                               return null;
                             },
                           ),

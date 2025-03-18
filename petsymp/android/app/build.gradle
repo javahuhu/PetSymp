@@ -22,10 +22,11 @@ android {
 
     defaultConfig {
     applicationId "com.example.petsymp"
-    minSdkVersion 23  // 🔧 Change from 23 to 21
+    minSdkVersion 23 // 🔧 Change from 23 to 21
     targetSdkVersion flutter.targetSdkVersion
     versionCode flutter.versionCode
     versionName flutter.versionName
+    multiDexEnabled true 
 }
 
 
@@ -44,7 +45,7 @@ flutter {
 
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:33.9.0')
-
+    implementation 'androidx.multidex:multidex:2.0.1'  // ✅ Add this line
     // Add specific Firebase dependencies (modify as needed)
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'

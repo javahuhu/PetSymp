@@ -16,7 +16,7 @@ const EmailScreen({super.key});
 class EmailScreenState extends State<EmailScreen> {
   bool _isAnimated = false; // Animation toggle
  // State to track the selected tab
-  final TextEditingController _breedcontroller = TextEditingController();
+  final TextEditingController _otpemailcontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,6 +32,7 @@ class EmailScreenState extends State<EmailScreen> {
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
+      Provider.of<UserData>(context, listen: false).setOTPemail(_otpemailcontroller.text);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const RecoveryScreen()),
@@ -116,7 +117,7 @@ class EmailScreenState extends State<EmailScreen> {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
-                            controller: _breedcontroller,
+                            controller: _otpemailcontroller,
                             autofillHints: const [AutofillHints.name],
                             inputFormatters: [
                               FirstLetterUpperCaseTextFormatter(),

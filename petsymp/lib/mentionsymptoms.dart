@@ -51,16 +51,33 @@ class MentionsympScreenState extends State<MentionsympScreen> {
       });
     });
   }
+  
 
   void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-      Provider.of<UserData>(context, listen: false).setAnotherSymptom(_anothersymptomscontroller.text);
+  if (_formKey.currentState?.validate() ?? false) {
+    String inputText = _anothersymptomscontroller.text.trim();
+
+    // ✅ Split symptoms while preserving multi-word symptoms
+    List<String> symptomsList = inputText.split(RegExp(r',\s*')) // Split by commas with optional spaces
+        .map((s) => s.trim()) // Remove extra spaces
+        .where((s) => s.isNotEmpty) // Remove empty entries
+        .toList();
+
+    if (symptomsList.isNotEmpty) {
+      // ✅ Store symptoms in UserData provider
+      final userData = Provider.of<UserData>(context, listen: false);
+      symptomsList.forEach(userData.addPetSymptom); // Store multiple symptoms
+
+      // ✅ Navigate to the "Another Search Symptoms" screen
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  const AnothersearchsymptomsScreen()),
+        MaterialPageRoute(
+          builder: (context) => const AnothersearchsymptomsScreen(),
+        ),
       );
     }
   }
+}
 
   
 

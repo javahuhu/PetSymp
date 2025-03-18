@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/Summaryinput.dart';
+import 'package:petsymp/newsummary.dart';
 import 'userdata.dart';
 import 'package:provider/provider.dart';
 class ReportScreen extends StatefulWidget {
@@ -123,7 +124,7 @@ class ReportScreenState extends State<ReportScreen> {
                 // Animated Buttons
                 
                 buildAnimatedButton(
-                    screenHeight * 1.03, screenWidth, 0.87, "Continue", const SummaryScreen(),1),
+                    screenHeight * 1.03, screenWidth, 0.87, "Continue", const NewSummaryScreen(),1),
               
               ],
             ),
