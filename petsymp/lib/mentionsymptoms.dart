@@ -14,12 +14,9 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return newValue; // Return empty value
     }
-
-    // Capitalize the first letter and keep the rest as-is
     final text = newValue.text;
     final firstLetter = text[0].toUpperCase();
     final restOfText = text.substring(1);
-
     return newValue.copyWith(
       text: firstLetter + restOfText,
       selection: newValue.selection,
@@ -28,7 +25,6 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
 }
 
 class MentionsympScreen extends StatefulWidget {
-
   const MentionsympScreen({super.key});
 
   @override
@@ -36,8 +32,7 @@ class MentionsympScreen extends StatefulWidget {
 }
 
 class MentionsympScreenState extends State<MentionsympScreen> {
-  bool _isAnimated = false; // Animation toggle
-   // State to track the selected tab
+  bool _isAnimated = false;
   final TextEditingController _anothersymptomscontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -52,201 +47,183 @@ class MentionsympScreenState extends State<MentionsympScreen> {
     });
   }
   
-
   void navigateToNextPage() {
-  if (_formKey.currentState?.validate() ?? false) {
-    String inputText = _anothersymptomscontroller.text.trim();
-
-    // ✅ Split symptoms while preserving multi-word symptoms
-    List<String> symptomsList = inputText.split(RegExp(r',\s*')) // Split by commas with optional spaces
-        .map((s) => s.trim()) // Remove extra spaces
-        .where((s) => s.isNotEmpty) // Remove empty entries
-        .toList();
-
-    if (symptomsList.isNotEmpty) {
-      // ✅ Store symptoms in UserData provider
-      final userData = Provider.of<UserData>(context, listen: false);
-      symptomsList.forEach(userData.addPetSymptom); // Store multiple symptoms
-
-      // ✅ Navigate to the "Another Search Symptoms" screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const AnothersearchsymptomsScreen(),
-        ),
-      );
+    if (_formKey.currentState?.validate() ?? false) {
+      String inputText = _anothersymptomscontroller.text.trim();
+      // Split the input into individual symptoms
+      List<String> symptomsList = inputText.split(RegExp(r',\s*'))
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+      if (symptomsList.isNotEmpty) {
+        final userData = Provider.of<UserData>(context, listen: false);
+        for (var symptom in symptomsList) {
+          // Use addNewPetSymptom() to add only the new input
+          userData.addNewPetSymptom(symptom);
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AnothersearchsymptomsScreen(),
+          ),
+        );
+      }
     }
   }
-}
-
   
-
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-
+    
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
-         
-          
           Positioned(
             top: screenHeight * 0.03,
             left: screenWidth * 0.01,
             child: ElevatedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back_sharp,
-                  color:  Color.fromRGBO(61, 47, 40, 1),
-                  size: 40.0,),
-                  label: const Text(''),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),), // Show this layout only on the first tab
-            Stack(
-              children: [
-                // AnimatedPositioned for Paw Image
-                  
-                AnimatedPositioned(
-                  duration: const Duration(seconds: 1),
-                  curve: Curves.easeInOut,
-                  top: _isAnimated ? screenHeight * 0.13 : -100, // From off-screen to final position
-                  left: screenWidth * 0.1,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: screenWidth * 0.15, // 15% of screen width
-                        height: screenWidth * 0.15, // Equal height for circular image
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          'assets/paw.png',
-                          fit: BoxFit.contain,
-                        ),
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(
+                Icons.arrow_back_sharp,
+                color: Color.fromRGBO(61, 47, 40, 1),
+                size: 40.0,
+              ),
+              label: const Text(''),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+              ),
+            ),
+          ),
+          Stack(
+            children: [
+              AnimatedPositioned(
+                duration: const Duration(seconds: 1),
+                curve: Curves.easeInOut,
+                top: _isAnimated ? screenHeight * 0.13 : -100,
+                left: screenWidth * 0.1,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
                       ),
-                      SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
-                      
-                    ],
-                  ),
+                      child: Image.asset(
+                        'assets/paw.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.05),
+                  ],
                 ),
-                Positioned(
-                  top: screenHeight * 0.22, // Text and input below the paw
-                  left: screenWidth * 0.12,
-                  right: screenWidth * 0.02,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Mention another sign or behavior that unusual for your pet",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
+              ),
+              Positioned(
+                top: screenHeight * 0.22,
+                left: screenWidth * 0.12,
+                right: screenWidth * 0.02,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Mention another sign or behavior that unusual for your pet",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(29, 29, 44, 1.0),
                       ),
-                      
-                    
-                      
-                      const SizedBox(height: 50),
-                      SizedBox(
-                        width: screenWidth * 0.8,
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            controller: _anothersymptomscontroller,
-                            autofillHints: const [AutofillHints.name],
-                            inputFormatters: [
-                              FirstLetterUpperCaseTextFormatter(),
-                              FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                            ],
-                            textInputAction: TextInputAction.done,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: const BorderSide(
-                                  color: Color.fromRGBO(82, 170, 164, 1), // Border color when not focused
-                                  width: 2.0, // Thickness when not focused
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: const BorderSide(
-                                  color:  Color.fromRGBO(72, 38, 163, 1),// Border color when focused
-                                  width: 2.0, // Thickness when focused
-                                ),
-                              ),
-
-                              hintText: 'e.g. Vomiting or Diarrhea etc. ',
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 20.0,
-                                horizontal: 15.0,
+                    ),
+                    const SizedBox(height: 50),
+                    SizedBox(
+                      width: screenWidth * 0.8,
+                      child: Form(
+                        key: _formKey,
+                        child: TextFormField(
+                          controller: _anothersymptomscontroller,
+                          autofillHints: const [AutofillHints.name],
+                          inputFormatters: [
+                            FirstLetterUpperCaseTextFormatter(),
+                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                          ],
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(82, 170, 164, 1),
+                                width: 2.0,
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter the symptoms of the pet';
-                              }
-                              
-                              return null;
-                            },
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                color: Color.fromRGBO(72, 38, 163, 1),
+                                width: 2.0,
+                              ),
+                            ),
+                            hintText: 'e.g. Vomiting or Diarrhea etc. ',
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 20.0,
+                              horizontal: 15.0,
+                            ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the symptoms of the pet';
+                            }
+                            return null;
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                // Next Button at the previous position
-                Positioned(
+              ),
+              Positioned(
                 top: screenHeight * 0.9,
-                right: screenWidth * 0.02, // Adjust dynamically for right alignment
-                child: SizedBox( // Wrap with SizedBox to ensure correct width
-                  width: 100, // Adjust as needed
+                right: screenWidth * 0.02,
+                child: SizedBox(
+                  width: 100,
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
                     style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Color.fromRGBO(82, 170, 164, 1),
-                        width: 2.0,
+                      backgroundColor: WidgetStateProperty.resolveWith(
+                        (states) {
+                          if (states.contains(WidgetState.pressed)) {
+                            return const Color.fromARGB(255, 0, 0, 0);
+                          }
+                          return Colors.transparent;
+                        },
                       ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
+                      foregroundColor: WidgetStateProperty.resolveWith(
+                        (states) {
+                          if (states.contains(WidgetState.pressed)) {
+                            return const Color.fromARGB(255, 255, 255, 255);
+                          }
+                          return const Color.fromRGBO(29, 29, 44, 1.0);
+                        },
                       ),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
+                      side: WidgetStateProperty.all(
+                        const BorderSide(
+                          color: Color.fromRGBO(82, 170, 164, 1),
+                          width: 2.0,
+                        ),
+                      ),
+                      shape: WidgetStateProperty.all(
+                        const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(100)),
+                        ),
+                      ),
+                      fixedSize: WidgetStateProperty.all(const Size(100, 55)),
                     ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
-                  ),
                     child: const Text(
                       "Next",
                       style: TextStyle(
@@ -257,12 +234,10 @@ class MentionsympScreenState extends State<MentionsympScreen> {
                   ),
                 ),
               ),
-              ],
-            ),
-         
+            ],
+          ),
         ],
       ),
-       
     );
   }
 }

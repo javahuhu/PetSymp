@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/duration.dart';
-import 'package:petsymp/userdata.dart'; // Import UserData Provider
+import 'package:petsymp/userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+
 class SearchsymptomsScreen extends StatefulWidget {
-  final List<String> symptoms; // ✅ Ensure parameter is correctly named
+  final List<String> symptoms;
 
   const SearchsymptomsScreen({super.key, required this.symptoms});
 
   @override
   SearchsymptomsScreenState createState() => SearchsymptomsScreenState();
 }
-
 
 class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   bool _isAnimated = false;
@@ -30,6 +31,13 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userData = Provider.of<UserData>(context, listen: false);
+
+    // Get the predefined symptoms from userData
+    final List<String> predefinedSymptoms = userData.getPredefinedSymptoms();
+
+    // Use the provided list (which now contains a single string)
+    final List<String> matchedSymptoms = widget.symptoms;
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
@@ -40,38 +48,35 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
-            Container(
-            height: screenHeight * 0.1, // Make sure the Stack has a defined height
-            child: Stack(
-              children: [
-                Positioned(
-                  top: screenHeight * 0.03,
-                  left: -screenWidth * 0.05,
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      color: Color.fromRGBO(61, 47, 40, 1),
-                      size: 40.0,
+              Container(
+                height: screenHeight * 0.1,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: screenHeight * 0.03,
+                      left: -screenWidth * 0.05,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(
+                          Icons.arrow_back_sharp,
+                          color: Color.fromRGBO(61, 47, 40, 1),
+                          size: 40.0,
+                        ),
+                        label: const Text(''),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.transparent,
+                        ),
+                      ),
                     ),
-                    label: const Text(''),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-              // Animated Headerw
-              SizedBox(height: screenHeight * 0.03,),
+              ),
+              SizedBox(height: screenHeight * 0.03),
               AnimatedOpacity(
                 duration: const Duration(seconds: 1),
                 opacity: _isAnimated ? 1 : 0,
-                child: 
-                Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
@@ -86,15 +91,13 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                       ),
                     ),
                     SizedBox(width: screenWidth * 0.05),
-                    
-                    // ✅ Use Expanded so the text takes available space
                     Expanded(
                       child: AutoSizeText(
                         "Select Symptoms",
-                        maxLines: 1, // Prevents multiple lines
-                        minFontSize: 12, // Ensures readability on small screens
+                        maxLines: 1,
+                        minFontSize: 12,
                         style: TextStyle(
-                          fontSize: screenWidth * 0.08, // Adjusts dynamically
+                          fontSize: screenWidth * 0.08,
                           fontWeight: FontWeight.bold,
                           color: const Color.fromRGBO(29, 29, 44, 1.0),
                         ),
@@ -104,27 +107,46 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.05),
-              // Symptoms List
-              buildSymptomsContainer(
-              screenWidth,
-              widget.symptoms.join(", "), // ✅ Join multiple symptoms into a readable string
-              ["Unwillingness to engage in activity or movement."],
-              context,
-            ),
-              SizedBox(height: screenHeight * 0.03),
-              buildSymptomsContainer(
-                screenWidth,
-                "Reduced Appetite",
-                ["Consuming little or having little appetite for", "food or treats."],
-                context,
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              buildSymptomsContainer(
-                screenWidth,
-                "Low Energy",
-                ["Less attentive to stimuli such as food, toys,", "or your own voice."],
-                context,
-              ),
+
+              // Dynamic symptom containers for matched symptoms
+              if (matchedSymptoms.isNotEmpty)
+                ...matchedSymptoms.map((symptom) {
+                  return Column(
+                    children: [
+                      buildSymptomsContainer(
+                        screenWidth,
+                        symptom,
+                        ["Tap to select this symptom and answer questions"],
+                        context,
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                    ],
+                  );
+                }).toList(),
+
+              // Add standard symptoms that aren't in the user's input
+              if (!matchedSymptoms.contains("Reduced Appetite") &&
+                  !widget.symptoms.any((s) => s.toLowerCase() == "reduced appetite"))
+                Column(
+                  children: [
+                    buildSymptomsContainer(
+                      screenWidth,
+                      "Reduced Appetite",
+                      ["Consuming little or having little appetite for", "food or treats."],
+                      context,
+                    ),
+                    SizedBox(height: screenHeight * 0.03),
+                  ],
+                ),
+
+              if (!matchedSymptoms.contains("Low Energy") &&
+                  !widget.symptoms.any((s) => s.toLowerCase() == "low energy"))
+                buildSymptomsContainer(
+                  screenWidth,
+                  "Low Energy",
+                  ["Less attentive to stimuli such as food, toys,", "or your own voice."],
+                  context,
+                ),
             ],
           ),
         ),
@@ -173,34 +195,40 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
             child: ElevatedButton(
               onPressed: () {
                 final userData = Provider.of<UserData>(context, listen: false);
-               
-                userData.addPetSymptom(title);
-
-                // Navigate to DurationScreen
+                // If title contains a comma, split it into individual symptoms
+                if (title.contains(',')) {
+                  List<String> symptoms = title.split(',').map((s) => s.trim()).toList();
+                  for (String s in symptoms) {
+                    userData.addPetSymptom(s);
+                  }
+                  // Do NOT call setSelectedSymptom when multiple symptoms are present.
+                } else {
+                  userData.addPetSymptom(title);
+                  userData.setSelectedSymptom(title);
+                }
+                print("✅ Selected Symptom: $title");
+                print("✅ Updated Questions: ${userData.questions}");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DurationScreen(),
+                    builder: (context) => const QoneScreen(),
                   ),
                 );
               },
+
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith(
-                  (states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromRGBO(66, 134, 130, 1.0);
-                    }
-                    return Colors.transparent;
-                  },
-                ),
-                foregroundColor: WidgetStateProperty.resolveWith(
-                  (states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromARGB(255, 255, 255, 255);
-                    }
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromRGBO(66, 134, 130, 1.0);
+                  }
+                  return Colors.transparent;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return const Color.fromARGB(255, 255, 255, 255);
-                  },
-                ),
+                  }
+                  return const Color.fromARGB(255, 255, 255, 255);
+                }),
                 shadowColor: WidgetStateProperty.all(Colors.transparent),
                 side: WidgetStateProperty.all(
                   const BorderSide(

@@ -31,11 +31,10 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
 
-    String allSymptoms = [
-  ...userData.petSymptoms,   // ✅ First inputted symptoms
-].where((symptom) => symptom.isNotEmpty).join(" + ");  // ✅ Format correctly
-
-// Avoid empty strings
+    // Display combined symptoms in summary
+    String allSymptoms = userData.petSymptoms.isNotEmpty 
+        ? userData.petSymptoms.join(" + ") 
+        : "Select Another Symptoms";
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
@@ -92,15 +91,13 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                       ),
                     ),
                     SizedBox(width: screenWidth * 0.05),
-
-                    // ✅ Dynamic Resizable Text
                     Expanded(
                       child: AutoSizeText(
                         "Select Another Symptoms",
                         maxLines: 1,
                         minFontSize: 12,
                         style: TextStyle(
-                          fontSize: screenWidth * 0.08, // Dynamic Text Size
+                          fontSize: screenWidth * 0.08,
                           fontWeight: FontWeight.bold,
                           color: const Color.fromRGBO(29, 29, 44, 1.0),
                         ),
@@ -112,15 +109,16 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
 
               SizedBox(height: screenHeight * 0.05),
 
-              // Symptoms List
+              // Show summary of all symptoms (previous + new)
               buildSymptomsContainer(
                 screenWidth,
-                allSymptoms.isNotEmpty ? allSymptoms : "Select Another Symptoms",
-                ["Drooling or licking lips excessively before", "or after vomiting."],
+                allSymptoms,
+                ["Tap to select and answer questions for new symptoms"],
                 const QoneScreen(),
               ),
               SizedBox(height: screenHeight * 0.03),
 
+              // Standard symptom containers (unchanged)
               buildSymptomsContainer(
                 screenWidth,
                 "Frequent Bowel Movements",
@@ -128,23 +126,19 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 const QoneScreen(),
               ),
               SizedBox(height: screenHeight * 0.03),
-
               buildSymptomsContainer(
                 screenWidth,
                 "Frequent Episodes",
                 ["Repeated vomiting over a short period"],
                 const QoneScreen(),
               ),
-
-               SizedBox(height: screenHeight * 0.03),
-
+              SizedBox(height: screenHeight * 0.03),
               buildSymptomsContainer(
                 screenWidth,
                 "Frequent Episodes",
                 ["Repeated vomiting over a short period"],
                 const QoneScreen(),
               ),
-              
             ],
           ),
         ),
@@ -152,8 +146,8 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     );
   }
 
-  Widget buildSymptomsContainer(double screenWidth, String title,
-      List<String> details, Widget navigate) {
+  Widget buildSymptomsContainer(
+      double screenWidth, String title, List<String> details, Widget navigate) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -198,22 +192,18 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 );
               },
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith(
-                  (states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromRGBO(66, 134, 130, 1.0);
-                    }
-                    return Colors.transparent;
-                  },
-                ),
-                foregroundColor: WidgetStateProperty.resolveWith(
-                  (states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return const Color.fromARGB(255, 255, 255, 255);
-                    }
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromRGBO(66, 134, 130, 1.0);
+                  }
+                  return Colors.transparent;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return const Color.fromARGB(255, 255, 255, 255);
-                  },
-                ),
+                  }
+                  return const Color.fromARGB(255, 255, 255, 255);
+                }),
                 shadowColor: WidgetStateProperty.all(Colors.transparent),
                 side: WidgetStateProperty.all(
                   const BorderSide(
@@ -226,9 +216,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                     borderRadius: BorderRadius.all(Radius.circular(3)),
                   ),
                 ),
-                fixedSize: WidgetStateProperty.all(
-                  const Size(120, 45),
-                ),
+                fixedSize: WidgetStateProperty.all(const Size(120, 45)),
               ),
               child: const Text(
                 "Select",

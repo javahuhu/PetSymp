@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:petsymp/anothersymptoms.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:petsymp/report.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class QoneScreen extends StatefulWidget {
   const QoneScreen({super.key});
 
@@ -12,10 +13,8 @@ class QoneScreen extends StatefulWidget {
 
 class QoneScreenState extends State<QoneScreen> {
   bool _isAnimated = false;
-  
   int currentQuestionIndex = 0;
-
-  List<bool> _buttonVisible = [false, false];
+  bool _buttonsVisible = false;
 
   @override
   void initState() {
@@ -26,37 +25,53 @@ class QoneScreenState extends State<QoneScreen> {
   void _triggerAnimation() {
     setState(() {
       _isAnimated = false;
-      _buttonVisible = [false, false]; // Reset buttons visibility
+      _buttonsVisible = false;
     });
-
     Future.delayed(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
       setState(() {
         _isAnimated = true;
       });
-
-      for (int i = 0; i < _buttonVisible.length; i++) {
-        Future.delayed(Duration(milliseconds: 200 * i), () {
-          setState(() {
-            _buttonVisible[i] = true; // Re-trigger button visibility sequentially
-          });
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (!mounted) return;
+        setState(() {
+          _buttonsVisible = true;
         });
-      }
+      });
     });
   }
 
-  void nextQuestion(BuildContext context) {
+  void nextQuestion(BuildContext context, String selectedAnswer) {
     final userData = Provider.of<UserData>(context, listen: false);
+    // Use questionSymptoms for the current question title;
+    // if not available, fall back to the overall selectedSymptom.
+    final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
+            currentQuestionIndex < userData.questionSymptoms.length
+        ? userData.questionSymptoms[currentQuestionIndex]
+        : userData.selectedSymptom;
+    final currentQuestion = userData.questions[currentQuestionIndex];
+
+    // Save the answer for this symptom question.
+    userData.setSymptomDuration(questionSymptom, selectedAnswer);
+
+    print("✅ Question: $currentQuestion");
+    print("✅ Answer: $selectedAnswer");
 
     if (currentQuestionIndex < userData.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
-      _triggerAnimation(); // Re-trigger animations for new question
+      _triggerAnimation();
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ReportScreen()),
-      );
+      // All questions answered; fetch diagnosis and then navigate.
+      userData.fetchDiagnosis().then((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AnothersympScreen(),
+          ),
+        );
+      });
     }
   }
 
@@ -77,6 +92,12 @@ class QoneScreenState extends State<QoneScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
     final questions = userData.questions;
+    final impactChoices = userData.impactChoices;
+    // Determine the current symptom for the question.
+    final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
+            currentQuestionIndex < userData.questionSymptoms.length
+        ? userData.questionSymptoms[currentQuestionIndex]
+        : userData.selectedSymptom;
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
@@ -88,10 +109,7 @@ class QoneScreenState extends State<QoneScreen> {
                 top: screenHeight * 0.03,
                 left: screenWidth * 0.01,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Navigate to the previous question instead of exiting
-                    previousQuestion();
-                  },
+                  onPressed: previousQuestion,
                   icon: const Icon(
                     Icons.arrow_back_sharp,
                     color: Color.fromRGBO(61, 47, 40, 1),
@@ -127,16 +145,16 @@ class QoneScreenState extends State<QoneScreen> {
                   ],
                 ),
               ),
-            Positioned(
+              Positioned(
                 top: screenHeight * 0.22,
                 left: screenWidth * 0.03,
                 right: screenWidth * 0.02,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Question",
-                      style: TextStyle(
+                    Text(
+                      "About the $questionSymptom",
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Color.fromRGBO(29, 29, 44, 1.0),
@@ -144,7 +162,8 @@ class QoneScreenState extends State<QoneScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      questions.isNotEmpty
+                      questions.isNotEmpty &&
+                              currentQuestionIndex < questions.length
                           ? questions[currentQuestionIndex]
                           : "No questions available",
                       style: const TextStyle(
@@ -157,10 +176,9 @@ class QoneScreenState extends State<QoneScreen> {
                   ],
                 ),
               ),
-
-              // Yes/No Buttons with Re-Triggered Animation
-              buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.8, "Yes", context, 0),
-              buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.87, "No", context, 1),
+              if (_buttonsVisible)
+                buildImpactButtons(
+                    screenHeight * 0.5, screenWidth, context, impactChoices),
             ],
           ),
         ],
@@ -168,58 +186,63 @@ class QoneScreenState extends State<QoneScreen> {
     );
   }
 
-  // Yes/No Buttons with Re-Triggered Animation
-  Widget buildAnimatedButton(
-      double screenHeight, double screenWidth, double topPosition, String label, BuildContext context, int index) {
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeInOut,
-      top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      right: screenWidth * 0.02,
-      child: ElevatedButton(
-       onPressed: () => nextQuestion(context),
-        style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Color.fromRGBO(82, 170, 164, 1),
-                        width: 2.0,
-                      ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
+  Widget buildImpactButtons(double top, double screenWidth, BuildContext context,
+      List<List<String>> impactChoices) {
+    List<String> currentChoices = [];
+    if (currentQuestionIndex < impactChoices.length) {
+      currentChoices = impactChoices[currentQuestionIndex];
+    }
+    return Positioned(
+      top: top,
+      left: screenWidth * 0.05,
+      right: screenWidth * 0.05,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: currentChoices.map((choice) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: ElevatedButton(
+              onPressed: () {
+                print("✅ Selected Impact Choice: $choice");
+                nextQuestion(context, choice); // Save answer and move on.
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromARGB(255, 0, 0, 0);
+                  }
+                  return Colors.transparent;
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromARGB(255, 255, 255, 255);
+                  }
+                  return const Color.fromRGBO(29, 29, 44, 1.0);
+                }),
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                side: WidgetStateProperty.all(
+                  const BorderSide(
+                    color: Color.fromRGBO(82, 170, 164, 1),
+                    width: 2.0,
                   ),
+                ),
+                shape: WidgetStateProperty.all(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(100)),
+                  ),
+                ),
+                fixedSize: WidgetStateProperty.all(const Size(double.infinity, 55)),
+              ),
               child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+                choice,
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
