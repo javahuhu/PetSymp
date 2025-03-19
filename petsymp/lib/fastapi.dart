@@ -1,51 +1,70 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'userdata.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String baseUrl = "http://10.153.70.133:8000";  // ✅ Updated with correct IP
+  // Detect server IP address automatically
+  static Future<String> getServerIP() async {
+    try {
+      for (var interface in await NetworkInterface.list()) {
+        for (var addr in interface.addresses) {
+          if (addr.address.startsWith("192.")) {
+            return addr.address;
+          }
+        }
+      }
+    } catch (e) {
+      print("⚠️ Error detecting IP: $e");
+    }
+    return "192.168.0.107"; // Default IP if auto-detection fails
+  }
 
-  static Future<Map<String, dynamic>?> diagnosePet(UserData userData) async {
-    final Uri url = Uri.parse("$baseUrl/diagnose");  
+  // Main diagnosis function
+  static Future<Map<String, dynamic>?> diagnosePet({
+    required String userName,
+    required List<String> symptoms,
+    required int age,
+    required String breed,
+    required String size,
+    required Map<String, Map<String, String>> userAnswers,
+  }) async {
+    final String serverIP = await getServerIP();
+    final Uri url = Uri.parse("http://$serverIP:8000/diagnose");
 
-    // ✅ Ensure all required fields are sent
-    List<String> allSymptoms = {
-      ...userData.petSymptoms,
-      if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
-      if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom,
-    }.toList();
-
-    // Include symptom durations or answers
-    Map<String, String> symptomAnswers = userData.symptomDurations;
-
-    final Map<String, dynamic> requestData = {
-      "userName": userData.userName.trim().isNotEmpty ? userData.userName : "Unknown",
-      "age": userData.age > 0 ? userData.age.toString() : "1",
-      "breed": userData.breed.trim().isNotEmpty ? userData.breed : "Unknown",
-      "size": _validateSize(userData.size),
-      "symptoms": allSymptoms.isNotEmpty ? allSymptoms : ["None"],
-      "user_answers": symptomAnswers, // Add the symptom answers here
+    // Prepare the fact base according to backend expectations.
+    // Note: The key "owner" is used (instead of "userName")
+    final Map<String, dynamic> factBase = {
+      "owner": userName.trim().isNotEmpty ? userName : "Unknown",
+      "symptoms": symptoms.isNotEmpty ? symptoms : ["None"],
+      "pet_info": {
+        "age": age > 0 ? age.toString() : "1",
+        "breed": breed.trim().isNotEmpty ? breed : "Unknown",
+        "size": _validateSize(size),
+      },
+      "user_answers": userAnswers,
     };
 
     try {
       print("\n📤 Sending API Request to: $url");
-      print("📤 Request Data: ${jsonEncode(requestData)}");
+      print("📤 Request Data: ${jsonEncode(factBase)}");
 
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestData),
-      ).timeout(const Duration(seconds: 10));  // ✅ Prevent infinite waiting
+        body: jsonEncode(factBase),
+      ).timeout(const Duration(seconds: 10));
 
       print("📩 Response Status: ${response.statusCode}");
-      print("📩 Response Body: ${response.body}");
+      if (kDebugMode && response.body.length < 1000) {
+        print("📩 Response Body: ${response.body}");
+      }
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("✅ Diagnosis Received: ${responseData["message"]}");
         return responseData;
       } else {
-        print("❌ API Error: ${response.statusCode} - ${response.body}");
+        print("❌ API Error: ${response.statusCode} - ${response.reasonPhrase}");
         return null;
       }
     } catch (e) {
@@ -54,15 +73,61 @@ class ApiService {
     }
   }
 
-  // 📌 Ensure size is valid (Small, Medium, or Large)
+  // Validate pet size
   static String _validateSize(String size) {
     final validSizes = ["Small", "Medium", "Large"];
     String formattedSize = size.trim().isNotEmpty ? size.capitalize() : "Medium";
     return validSizes.contains(formattedSize) ? formattedSize : "Medium";
   }
+
+  // Debug endpoint to test connectivity
+  static Future<bool> testConnection() async {
+    try {
+      final String serverIP = await getServerIP();
+      final Uri url = Uri.parse("http://$serverIP:8000/debug/all-symptoms");
+      
+      final response = await http.get(url).timeout(const Duration(seconds: 5));
+      
+      return response.statusCode == 200;
+    } catch (e) {
+      print("🚨 Connection test failed: $e");
+      return false;
+    }
+  }
+  
+  // Get all symptoms from the backend
+  static Future<List<String>> getAllSymptoms() async {
+    try {
+      final String serverIP = await getServerIP();
+      final Uri url = Uri.parse("http://$serverIP:8000/debug/all-symptoms");
+      
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        List<String> allSymptoms = [];
+        
+        // Flatten the list of symptoms from all illnesses
+        data.forEach((illness, symptoms) {
+          for (var symptom in symptoms) {
+            if (!allSymptoms.contains(symptom)) {
+              allSymptoms.add(symptom);
+            }
+          }
+        });
+        
+        return allSymptoms;
+      }
+      return [];
+    } catch (e) {
+      print("🚨 Failed to get symptoms: $e");
+      return [];
+    }
+  }
 }
 
-// 📌 Helper extension to capitalize strings
+// Helper extension to capitalize strings
 extension StringCasingExtension on String {
-  String capitalize() => this.isNotEmpty ? "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}" : "";
+  String capitalize() =>
+      isNotEmpty ? "${this[0].toUpperCase()}${substring(1).toLowerCase()}" : "";
 }

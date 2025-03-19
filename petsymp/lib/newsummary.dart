@@ -399,6 +399,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 2,
+                              maxFontSize: 30,
                               textAlign: TextAlign.center,
                             )
                             ),
@@ -474,15 +475,17 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             Padding(
                               padding: EdgeInsets.only(top: 170.h),
                               child: 
-                              AutoSizeText(
-                              topDiagnoses[2]['illness'] ?? "",
-                              style: const TextStyle(
-                                fontSize: 22,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ), // Make sure "F" is uppercase
-                              textAlign: TextAlign.center,
+                             AutoSizeText(
+                            topDiagnoses[2]['illness'] ?? "",
+                            style: const TextStyle(
+                              fontSize: 22, // using a fixed value instead of 22.sp
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 2,
+                            minFontSize: 14,  // fixed value
+                            textAlign: TextAlign.center,
+                          )
                             ),
                           ],
                         ),
@@ -548,7 +551,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             Text(
                               "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
                               style: TextStyle(
-                                fontSize: 22.sp,
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
