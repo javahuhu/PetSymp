@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
-import 'package:petsymp/duration.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
@@ -33,11 +32,36 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context, listen: false);
 
-    // Get the predefined symptoms from userData
+    // Get the predefined symptoms from userData.
     final List<String> predefinedSymptoms = userData.getPredefinedSymptoms();
 
-    // Use the provided list (which now contains a single string)
-    final List<String> matchedSymptoms = widget.symptoms;
+    // Filter the provided list (which now contains a single string)
+    final List<String> matchedSymptoms = widget.symptoms.where((symptom) {
+      return predefinedSymptoms.contains(symptom.toLowerCase());
+    }).toList();
+
+    // If no matching symptom is found, show a message.
+    if (matchedSymptoms.isEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFE8F2F5),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "No such symptom found.",
+                style: TextStyle(fontSize: 20, color: Colors.black),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Go Back"),
+              )
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
@@ -107,44 +131,47 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                 ),
               ),
               SizedBox(height: screenHeight * 0.05),
-
               // Dynamic symptom containers for matched symptoms
-              if (matchedSymptoms.isNotEmpty)
-                ...matchedSymptoms.map((symptom) {
-                  return Column(
-                    children: [
-                      buildSymptomsContainer(
-                        screenWidth,
-                        symptom,
-                        ["Tap to select this symptom and answer questions"],
-                        context,
-                      ),
-                      SizedBox(height: screenHeight * 0.03),
-                    ],
-                  );
-                }).toList(),
-
-              // Add standard symptoms that aren't in the user's input
+              ...matchedSymptoms.map((symptom) {
+                return Column(
+                  children: [
+                    buildSymptomsContainer(
+                      screenWidth,
+                      symptom,
+                      ["Tap to select this symptom and answer questions"],
+                      context,
+                    ),
+                    SizedBox(height: screenHeight * 0.03),
+                  ],
+                );
+              }).toList(),
+              // Add standard symptoms that aren't in the user's input.
               if (!matchedSymptoms.contains("Reduced Appetite") &&
-                  !widget.symptoms.any((s) => s.toLowerCase() == "reduced appetite"))
+                  !widget.symptoms.any((s) =>
+                      s.toLowerCase() == "reduced appetite"))
                 Column(
                   children: [
                     buildSymptomsContainer(
                       screenWidth,
                       "Reduced Appetite",
-                      ["Consuming little or having little appetite for", "food or treats."],
+                      [
+                        "Consuming little or having little appetite for",
+                        "food or treats."
+                      ],
                       context,
                     ),
                     SizedBox(height: screenHeight * 0.03),
                   ],
                 ),
-
               if (!matchedSymptoms.contains("Low Energy") &&
                   !widget.symptoms.any((s) => s.toLowerCase() == "low energy"))
                 buildSymptomsContainer(
                   screenWidth,
                   "Low Energy",
-                  ["Less attentive to stimuli such as food, toys,", "or your own voice."],
+                  [
+                    "Less attentive to stimuli such as food, toys,",
+                    "or your own voice."
+                  ],
                   context,
                 ),
             ],
@@ -195,15 +222,16 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
             child: ElevatedButton(
               onPressed: () {
                 final userData = Provider.of<UserData>(context, listen: false);
-                // If title contains a comma, split it into individual symptoms
+                // If title contains a comma, split it into individual symptoms.
                 if (title.contains(',')) {
-                  List<String> symptoms = title.split(',').map((s) => s.trim()).toList();
+                  List<String> symptoms =
+                      title.split(',').map((s) => s.trim()).toList();
                   for (String s in symptoms) {
-                    userData.addPetSymptom(s);
+                    userData.addNewPetSymptom(title);
                   }
                   // Do NOT call setSelectedSymptom when multiple symptoms are present.
                 } else {
-                  userData.addPetSymptom(title);
+                  userData.addNewPetSymptom(title);
                   userData.setSelectedSymptom(title);
                 }
                 print("✅ Selected Symptom: $title");
@@ -215,7 +243,6 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                   ),
                 );
               },
-
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.pressed)) {

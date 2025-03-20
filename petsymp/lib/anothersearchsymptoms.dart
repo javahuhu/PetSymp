@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'QuestionDiseasesone/questionone.dart';
+import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -14,6 +14,7 @@ class AnothersearchsymptomsScreen extends StatefulWidget {
 
 class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen> {
   bool _isAnimated = false;
+  final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
   void initState() {
@@ -22,19 +23,33 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       setState(() {
         _isAnimated = true;
       });
+      for (int i = 0; i < _buttonVisible.length; i++) {
+        final int index = i;
+        Future.delayed(Duration(milliseconds: 300 * index), () {
+          if (!mounted) return;
+          setState(() {
+            _buttonVisible[index] = true;
+          });
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth  = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
-
-    // Display combined symptoms in summary
-    String allSymptoms = userData.petSymptoms.isNotEmpty 
-        ? userData.petSymptoms.join(" + ") 
-        : "Select Another Symptoms";
+    
+    // Display overall symptom – show only the most recent input.
+    String displayedSymptom = "";
+    if (userData.anotherSymptom.isNotEmpty) {
+      displayedSymptom = userData.anotherSymptom;
+    } else if (userData.selectedSymptom.isNotEmpty) {
+      displayedSymptom = userData.selectedSymptom;
+    } else {
+      displayedSymptom = "Select Another Symptoms";
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
@@ -45,9 +60,9 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Back Button in Stack
+              // Back Button
               Container(
-                height: screenHeight * 0.1, // Ensure Stack has height
+                height: screenHeight * 0.1,
                 child: Stack(
                   children: [
                     Positioned(
@@ -71,7 +86,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ),
               ),
               SizedBox(height: screenHeight * 0.03),
-
               // Animated Header
               AnimatedOpacity(
                 duration: const Duration(seconds: 1),
@@ -82,13 +96,8 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                     Container(
                       width: screenWidth * 0.15,
                       height: screenWidth * 0.15,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.asset(
-                        'assets/paw.png',
-                        fit: BoxFit.contain,
-                      ),
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: Image.asset('assets/paw.png', fit: BoxFit.contain),
                     ),
                     SizedBox(width: screenWidth * 0.05),
                     Expanded(
@@ -106,19 +115,16 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   ],
                 ),
               ),
-
               SizedBox(height: screenHeight * 0.05),
-
-              // Show summary of all symptoms (previous + new)
+              // Show summary of the current (latest) symptom.
               buildSymptomsContainer(
                 screenWidth,
-                allSymptoms,
+                displayedSymptom,
                 ["Tap to select and answer questions for new symptoms"],
                 const QoneScreen(),
               ),
               SizedBox(height: screenHeight * 0.03),
-
-              // Standard symptom containers (unchanged)
+              // Additional standard symptom containers (if needed)
               buildSymptomsContainer(
                 screenWidth,
                 "Frequent Bowel Movements",
@@ -133,12 +139,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 const QoneScreen(),
               ),
               SizedBox(height: screenHeight * 0.03),
-              buildSymptomsContainer(
-                screenWidth,
-                "Frequent Episodes",
-                ["Repeated vomiting over a short period"],
-                const QoneScreen(),
-              ),
             ],
           ),
         ),
@@ -169,7 +169,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
@@ -186,10 +186,16 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => navigate),
-                );
+                // Wrap navigation in a post-frame callback to avoid build-phase update issues.
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final userData = Provider.of<UserData>(context, listen: false);
+                  userData.addNewPetSymptom(title);
+                  userData.setSelectedSymptom(title);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => navigate),
+                  );
+                });
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -200,9 +206,9 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 }),
                 foregroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.pressed)) {
-                    return const Color.fromARGB(255, 255, 255, 255);
+                    return Colors.white;
                   }
-                  return const Color.fromARGB(255, 255, 255, 255);
+                  return Colors.white;
                 }),
                 shadowColor: WidgetStateProperty.all(Colors.transparent),
                 side: WidgetStateProperty.all(

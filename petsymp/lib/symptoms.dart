@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:petsymp/searchsymptoms.dart';
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
-// Custom TextInputFormatter to capitalize only the first letter
+/// Custom TextInputFormatter to capitalize only the first letter.
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) {
-      return newValue; // Return empty value
-    }
+    if (newValue.text.isEmpty) return newValue;
     final text = newValue.text;
     final firstLetter = text[0].toUpperCase();
     final restOfText = text.substring(1);
@@ -29,13 +29,13 @@ class SymptomsScreen extends StatefulWidget {
 
 class SymptomsScreenState extends State<SymptomsScreen> {
   bool _isAnimated = false;
-  final TextEditingController _symptomscontroller = TextEditingController();
+  final TextEditingController _symptomsController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    // Trigger the animation after the widget builds
+    // Trigger the animation after the widget builds.
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -45,16 +45,14 @@ class SymptomsScreenState extends State<SymptomsScreen> {
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
-      String inputText = _symptomscontroller.text.trim();
-      // Do NOT split the input – pass the entire input as one list item.
+      String inputText = _symptomsController.text.trim();
+      // Since only one symptom is allowed, we pass the input as a single-item list.
       List<String> symptomsList = [inputText];
-
       if (symptomsList.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                SearchsymptomsScreen(symptoms: symptomsList), // Pass list correctly
+            builder: (context) => SearchsymptomsScreen(symptoms: symptomsList),
           ),
         );
       }
@@ -65,11 +63,15 @@ class SymptomsScreenState extends State<SymptomsScreen> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    // Get predefined symptoms from UserData (the keys from the map).
+    final List<String> predefinedSymptoms =
+        Provider.of<UserData>(context, listen: false).getPredefinedSymptoms();
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
+          // Back Button.
           Positioned(
             top: screenHeight * 0.03,
             left: screenWidth * 0.01,
@@ -87,150 +89,148 @@ class SymptomsScreenState extends State<SymptomsScreen> {
               ),
             ),
           ),
-          Stack(
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeInOut,
-                top: _isAnimated ? screenHeight * 0.13 : -100,
-                left: screenWidth * 0.1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: screenWidth * 0.15,
-                      height: screenWidth * 0.15,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.asset(
-                        'assets/paw.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.05),
-                  ],
+          // Animated Header.
+          AnimatedPositioned(
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+            top: _isAnimated ? screenHeight * 0.13 : -100,
+            left: screenWidth * 0.1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: screenWidth * 0.15,
+                  height: screenWidth * 0.15,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/paw.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
-              ),
-              Positioned(
-                top: screenHeight * 0.22,
-                left: screenWidth * 0.12,
-                right: screenWidth * 0.02,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Let's start with the symptoms",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                    const Text(
-                      "that’s troubling your pet the most.",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    SizedBox(
-                      width: screenWidth * 0.8,
-                      child: Form(
-                        key: _formKey,
-                        child: TextFormField(
-                          controller: _symptomscontroller,
-                          autofillHints: const [AutofillHints.name],
-                          inputFormatters: [
-                            FirstLetterUpperCaseTextFormatter(),
-                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                          ],
-                          textInputAction: TextInputAction.done,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1),
-                                width: 2.0,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromRGBO(72, 38, 163, 1),
-                                width: 2.0,
-                              ),
-                            ),
-                            hintText: 'e.g Lethargy, Vomiting, Rushes etc.',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0,
-                              horizontal: 15.0,
-                            ),
+                SizedBox(width: screenWidth * 0.05),
+              ],
+            ),
+          ),
+          // Form for symptom input.
+          Positioned(
+            top: screenHeight * 0.22,
+            left: screenWidth * 0.12,
+            right: screenWidth * 0.02,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Enter a single symptom that troubles your pet",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(29, 29, 44, 1.0),
+                  ),
+                ),
+                const SizedBox(height: 50),
+                SizedBox(
+                  width: screenWidth * 0.8,
+                  child: Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      controller: _symptomsController,
+                      autofillHints: const [AutofillHints.name],
+                      inputFormatters: [
+                        FirstLetterUpperCaseTextFormatter(),
+                        FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                      ],
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(82, 170, 164, 1),
+                            width: 2.0,
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the symptoms of the pet';
-                            }
-                            return null;
-                          },
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: const BorderSide(
+                            color: Color.fromRGBO(72, 38, 163, 1),
+                            width: 2.0,
+                          ),
+                        ),
+                        // Updated hint to show only one symptom.
+                        hintText: 'e.g., Vomiting',
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 20.0,
+                          horizontal: 15.0,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.9,
-                right: screenWidth * 0.02,
-                child: SizedBox(
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: navigateToNextPage,
-                    style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0);
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the symptom of the pet';
                         }
-                        return Colors.transparent;
-                      }),
-                      foregroundColor:
-                          WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255);
+                        // Enforce single symptom by disallowing additional words.
+                        if (value.trim().split(RegExp(r'\s+')).length > 1) {
+                          return 'Please enter only one symptom at a time';
                         }
-                        return const Color.fromRGBO(29, 29, 44, 1.0);
-                      }),
-                      shadowColor: WidgetStateProperty.all(Colors.transparent),
-                      side: WidgetStateProperty.all(
-                        const BorderSide(
-                          color: Color.fromRGBO(82, 170, 164, 1),
-                          width: 2.0,
-                        ),
-                      ),
-                      shape: WidgetStateProperty.all(
-                        const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(100)),
-                        ),
-                      ),
-                      fixedSize: WidgetStateProperty.all(const Size(100, 55)),
-                    ),
-                    child: const Text(
-                      "Next",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                        String input = value.trim().toLowerCase();
+                        if (!predefinedSymptoms.contains(input)) {
+                          return 'No such symptom found';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+          // Next Button.
+          Positioned(
+            top: screenHeight * 0.9,
+            right: screenWidth * 0.02,
+            child: SizedBox(
+              width: 100,
+              child: ElevatedButton(
+                onPressed: navigateToNextPage,
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 0, 0, 0);
+                    }
+                    return Colors.transparent;
+                  }),
+                  foregroundColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return const Color.fromARGB(255, 255, 255, 255);
+                    }
+                    return const Color.fromRGBO(29, 29, 44, 1.0);
+                  }),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  side: WidgetStateProperty.all(
+                    const BorderSide(
+                      color: Color.fromRGBO(82, 170, 164, 1),
+                      width: 2.0,
+                    ),
+                  ),
+                  shape: WidgetStateProperty.all(
+                    const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(100)),
+                    ),
+                  ),
+                  fixedSize: WidgetStateProperty.all(const Size(100, 55)),
+                ),
+                child: const Text(
+                  "Next",
+                  style: TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ],
+            ),
           ),
         ],
       ),

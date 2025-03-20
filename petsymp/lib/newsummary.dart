@@ -59,22 +59,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
     final List<Color> containerColors =
         List.filled(10, const Color.fromRGBO(29, 29, 44, 1.0));
 
-    String truncateText(String text, int maxLength) {
-      if (text.length <= maxLength) {
-        return text;
-      }
-      return text.substring(0, maxLength) + "...";
-    }
-
+    // Removed truncation so that all symptoms are shown.
     final userData = Provider.of<UserData>(context);
-
-    String allSymptoms = truncateText(
-        {
-          if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
-          if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom,
-          ...userData.petSymptoms.where((symptom) => symptom.isNotEmpty),
-        }.join(" + "),
-        20);
+    String allSymptoms = [
+      if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
+      if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom,
+      ...userData.petSymptoms.where((symptom) => symptom.isNotEmpty),
+    ].join(" + ");
 
     final List<Map<String, String>> petDetails = [
       {"icon": "🎂", "label": "Age", "value": userData.age.toString()},
@@ -189,7 +180,6 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               width: 70.w, // Explicitly set width & height
                               height: 70.w,
                               child: CircularProgressIndicator(
-                                /// put the highest result in here
                                 value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
                                 color: const Color.fromARGB(255, 239, 0, 0),
@@ -197,7 +187,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               ),
                             ),
                             Text(
-                              "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
+                              "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
                               style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -221,19 +211,17 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                           alignment: Alignment.center,
                           children: [
                             SizedBox(
-                              width: 70.w, // Explicitly set width & height
+                              width: 70.w,
                               height: 70.w,
                               child: CircularProgressIndicator(
-                                value:
-                                    topDiagnoses[1]['confidence_ab'] ?? 0.0,
+                                value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
-                                color:
-                                    const Color.fromARGB(255, 13, 253, 0),
-                                strokeWidth: 7.w, // Make it thicker
+                                color: const Color.fromARGB(255, 13, 253, 0),
+                                strokeWidth: 7.w,
                               ),
                             ),
                             Text(
-                              "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
+                              "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
                               style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -251,24 +239,23 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       right: 15.w,
                       top: 235.h,
                       child: SizedBox(
-                        width: 150.w, // Controls the outer size
+                        width: 150.w,
                         height: 150.w,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             SizedBox(
-                              width: 70.w, // Explicitly set width & height
+                              width: 70.w,
                               height: 70.w,
                               child: CircularProgressIndicator(
-                                value:
-                                    topDiagnoses[2]['confidence_ab'] ?? 0.0,
+                                value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
                                 color: const Color.fromARGB(255, 232, 135, 44),
-                                strokeWidth: 7.w, // Make it thicker
+                                strokeWidth: 7.w,
                               ),
                             ),
                             Text(
-                              "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
+                              "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
                               style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -287,17 +274,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10.h),
               child: Stack(
-                clipBehavior: Clip.none, // ✅ Ensures animation does not get clipped
+                clipBehavior: Clip.none,
                 children: [
                   // 🔥 Lottie Background Animation (Fixed)
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 25.h, // ✅ Adjust this value to push animation down
+                    bottom: 25.h,
                     child: SizedBox(
-                      // ✅ Adjust height as needed
                       child: Lottie.asset(
-                        'assets/wavy.json', // ✅ Replace with your Lottie animation
+                        'assets/wavy.json',
                         fit: BoxFit.cover,
                         repeat: true,
                       ),
@@ -320,24 +306,20 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // 🔹 Label (Light Color)
                                   Text(
                                     detail["label"]!,
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                      color: Colors.black,
                                     ),
                                   ),
-
-                                  // 🔹 Value (Bold)
                                   Text(
                                     detail["value"]!,
                                     style: TextStyle(
                                       fontSize: 18.sp,
                                       fontWeight: FontWeight.bold,
-                                      color:
-                                          const Color.fromRGBO(29, 29, 44, 1.0),
+                                      color: const Color.fromRGBO(29, 29, 44, 1.0),
                                     ),
                                   ),
                                 ],
@@ -365,24 +347,23 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                     Padding(
                       padding: EdgeInsets.only(right: 200.w, top: 15.h),
                       child: SizedBox(
-                        width: 150.w, // Controls the outer size
+                        width: 150.w,
                         height: 200.w,
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
                             SizedBox(
-                              width: 110.w, // Explicitly set width & height
+                              width: 110.w,
                               height: 110.w,
                               child: CircularProgressIndicator(
-                                /// put the highest result in here
                                 value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
                                 color: const Color.fromARGB(255, 255, 0, 0),
-                                strokeWidth: 10.w, // Make it thicker
+                                strokeWidth: 10.w,
                               ),
                             ),
                             Text(
-                              "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
+                              "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
                               style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -392,16 +373,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             Padding(
                               padding: EdgeInsets.only(top: 170.h),
                               child: AutoSizeText(
-                              topDiagnoses[0]['illness'] ?? "",
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                                topDiagnoses[0]['illness'] ?? "",
+                                style: TextStyle(
+                                  fontSize: 22.sp,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                maxFontSize: 30,
+                                textAlign: TextAlign.center,
                               ),
-                              maxLines: 2,
-                              maxFontSize: 30,
-                              textAlign: TextAlign.center,
-                            )
                             ),
                           ],
                         ),
@@ -411,94 +392,10 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w, // Ensure width is fixed
+                      width: 350.w,
                       child: Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
-                        softWrap: true, // ✅ Allows text wrapping
-                        style: TextStyle(
-                          fontSize: 18.sp, // ✅ Keeps font size consistent
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter', // ✅ Must match 'family' in pubspec.yaml
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.only(top: 5.h),
-                    child: SizedBox(
-                      width: 350.w, // Ensure width is fixed
-                      child: Text(
-                        "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
-                        softWrap: true, // ✅ Allows text wrapping
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  //progress indicator 2///////////////////////////////////////
-                  if (topDiagnoses.length > 1)
-                    Padding(
-                      padding: EdgeInsets.only(right: 200.w, top: 15.h),
-                      child: SizedBox(
-                        width: 150.w, // Controls the outer size
-                        height: 200.w,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 110.w,
-                              height: 110.w,
-                              child: CircularProgressIndicator(
-                                /// put the second highest result in here
-                                value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
-                                backgroundColor: Colors.grey,
-                                color: Colors.blue,
-                                strokeWidth: 10.w,
-                              ),
-                            ),
-                            Text(
-                              // Show the percentage
-                              "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 170.h),
-                              child: 
-                             AutoSizeText(
-                            topDiagnoses[2]['illness'] ?? "",
-                            style: const TextStyle(
-                              fontSize: 22, // using a fixed value instead of 22.sp
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 2,
-                            minFontSize: 14,  // fixed value
-                            textAlign: TextAlign.center,
-                          )
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  Padding(
-                    padding: EdgeInsets.only(top: 5.h),
-                    child: SizedBox(
-                      width: 350.w, // Ensure width is fixed
-                      child: Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
-                        softWrap: true, // ✅ Allows text wrapping
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 18.sp,
                           color: Colors.black,
@@ -512,7 +409,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w, // Ensure width is fixed
+                      width: 350.w,
                       child: Text(
                         "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
                         softWrap: true,
@@ -526,7 +423,88 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                     ),
                   ),
 
-                  //progress indicator 3////////////////////////////////////////////////////////
+                  //progress indicator 2
+                  if (topDiagnoses.length > 1)
+                    Padding(
+                      padding: EdgeInsets.only(right: 200.w, top: 15.h),
+                      child: SizedBox(
+                        width: 150.w,
+                        height: 200.w,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 110.w,
+                              height: 110.w,
+                              child: CircularProgressIndicator(
+                                value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
+                                backgroundColor: Colors.grey,
+                                color: Colors.blue,
+                                strokeWidth: 10.w,
+                              ),
+                            ),
+                            Text(
+                              "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
+                              style: TextStyle(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 170.h),
+                              child: AutoSizeText(
+                                topDiagnoses[2]['illness'] ?? "",
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                minFontSize: 14,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  Padding(
+                    padding: EdgeInsets.only(top: 5.h),
+                    child: SizedBox(
+                      width: 350.w,
+                      child: Text(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.only(top: 5.h),
+                    child: SizedBox(
+                      width: 350.w,
+                      child: Text(
+                        "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  //progress indicator 3
                   if (topDiagnoses.length > 2)
                     Padding(
                       padding: EdgeInsets.only(right: 200.w, top: 15.h),
@@ -540,16 +518,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               width: 110.w,
                               height: 110.w,
                               child: CircularProgressIndicator(
-                                /// put the third highest result in here
                                 value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
-                                color:
-                                    const Color.fromARGB(255, 255, 145, 0),
+                                color: const Color.fromARGB(255, 255, 145, 0),
                                 strokeWidth: 10.w,
                               ),
                             ),
                             Text(
-                              "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%", // Centered text
+                              "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
                               style: TextStyle(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -559,15 +535,15 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             Padding(
                               padding: EdgeInsets.only(top: 170.h),
                               child: AutoSizeText(
-                              topDiagnoses[2]['illness'] ?? "",
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                                topDiagnoses[2]['illness'] ?? "",
+                                style: TextStyle(
+                                  fontSize: 22.sp,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
                               ),
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                            )
                             ),
                           ],
                         ),
@@ -621,10 +597,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
                 ),
                 children: [
-                  // 🔹 Wrap in ConstrainedBox for controlled height
                   ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight: 300.h, // ✅ Limits height to enable scrolling
+                      maxHeight: 300.h,
                     ),
                     child: SingleChildScrollView(
                       child: Column(
@@ -678,7 +653,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 ],
               ),
             ),
-            // put the code here gpt//
+            // (Rest of your recommendation code remains unchanged)
           ],
         ),
       ),
@@ -703,10 +678,10 @@ class ListItem {
 
   const ListItem({
     required this.title,
+    required this.subtitle,
     this.route,
     this.url,
     required this.isExternal,
     required this.imageUrl,
-    required this.subtitle,
   });
 }
