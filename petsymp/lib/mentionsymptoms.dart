@@ -51,19 +51,24 @@ void initState() {
 
 
   void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-      String inputText = _symptomController.text.trim();
-      final userData = Provider.of<UserData>(context, listen: false);
-      // Set anotherSymptom so that AnothersearchsymptomsScreen shows the new input.
-      userData.setAnotherSymptom(inputText);
-      // Add it as a new symptom.
-      userData.addNewPetSymptom(inputText);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const AnothersearchsymptomsScreen()),
-      );
-    }
+  if (_formKey.currentState?.validate() ?? false) {
+    final userData = Provider.of<UserData>(context, listen: false);
+    final inputText = _symptomController.text.trim().toLowerCase();
+
+    // 1) Mark the typed symptom as "pending" (not finalized):
+    userData.addPendingSymptom(inputText);
+
+    // 2) Optionally store it in "anotherSymptom," if that’s your logic:
+    userData.setAnotherSymptom(inputText);
+
+    // Then proceed to your AnothersearchsymptomsScreen:
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AnothersearchsymptomsScreen()),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -163,23 +168,31 @@ void initState() {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the symptom of the pet';
-                        }
-                        if (value.contains(',') || value.contains('+')) {
-                          return 'Please enter only one symptom at a time';
-                        }
-                        String input = value.trim().toLowerCase();
-                        if (!predefinedSymptoms.contains(input)) {
-                          return 'No such symptom found';
-                        }
-                        if (Provider.of<UserData>(context, listen: false)
-                            .petSymptoms
-                            .contains(value.trim())) {
-                          return 'This symptom is already added';
-                        }
-                        return null;
-                      },
+  if (value == null || value.isEmpty) {
+    return 'Please enter the symptom of the pet';
+  }
+  if (value.contains(',') || value.contains('+')) {
+    return 'Please enter only one symptom at a time';
+  }
+
+  final inputLower = value.trim().toLowerCase();
+  final userData = Provider.of<UserData>(context, listen: false);
+
+  // Check if it’s a recognized (predefined) symptom:
+  final List<String> predefinedLower =
+      userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
+  if (!predefinedLower.contains(inputLower)) {
+    return 'No such symptom found';
+  }
+
+  // **NEW**: If it’s in the finalizedSymptoms list, block it:
+  if (userData.finalizedSymptoms.contains(inputLower)) {
+    return 'This symptom is already added/finalized';
+  }
+
+  return null;
+},
+
                     ),
                   ),
                 ),

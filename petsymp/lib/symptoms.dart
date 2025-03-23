@@ -43,22 +43,26 @@ class SymptomsScreenState extends State<SymptomsScreen> {
     });
   }
 
-  void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-      String inputText = _symptomsController.text.trim();
-      // Since only one symptom is allowed, we pass the input as a single-item list.
-      List<String> symptomsList = [inputText];
-      if (symptomsList.isNotEmpty) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchsymptomsScreen(symptoms: symptomsList),
-          ),
-        );
-      }
-    }
-  }
+ void navigateToNextPage() {
+  if (_formKey.currentState?.validate() ?? false) {
+    final userData = Provider.of<UserData>(context, listen: false);
+    final inputText = _symptomsController.text.trim().toLowerCase();
 
+    // 1) Mark it as a pending symptom (instead of permanently adding to petSymptoms)
+    userData.addPendingSymptom(inputText);
+
+    // 2) Also store it if you want "anotherSymptom," etc.
+    userData.setAnotherSymptom(inputText);
+
+    // Then navigate
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchsymptomsScreen(symptoms: [inputText]),
+      ),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -168,19 +172,31 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the symptom of the pet';
-                        }
-                        // Enforce single symptom by disallowing additional words.
-                        if (value.trim().split(RegExp(r'\s+')).length > 1) {
-                          return 'Please enter only one symptom at a time';
-                        }
-                        String input = value.trim().toLowerCase();
-                        if (!predefinedSymptoms.contains(input)) {
-                          return 'No such symptom found';
-                        }
-                        return null;
-                      },
+  if (value == null || value.isEmpty) {
+    return 'Please enter the symptom of the pet';
+  }
+  // Single-symptom check as you had:
+  if (value.trim().split(RegExp(r'\s+')).length > 1) {
+    return 'Please enter only one symptom at a time';
+  }
+
+  final userData = Provider.of<UserData>(context, listen: false);
+  final inputLower = value.trim().toLowerCase();
+
+  // Make sure it exists in your predefinedSymptoms...
+  final List<String> predefLower = userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
+  if (!predefLower.contains(inputLower)) {
+    return 'No such symptom found';
+  }
+
+  // **NEW**: If it's in the finalized list, block it:
+  if (userData.finalizedSymptoms.contains(inputLower)) {
+    return 'This symptom is already finalized';
+  }
+
+  return null;
+},
+
                     ),
                   ),
                 ),

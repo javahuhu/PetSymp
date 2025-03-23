@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/anothersymptoms.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
-import 'package:petsymp/report.dart';
 
 class QoneScreen extends StatefulWidget {
   const QoneScreen({super.key});
@@ -43,12 +42,14 @@ class QoneScreenState extends State<QoneScreen> {
 
   void nextQuestion(BuildContext context, String selectedAnswer) {
     final userData = Provider.of<UserData>(context, listen: false);
-    // Use questionSymptoms for the current question title;
-    // if not available, fall back to the overall selectedSymptom.
+
+    // Use questionSymptoms for the current question label if available;
+    // fall back to selectedSymptom if not.
     final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
             currentQuestionIndex < userData.questionSymptoms.length
         ? userData.questionSymptoms[currentQuestionIndex]
         : userData.selectedSymptom;
+
     final currentQuestion = userData.questions[currentQuestionIndex];
 
     // Save the answer for this symptom question.
@@ -57,13 +58,17 @@ class QoneScreenState extends State<QoneScreen> {
     print("✅ Question: $currentQuestion");
     print("✅ Answer: $selectedAnswer");
 
+    // Move to the next question if there is one; otherwise finalize the symptom.
     if (currentQuestionIndex < userData.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
       _triggerAnimation();
     } else {
-      // All questions answered; fetch diagnosis and then navigate.
+      // All questions answered. Finalize the symptom to block re-entry:
+      _finalizeSymptom(userData, questionSymptom);
+
+      // Then fetch diagnosis if needed and navigate onwards.
       userData.fetchDiagnosis().then((_) {
         Navigator.push(
           context,
@@ -73,6 +78,28 @@ class QoneScreenState extends State<QoneScreen> {
         );
       });
     }
+  }
+
+  void _finalizeSymptom(UserData userData, String symptom) {
+    // A new method that marks this symptom as "finalized" so the user can't re-enter it.
+    // We'll define finalizeSymptom in your userData, which moves from pending → finalized.
+    // e.g.: userData.finalizeSymptom(symptom);
+
+    // If your userData does not yet have finalizeSymptom(...), add it:
+    // 
+    //   void finalizeSymptom(String symptom) {
+    //     final normalized = symptom.trim().toLowerCase();
+    //     _pendingSymptoms.remove(normalized);
+    //     if (!_finalizedSymptoms.contains(normalized)) {
+    //       _finalizedSymptoms.add(normalized);
+    //     }
+    //     notifyListeners();
+    //   }
+    // 
+    // If you're not using that approach, see prior instructions for the "pending vs. finalized" logic.
+
+    userData.finalizeSymptom(symptom);
+    print("✅ Finalized Symptom: $symptom");
   }
 
   void previousQuestion() {
@@ -93,7 +120,8 @@ class QoneScreenState extends State<QoneScreen> {
     final userData = Provider.of<UserData>(context);
     final questions = userData.questions;
     final impactChoices = userData.impactChoices;
-    // Determine the current symptom for the question.
+
+    // Current label for the question
     final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
             currentQuestionIndex < userData.questionSymptoms.length
         ? userData.questionSymptoms[currentQuestionIndex]
@@ -105,6 +133,7 @@ class QoneScreenState extends State<QoneScreen> {
         children: [
           Stack(
             children: [
+              // Back Button
               Positioned(
                 top: screenHeight * 0.03,
                 left: screenWidth * 0.01,
@@ -122,6 +151,8 @@ class QoneScreenState extends State<QoneScreen> {
                   ),
                 ),
               ),
+
+              // Animated Paw
               AnimatedPositioned(
                 duration: const Duration(seconds: 1),
                 curve: Curves.easeInOut,
@@ -145,6 +176,8 @@ class QoneScreenState extends State<QoneScreen> {
                   ],
                 ),
               ),
+
+              // Question UI
               Positioned(
                 top: screenHeight * 0.22,
                 left: screenWidth * 0.03,
@@ -162,8 +195,7 @@ class QoneScreenState extends State<QoneScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      questions.isNotEmpty &&
-                              currentQuestionIndex < questions.length
+                      questions.isNotEmpty && currentQuestionIndex < questions.length
                           ? questions[currentQuestionIndex]
                           : "No questions available",
                       style: const TextStyle(
@@ -176,9 +208,15 @@ class QoneScreenState extends State<QoneScreen> {
                   ],
                 ),
               ),
+
+              // Buttons for answers
               if (_buttonsVisible)
                 buildImpactButtons(
-                    screenHeight * 0.5, screenWidth, context, impactChoices),
+                  screenHeight * 0.5,
+                  screenWidth,
+                  context,
+                  impactChoices,
+                ),
             ],
           ),
         ],
@@ -186,8 +224,12 @@ class QoneScreenState extends State<QoneScreen> {
     );
   }
 
-  Widget buildImpactButtons(double top, double screenWidth, BuildContext context,
-      List<List<String>> impactChoices) {
+  Widget buildImpactButtons(
+    double top,
+    double screenWidth,
+    BuildContext context,
+    List<List<String>> impactChoices,
+  ) {
     List<String> currentChoices = [];
     if (currentQuestionIndex < impactChoices.length) {
       currentChoices = impactChoices[currentQuestionIndex];
@@ -204,7 +246,7 @@ class QoneScreenState extends State<QoneScreen> {
             child: ElevatedButton(
               onPressed: () {
                 print("✅ Selected Impact Choice: $choice");
-                nextQuestion(context, choice); // Save answer and move on.
+                nextQuestion(context, choice); // Save answer and move on
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {

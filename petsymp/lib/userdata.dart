@@ -3,26 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class UserData with ChangeNotifier {
+  // Basic user info
   String _userName = '';
   String _petSize = '';
   String _email = '';
   int _petAge = 0;
   String _breed = '';
   String _anotherSymptom = '';
+
+  // Symptom lists
+  final List<String> _pendingSymptoms = [];
+  final List<String> _finalizedSymptoms = [];
+  final List<String> _newSymptoms = [];
+
+  // Symptom-specific QA
   Map<String, String> _symptomDurations = {};
   String _selectedSymptom = "";
-  List<String> _petSymptoms = [];
+  List<Map<String, dynamic>> _diagnosisResults = [];
   List<String> _questions = [];
   List<List<String>> _impactChoices = [];
-  List<Map<String, dynamic>> _diagnosisResults = [];
-
-  // Track only the new (unanswered) symptoms.
-  List<String> _newSymptoms = [];
-  List<String> get newSymptoms => _newSymptoms;
-
-  // Track which symptom each question belongs to.
   List<String> _questionSymptoms = [];
-  List<String> get questionSymptoms => _questionSymptoms;
 
   // Getters
   String get userName => _userName;
@@ -31,102 +31,128 @@ class UserData with ChangeNotifier {
   String get size => _petSize;
   int get age => _petAge;
   String get anotherSymptom => _anotherSymptom;
+
+  List<String> get pendingSymptoms => _pendingSymptoms;
+  List<String> get finalizedSymptoms => _finalizedSymptoms;
+  List<String> get newSymptoms => _newSymptoms;
   Map<String, String> get symptomDurations => _symptomDurations;
   String get selectedSymptom => _selectedSymptom;
-  List<String> get petSymptoms => _petSymptoms;
+  List<Map<String, dynamic>> get diagnosisResults => _diagnosisResults;
   List<String> get questions => _questions;
   List<List<String>> get impactChoices => _impactChoices;
-  List<Map<String, dynamic>> get diagnosisResults => _diagnosisResults;
+  List<String> get questionSymptoms => _questionSymptoms;
 
-  // Setters
+  /// ✅ Getter used by NewSummaryScreen
+  List<String> get petSymptoms {
+    return [..._finalizedSymptoms, ..._pendingSymptoms];
+  }
+
+  // Basic setters
   void setUserName(String name) {
     _userName = name;
     notifyListeners();
   }
+
   void setOTPemail(String email) {
     _email = email;
     notifyListeners();
   }
+
   void setpetBreed(String breed) {
     _breed = breed;
     notifyListeners();
   }
+
   void setpetSize(String size) {
     _petSize = size;
     notifyListeners();
   }
+
   void setpetAge(int age) {
     _petAge = age;
     notifyListeners();
   }
-  
-  void addPetSymptom(String symptom) {
-    String normalized = symptom.trim();
-    if (!_petSymptoms.contains(normalized)) {
-      _petSymptoms.add(normalized);
-    }
-    // Do not update questions here.
+
+  void setAnotherSymptom(String symptom) {
+    _anotherSymptom = symptom.trim().toLowerCase();
     notifyListeners();
   }
-  
-  // Use this for each new (single) symptom input.
-  void addNewPetSymptom(String symptom) {
-    String normalized = symptom.trim();
-    if (!_newSymptoms.contains(normalized)) {
-      _newSymptoms.add(normalized);
-      if (!_petSymptoms.contains(normalized)) {
-        _petSymptoms.add(normalized);
-      }
-      // Do not update questions here.
+
+  // Add/remove symptoms
+  void addPendingSymptom(String symptom) {
+    final normalized = symptom.trim().toLowerCase();
+    if (!_pendingSymptoms.contains(normalized)) {
+      _pendingSymptoms.add(normalized);
       notifyListeners();
     }
   }
-  
-  // Once a symptom’s questions are answered, clear it from the new batch.
+
+  void finalizeSymptom(String symptom) {
+    final normalized = symptom.trim().toLowerCase();
+    _pendingSymptoms.remove(normalized);
+    if (!_finalizedSymptoms.contains(normalized)) {
+      _finalizedSymptoms.add(normalized);
+    }
+    notifyListeners();
+  }
+
+  void removePendingSymptom(String symptom) {
+    final normalized = symptom.trim().toLowerCase();
+    _pendingSymptoms.remove(normalized);
+    notifyListeners();
+  }
+
+  void addNewSymptom(String symptom) {
+    final normalized = symptom.trim().toLowerCase();
+    if (!_newSymptoms.contains(normalized)) {
+      _newSymptoms.add(normalized);
+    }
+    notifyListeners();
+  }
+
   void clearNewSymptoms() {
     _newSymptoms.clear();
     notifyListeners();
   }
-  
-  void setAnotherSymptom(String symptom) {
-    String normalized = symptom.trim();
-    _anotherSymptom = normalized;  // Update the field!
-    if (!_petSymptoms.contains(normalized)) {
-      _petSymptoms.add(normalized);
+
+  void addNewPetSymptom(String symptom) {
+    final normalized = symptom.trim().toLowerCase();
+    if (!_finalizedSymptoms.contains(normalized) && !_pendingSymptoms.contains(normalized)) {
+      _pendingSymptoms.add(normalized);
     }
-    // Optionally update questions if needed.
     notifyListeners();
   }
-  
+
+  // Q&A logic
   void setSelectedSymptom(String symptom) {
-    _selectedSymptom = symptom.trim();
-    // Delay updating questions until after the current frame.
+    _selectedSymptom = symptom.trim().toLowerCase();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateQuestions();
       notifyListeners();
     });
   }
-  
+
   void setSymptomDuration(String symptom, String duration) {
-    _symptomDurations[symptom.trim()] = duration;
+    _symptomDurations[symptom.trim().toLowerCase()] = duration;
     notifyListeners();
   }
-  
+
   void addSymptomAnswer(String symptom, String answer) {
-    _symptomDurations[symptom.trim()] = answer;
+    _symptomDurations[symptom.trim().toLowerCase()] = answer;
     notifyListeners();
   }
-  
+
   Map<String, String> getSymptomDurations() {
     return _symptomDurations;
   }
-  
+
   void setDiagnosisResults(List<Map<String, dynamic>> results) {
     _diagnosisResults = results;
     notifyListeners();
   }
 
-  // Mapping for symptom questions and impact values.
+  // Symptom-question mapping
+   // Mapping for symptom questions and impact values.
   final Map<String, dynamic> _symptomQuestions = {
     "vomiting": {
       "questions": [
@@ -233,50 +259,41 @@ class UserData with ChangeNotifier {
     return _symptomQuestions.keys.toList();
   }
 
-  // Update follow-up questions using only the currently selected symptom.
-  // This is called via setSelectedSymptom.
   void updateQuestions() {
-    if (_selectedSymptom.isNotEmpty) {
-      final String symptomKey = _selectedSymptom.toLowerCase();
-      if (_symptomQuestions.containsKey(symptomKey)) {
-        _questions = List<String>.from(_symptomQuestions[symptomKey]["questions"]);
-        _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
-        List<String> impactDaysChoices = [];
-        List<String> impactSymptomChoices = [];
-        if (_symptomQuestions[symptomKey].containsKey("impactDays")) {
-          impactDaysChoices = List<String>.from(
-            (_symptomQuestions[symptomKey]["impactDays"] as Map<String, dynamic>).keys,
-          );
-        }
-        if (_symptomQuestions[symptomKey].containsKey("impactSymptom")) {
-          impactSymptomChoices = List<String>.from(
-            (_symptomQuestions[symptomKey]["impactSymptom"] as Map<String, dynamic>).keys,
-          );
-        }
-        _impactChoices = [impactDaysChoices, impactSymptomChoices];
-      } else {
-        _questions = [];
-        _impactChoices = [[], []];
-        _questionSymptoms = [];
+    final key = _selectedSymptom.toLowerCase();
+    if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
+      _questions = List<String>.from(_symptomQuestions[key]["questions"]);
+      _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
+
+      List<String> impactDaysChoices = [];
+      List<String> impactSymptomChoices = [];
+
+      if (_symptomQuestions[key].containsKey("impactDays")) {
+        impactDaysChoices = List<String>.from(
+            (_symptomQuestions[key]["impactDays"] as Map<String, dynamic>).keys);
       }
+      if (_symptomQuestions[key].containsKey("impactSymptom")) {
+        impactSymptomChoices = List<String>.from(
+            (_symptomQuestions[key]["impactSymptom"] as Map<String, dynamic>).keys);
+      }
+
+      _impactChoices = [impactDaysChoices, impactSymptomChoices];
     } else {
       _questions = [];
       _impactChoices = [[], []];
       _questionSymptoms = [];
     }
-    // No immediate notifyListeners() here; it's called in setSelectedSymptom's post-frame callback.
   }
 
+  // Call Flask API to get diagnosis results
   Future<void> fetchDiagnosis() async {
-    final Uri url = Uri.parse("http://10.0.2.2:8000/diagnose");
+    final Uri url = Uri.parse("http://192.168.1.101:8000/diagnose");
+    final allTypedSymptoms = [..._finalizedSymptoms];
+    final uniqueSymptoms = allTypedSymptoms.toSet().toList();
 
-    if (_anotherSymptom.isNotEmpty && !_petSymptoms.contains(_anotherSymptom)) {
-      _petSymptoms.add(_anotherSymptom);
-    }
-
-    final Map<String, dynamic> requestData = {
+    final requestData = {
       "owner": _userName,
-      "symptoms": _petSymptoms.toSet().toList(),
+      "symptoms": uniqueSymptoms,
       "pet_info": {
         "age": _petAge.toString(),
         "breed": _breed,
@@ -291,16 +308,16 @@ class UserData with ChangeNotifier {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(requestData),
       ).timeout(const Duration(minutes: 2));
+
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        List<Map<String, dynamic>> illnesses =
-            List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
+        final illnesses = List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
         setDiagnosisResults(illnesses);
       } else {
         print("❌ API Error: ${response.statusCode}");
       }
     } catch (e) {
-      print("🚨 Failed to connect to API: $e");
+      print("🚨 Failed to connect: $e");
     }
   }
 }

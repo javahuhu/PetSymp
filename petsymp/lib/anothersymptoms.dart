@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:petsymp/mentionsymptoms.dart';
 import 'package:petsymp/newsummary.dart';
 

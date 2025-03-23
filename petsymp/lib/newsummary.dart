@@ -18,40 +18,44 @@ class NewSummaryScreen extends StatefulWidget {
 class NewSummaryScreenState extends State<NewSummaryScreen> {
   final List<ListItem> items = [
     const ListItem(
-        title: 'Provide Medicine for Lethargy',
-        subtitle: 'techniques on how can dog drink a vitamins quickly',
-        route: HomePageScreen(),
-        isExternal: false,
-        imageUrl: 'assets/youtube1.jpg'),
+      title: 'Provide Medicine for Lethargy',
+      subtitle: 'techniques on how can dog drink a vitamins quickly',
+      route: HomePageScreen(),
+      isExternal: false,
+      imageUrl: 'assets/youtube1.jpg',
+    ),
     const ListItem(
-        title: 'How to Easily Give Your Pet Medicine Without Stress!',
-        subtitle:
-            "Learn simple and stress-free techniques to give your pet medicine, whether it's a pill, liquid, or injection, ensuring their health and comfort",
-        route: Profilescreen(),
-        isExternal: false,
-        imageUrl: 'assets/youtube1.jpg'),
+      title: 'How to Easily Give Your Pet Medicine Without Stress!',
+      subtitle:
+          "Learn simple and stress-free techniques to give your pet medicine, whether it's a pill, liquid, or injection, ensuring their health and comfort",
+      route: Profilescreen(),
+      isExternal: false,
+      imageUrl: 'assets/youtube1.jpg',
+    ),
     const ListItem(
-        title: 'ricks to Give Your Pet Medicine Without a Fight!',
-        subtitle:
-            'Discover easy and effective ways to give your pet medicine without stress, making it a smooth experience for both of you.',
-        url:
-            'https://www.youtube.com/results?search_query=flutter+list+with+images',
-        isExternal: true,
-        imageUrl: 'assets/youtube1.jpg'),
+      title: 'ricks to Give Your Pet Medicine Without a Fight!',
+      subtitle:
+          'Discover easy and effective ways to give your pet medicine without stress, making it a smooth experience for both of you.',
+      url: 'https://www.youtube.com/results?search_query=flutter+list+with+images',
+      isExternal: true,
+      imageUrl: 'assets/youtube1.jpg',
+    ),
     const ListItem(
-        title: 'How to Hide Medicine in Treats for Your Pet!',
-        subtitle:
-            'Learn sneaky yet safe ways to hide pills in treats and food so your pet takes their medicine without even noticing.',
-        route: HomePageScreen(),
-        isExternal: false,
-        imageUrl: 'assets/youtube1.jpg'),
+      title: 'How to Hide Medicine in Treats for Your Pet!',
+      subtitle:
+          'Learn sneaky yet safe ways to hide pills in treats and food so your pet takes their medicine without even noticing.',
+      route: HomePageScreen(),
+      isExternal: false,
+      imageUrl: 'assets/youtube1.jpg',
+    ),
     const ListItem(
-        title: 'The Right Way to Give Your Pet Liquid Medicine!',
-        subtitle:
-            "Master the best techniques to give your pet liquid medicine without mess or resistance.",
-        route: Profilescreen(),
-        isExternal: false,
-        imageUrl: 'assets/youtube1.jpg'),
+      title: 'The Right Way to Give Your Pet Liquid Medicine!',
+      subtitle:
+          "Master the best techniques to give your pet liquid medicine without mess or resistance.",
+      route: Profilescreen(),
+      isExternal: false,
+      imageUrl: 'assets/youtube1.jpg',
+    ),
   ];
 
   @override
@@ -59,13 +63,10 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
     final List<Color> containerColors =
         List.filled(10, const Color.fromRGBO(29, 29, 44, 1.0));
 
-    // Removed truncation so that all symptoms are shown.
+    // Deduplicate by using a Set, so each symptom only appears once
     final userData = Provider.of<UserData>(context);
-    String allSymptoms = [
-      if (userData.selectedSymptom.isNotEmpty) userData.selectedSymptom,
-      if (userData.anotherSymptom.isNotEmpty) userData.anotherSymptom,
-      ...userData.petSymptoms.where((symptom) => symptom.isNotEmpty),
-    ].join(" + ");
+    final String allSymptoms = userData.petSymptoms.join(" + ");
+
 
     final List<Map<String, String>> petDetails = [
       {"icon": "🎂", "label": "Age", "value": userData.age.toString()},
@@ -89,14 +90,26 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+             SizedBox(height: 60.h),
+             Center( child: 
+             Padding(
+              padding:  EdgeInsets.only(left: 20.w),
+              child: Container(
+                      width: 70.w,
+                      height: 70.w,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: Image.asset('assets/paw.png', fit: BoxFit.fill),
+                    ),
+            )),
             // **Month Title**
-            SizedBox(height: 25.h),
-            const Padding(
-              padding: EdgeInsets.only(left: 20),
+            SizedBox(height: 30.h),
+             Padding(
+              padding:  EdgeInsets.only(left: 20.w),
               child: Text(
                 "March, 2025",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 22.sp,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
@@ -115,9 +128,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                     Border borderstyle = index == 2
                         ? Border.all(
                             color: const Color.fromARGB(255, 255, 0, 0),
-                            width: 4)
-                        : Border.all(
-                            color: const Color.fromARGB(255, 0, 0, 0));
+                            width: 4,
+                          )
+                        : Border.all(color: const Color.fromARGB(255, 0, 0, 0));
                     return Container(
                       width: 50,
                       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -139,7 +152,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
             ),
             SizedBox(height: 0.h),
 
-            // **Fix: Wrap Stack Inside a SizedBox**
+            // **Wrap Stack Inside a SizedBox**
             SizedBox(
               height: 450.h, // 🔥 Ensure Stack has a fixed height
               child: Stack(
@@ -154,13 +167,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       width: 250.w,
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: const Color.fromARGB(255, 255, 0, 0),
-                            width: 5),
+                          color: const Color.fromARGB(255, 255, 0, 0),
+                          width: 5,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: Image.asset("assets/sampleimage.jpg",
-                            fit: BoxFit.cover),
+                        child: Image.asset(
+                          "assets/sampleimage.jpg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -183,7 +199,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                 value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
                                 backgroundColor: Colors.grey,
                                 color: const Color.fromARGB(255, 239, 0, 0),
-                                strokeWidth: 7.w, // Make it thicker
+                                strokeWidth: 7.w,
                               ),
                             ),
                             Text(
@@ -205,7 +221,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       right: -15.w,
                       top: 145.h,
                       child: SizedBox(
-                        width: 150.w, // Controls the outer size
+                        width: 150.w,
                         height: 150.w,
                         child: Stack(
                           alignment: Alignment.center,
@@ -237,7 +253,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   if (topDiagnoses.length > 2)
                     Positioned(
                       right: 15.w,
-                      top: 235.h,
+                      top: 232.h,
                       child: SizedBox(
                         width: 150.w,
                         height: 150.w,
@@ -272,7 +288,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
 
             // 🔹 Pet Details Section (Scrollable List)
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h),
+              padding: EdgeInsets.symmetric(vertical: 0.h),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -280,7 +296,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 25.h,
+                    bottom: 35.h,
                     child: SizedBox(
                       child: Lottie.asset(
                         'assets/wavy.json',
@@ -334,18 +350,31 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               ),
             ),
 
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 0.h),
-              child: ExpansionTile(
+             Positioned(
+              top: 0.h,
+              child: Center( child: 
+              Container(
+              width: 350.w, 
+              child: Card(
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(10.0), 
+                    side: BorderSide.none,
+                  ),
+                  elevation: 3,
+                  child: Theme(
+                    data: Theme.of(context)
+                        .copyWith(dividerColor: Colors.transparent),
+                    child:  ExpansionTile(
                 title: const Text(
-                  'Illness Pet Result',
+                  'Illness Pet Results',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
                 ),
                 children: [
-                  //progress indicator 1//
+                  //progress indicator 1
                   if (topDiagnoses.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.only(right: 200.w, top: 15.h),
+                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
                       child: SizedBox(
                         width: 150.w,
                         height: 200.w,
@@ -374,13 +403,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               padding: EdgeInsets.only(top: 170.h),
                               child: AutoSizeText(
                                 topDiagnoses[0]['illness'] ?? "",
-                                style: TextStyle(
-                                  fontSize: 22.sp,
+                                style: const TextStyle(
+                                  fontSize: 22,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                maxLines: 2,
-                                maxFontSize: 30,
+                                maxLines: 4,
+                                minFontSize: 18,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -392,7 +421,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
                         softWrap: true,
@@ -409,7 +438,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
                         softWrap: true,
@@ -426,7 +455,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   //progress indicator 2
                   if (topDiagnoses.length > 1)
                     Padding(
-                      padding: EdgeInsets.only(right: 200.w, top: 15.h),
+                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
                       child: SizedBox(
                         width: 150.w,
                         height: 200.w,
@@ -454,14 +483,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             Padding(
                               padding: EdgeInsets.only(top: 170.h),
                               child: AutoSizeText(
-                                topDiagnoses[2]['illness'] ?? "",
+                                topDiagnoses[1]['illness'] ?? "",
                                 style: const TextStyle(
                                   fontSize: 22,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                maxLines: 2,
-                                minFontSize: 14,
+                                maxLines: 4,
+                                minFontSize: 18,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -473,7 +502,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
                         softWrap: true,
@@ -490,7 +519,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
                         softWrap: true,
@@ -507,7 +536,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   //progress indicator 3
                   if (topDiagnoses.length > 2)
                     Padding(
-                      padding: EdgeInsets.only(right: 200.w, top: 15.h),
+                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
                       child: SizedBox(
                         width: 150.w,
                         height: 200.w,
@@ -536,12 +565,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               padding: EdgeInsets.only(top: 170.h),
                               child: AutoSizeText(
                                 topDiagnoses[2]['illness'] ?? "",
-                                style: TextStyle(
-                                  fontSize: 22.sp,
+                                style: const TextStyle(
+                                  fontSize: 22,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                maxLines: 1,
+                                maxLines: 4,
+                                minFontSize: 18,
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -553,7 +583,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
                         softWrap: true,
@@ -570,7 +600,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
-                      width: 350.w,
+                      width: 340.w,
                       child: Text(
                         "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
                         softWrap: true,
@@ -585,13 +615,26 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   ),
                   SizedBox(height: 50.h),
                 ],
-              ),
-            ),
+              )))))),
+            
 
             ///Recommendation//////////
             Padding(
               padding: EdgeInsets.symmetric(vertical: 15.h),
-              child: ExpansionTile(
+              child: Center( child: 
+              Container(
+              width: 350.w, 
+              child: Card(
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(10.0), 
+                    side: BorderSide.none,
+                  ),
+                  elevation: 3,
+                  child: Theme(
+                    data: Theme.of(context)
+                        .copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
                 title: const Text(
                   'Recommendations',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
@@ -599,14 +642,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight: 300.h,
+                      maxHeight: 525.h,
                     ),
                     child: SingleChildScrollView(
                       child: Column(
                         children: items.map((item) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 10),
+                              vertical: 8.0,
+                              horizontal: 10,
+                            ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(8),
                               leading: ClipRRect(
@@ -640,7 +685,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => item.route!),
+                                      builder: (context) => item.route!,
+                                    ),
                                   );
                                 }
                               },
@@ -652,8 +698,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   ),
                 ],
               ),
-            ),
-            // (Rest of your recommendation code remains unchanged)
+            ))))),
+            SizedBox(height: 50.h),
           ],
         ),
       ),

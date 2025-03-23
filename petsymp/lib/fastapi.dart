@@ -17,7 +17,7 @@ class ApiService {
     } catch (e) {
       print("⚠️ Error detecting IP: $e");
     }
-    return "http://10.0.2.2"; // Default IP if auto-detection fails
+    return "192.168.1.101"; // Default IP if auto-detection fails
   }
 
   // Main diagnosis function
