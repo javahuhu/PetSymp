@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'barchart/barchart.dart';
+import 'dart:math' as math;
 
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
@@ -84,6 +86,20 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
           : List<Map<String, dynamic>>.from(diagnoses);
     }
 
+
+    // Extract illness names and confidence scores
+    final List<String> illnessLabels = [];
+    final List<double> fcScores = [];
+    final List<double> gbScores = [];
+    final List<double> abScores = [];
+
+    for (var item in diagnoses.take(10)) {
+      illnessLabels.add(item['illness']);
+      fcScores.add((item['confidence_fc'] as num).toDouble());
+      gbScores.add((item['confidence_gb'] as num).toDouble());
+      abScores.add((item['confidence_ab'] as num).toDouble());
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: SingleChildScrollView(
@@ -91,18 +107,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-             SizedBox(height: 60.h),
-             Center( child: 
-             Padding(
-              padding:  EdgeInsets.only(left: 20.w),
-              child: Container(
-                      width: 70.w,
-                      height: 70.w,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: Image.asset('assets/paw.png', fit: BoxFit.fill),
-                    ),
-            )),
-            // **Month Title**
+            
             SizedBox(height: 30.h),
              Padding(
               padding:  EdgeInsets.only(left: 20.w),
@@ -350,6 +355,54 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               ),
             ),
 
+           // ===== Top 1–5 =====
+
+// ===== Single scrollable Top‑10 chart =====
+// ===== Single scrollable Top‑10 chart =====
+Padding(
+  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+  child: Container(
+    decoration: BoxDecoration(
+      color: const Color.fromRGBO(29, 29, 44, 1.0),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    height: 250.h,
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Consumer<UserData>(
+        builder: (_, userData, __) {
+          final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
+            ..sort((a, b) => (b['confidence_ab'] as num).compareTo((a['confidence_ab'] as num)));
+          final top10 = diagnoses.take(10).toList();
+          while (top10.length < 10) {
+            top10.add({'illness': '', 'confidence_fc': 0.0, 'confidence_gb': 0.0, 'confidence_ab': 0.0});
+          }
+
+          final labels = top10.map((d) => d['illness'] as String).toList();
+          final fc = top10.map((d) => (d['confidence_fc'] as num).toDouble()).toList();
+          final gb = top10.map((d) => (d['confidence_gb'] as num).toDouble()).toList();
+          final ab = top10.map((d) => (d['confidence_ab'] as num).toDouble()).toList();
+
+          // Calculate width: 100.w per group with some margin
+          final chartWidth = math.max(labels.length * 110.w, MediaQuery.of(context).size.width - 70.w);
+
+          return SizedBox(
+            width: chartWidth,
+            child: BarChartSample2(
+              illnessLabels: labels,
+              fcScores: fc,
+              gbScores: gb,
+              abScores: ab,// Pass the calculated width
+            ),
+          );
+        },
+      ),
+    ),
+  ),
+),
+
+    SizedBox(height: 20.h,),
+
              Positioned(
               top: 0.h,
               child: Center( child: 
@@ -371,59 +424,68 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
                 ),
                 children: [
-                  //progress indicator 1
-                  if (topDiagnoses.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
-                      child: SizedBox(
-                        width: 150.w,
-                        height: 200.w,
-                        child: Stack(
-                          alignment: Alignment.center,
+                                        //progress indicator 1
+                        if (topDiagnoses.isNotEmpty)         
+                        Padding(
+                        padding: EdgeInsets.only(top: 15.h, left: 10.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
                           children: [
-                            SizedBox(
-                              width: 110.w,
-                              height: 110.w,
-                              child: CircularProgressIndicator(
-                                value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
-                                backgroundColor: Colors.grey,
-                                color: const Color.fromARGB(255, 255, 0, 0),
-                                strokeWidth: 10.w,
-                              ),
-                            ),
-                            Text(
-                              "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                              style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 170.h),
-                              child: AutoSizeText(
-                                topDiagnoses[0]['illness'] ?? "",
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Circle with red arc + gray background
+                                SizedBox(
+                                  width: 110.w,
+                                  height: 110.w,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 110.w,
+                                        height: 110.w,
+                                        child: CircularProgressIndicator(
+                                          value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
+                                          backgroundColor: Colors.grey,
+                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          strokeWidth: 10.w,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
+                                        style: TextStyle(
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                maxLines: 4,
-                                minFontSize: 18,
-                                textAlign: TextAlign.center,
-                              ),
+                                SizedBox(height: 10.h),
+
+                                // Illness text directly underneath
+                                Text(
+                                topDiagnoses[0]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-                    ),
+
 
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
+                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 18.sp,
@@ -436,75 +498,93 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
+                    padding: EdgeInsets.only(top: 5.h, left: 200.w),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          // Your logic here
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,                       // Removes shadow
+                          backgroundColor: Colors.transparent, // Makes background transparent
+                          shadowColor: const Color.fromARGB(0, 0, 0, 0),     // Ensures no shadow color
+                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)         // Optional: remove extra padding
                         ),
-                      ),
-                    ),
+                        child: Text(
+                          'See More',
+                          style: TextStyle(
+                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                      )
+
                   ),
 
-                  //progress indicator 2
-                  if (topDiagnoses.length > 1)
-                    Padding(
-                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
-                      child: SizedBox(
-                        width: 150.w,
-                        height: 200.w,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 110.w,
-                              height: 110.w,
-                              child: CircularProgressIndicator(
-                                value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
-                                backgroundColor: Colors.grey,
-                                color: Colors.blue,
-                                strokeWidth: 10.w,
-                              ),
-                            ),
-                            Text(
-                              "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 170.h),
-                              child: AutoSizeText(
-                                topDiagnoses[1]['illness'] ?? "",
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                  
+
+
+              if (topDiagnoses.length > 1)  
+                Padding(
+                padding: EdgeInsets.only(top: 15.h, left: 10.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Circle with red arc + gray background
+                        SizedBox(
+                          width: 110.w,
+                          height: 110.w,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 110.w,
+                                height: 110.w,
+                                child: CircularProgressIndicator(
+                                  value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
+                                  backgroundColor: Colors.grey,
+                                  color: const Color.fromARGB(255, 255, 0, 0),
+                                  strokeWidth: 10.w,
                                 ),
-                                maxLines: 4,
-                                minFontSize: 18,
-                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          ],
+                              Text(
+                                "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
+                                style: TextStyle(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
+                        SizedBox(height: 10.h),
 
+                        // Illness text directly underneath
+                        Text(
+                        topDiagnoses[1]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+                  
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
+                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 18.sp,
@@ -517,75 +597,94 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
+                    padding: EdgeInsets.only(top: 5.h, left: 200.w),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          // Your logic here
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,                       // Removes shadow
+                          backgroundColor: Colors.transparent, // Makes background transparent
+                          shadowColor: Colors.transparent,     // Ensures no shadow color
+                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)        // Optional: remove extra padding
                         ),
-                      ),
-                    ),
+                        child: Text(
+                          'See More',
+                          style: TextStyle(
+                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                      )
+
                   ),
+
+                  
 
                   //progress indicator 3
-                  if (topDiagnoses.length > 2)
-                    Padding(
-                      padding: EdgeInsets.only(right: 180.w, top: 15.h),
-                      child: SizedBox(
-                        width: 150.w,
-                        height: 200.w,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 110.w,
-                              height: 110.w,
-                              child: CircularProgressIndicator(
-                                value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
-                                backgroundColor: Colors.grey,
-                                color: const Color.fromARGB(255, 255, 145, 0),
-                                strokeWidth: 10.w,
-                              ),
-                            ),
-                            Text(
-                              "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                              style: TextStyle(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 170.h),
-                              child: AutoSizeText(
-                                topDiagnoses[2]['illness'] ?? "",
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                                  
+                if (topDiagnoses.length > 2)                   
+                  Padding(
+                  padding: EdgeInsets.only(top: 15.h, left: 10.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Circle with red arc + gray background
+                          SizedBox(
+                            width: 110.w,
+                            height: 110.w,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 110.w,
+                                  height: 110.w,
+                                  child: CircularProgressIndicator(
+                                    value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
+                                    backgroundColor: Colors.grey,
+                                    color: const Color.fromARGB(255, 255, 0, 0),
+                                    strokeWidth: 10.w,
+                                  ),
                                 ),
-                                maxLines: 4,
-                                minFontSize: 18,
-                                textAlign: TextAlign.center,
-                              ),
+                                Text(
+                                  "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
+                          SizedBox(height: 10.h),
 
+                          // Illness text directly underneath
+                          Text(
+                          topDiagnoses[2]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                 
                   Padding(
                     padding: EdgeInsets.only(top: 5.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vitae accumsan leo, quis pretium turpis. Phasellus laoreet libero vitae mauris fermentum, in imperdiet diam laoreet. Aenean odio metus, tempor a mattis non, pretium at mauris.",
+                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 18.sp,
@@ -598,21 +697,31 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "Duis eleifend elementum sapien, eget pulvinar elit ultrices id. Aliquam imperdiet velit id tempor ullamcorper. Quisque aliquam et lacus id efficitur. Sed molestie justo cursus lobortis tempor.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
+                    padding: EdgeInsets.only(top: 5.h, left: 200.w),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          // Your logic here
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,                       // Removes shadow
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          surfaceTintColor: Colors.transparent, // for Material3// disables splash/tap color   // Ensures no shadow color
+                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)          // Optional: remove extra padding
                         ),
-                      ),
-                    ),
+                        child: Text(
+                          'See More',
+                          style: TextStyle(
+                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                      )
+
                   ),
+
+                  
                   SizedBox(height: 50.h),
                 ],
               )))))),

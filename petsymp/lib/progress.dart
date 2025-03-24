@@ -4,7 +4,7 @@ import 'package:petsymp/getstarted.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'loginaccount.dart';
-import 'package:responsive_framework/responsive_framework.dart';
+
 class ProgressScreen extends StatefulWidget {
   final String username;
   final String password;
