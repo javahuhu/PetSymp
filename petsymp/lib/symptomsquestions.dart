@@ -44,7 +44,7 @@
         "How long has your pet had lethargy?",
         "Is the lethargy Mild or Severe?"
       ],
-      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5},
+      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5, "variable": 1.1},
       "impactSymptom": {"mild": 1.1, "severe": 1.5, "variable": 1.1},
     },
     "eye discharge": {
@@ -76,7 +76,7 @@
         "How long has your pet had seizures?",
         "Are the seizures Partial or Generalized?"
       ],
-      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5},
+      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5, "generalized": 1.4,},
       "impactSymptom": {
         "partial": 1.1,
         "generalized": 1.4,
@@ -98,7 +98,7 @@
         "How long has your pet had muscle paralysis?",
         "Is the muscle paralysis Ascending?"
       ],
-      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5},
+      "impactDays": {"1-2 days": 1.0, "3-5 days": 1.1, "6-10 days": 1.2, "11+ days": 1.5, "irreversible": 1.2},
       "impactSymptom": {"ascending": 1.3, "irreversible": 1.2},
     },
   };

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:petsymp/Illnessdetails.dart';
 import 'package:petsymp/homepage.dart';
 import 'package:petsymp/profile.dart';
 import 'package:provider/provider.dart';
@@ -357,51 +358,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
 
            // ===== Top 1–5 =====
 
-// ===== Single scrollable Top‑10 chart =====
-// ===== Single scrollable Top‑10 chart =====
-Padding(
-  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-  child: Container(
-    decoration: BoxDecoration(
-      color: const Color.fromRGBO(29, 29, 44, 1.0),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    height: 250.h,
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Consumer<UserData>(
-        builder: (_, userData, __) {
-          final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
-            ..sort((a, b) => (b['confidence_ab'] as num).compareTo((a['confidence_ab'] as num)));
-          final top10 = diagnoses.take(10).toList();
-          while (top10.length < 10) {
-            top10.add({'illness': '', 'confidence_fc': 0.0, 'confidence_gb': 0.0, 'confidence_ab': 0.0});
-          }
 
-          final labels = top10.map((d) => d['illness'] as String).toList();
-          final fc = top10.map((d) => (d['confidence_fc'] as num).toDouble()).toList();
-          final gb = top10.map((d) => (d['confidence_gb'] as num).toDouble()).toList();
-          final ab = top10.map((d) => (d['confidence_ab'] as num).toDouble()).toList();
-
-          // Calculate width: 100.w per group with some margin
-          final chartWidth = math.max(labels.length * 110.w, MediaQuery.of(context).size.width - 70.w);
-
-          return SizedBox(
-            width: chartWidth,
-            child: BarChartSample2(
-              illnessLabels: labels,
-              fcScores: fc,
-              gbScores: gb,
-              abScores: ab,// Pass the calculated width
-            ),
-          );
-        },
-      ),
-    ),
-  ),
-),
-
-    SizedBox(height: 20.h,),
+    SizedBox(height: 0.h,),
 
              Positioned(
               top: 0.h,
@@ -426,15 +384,14 @@ Padding(
                 children: [
                                         //progress indicator 1
                         if (topDiagnoses.isNotEmpty)         
-                        Padding(
-                        padding: EdgeInsets.only(top: 15.h, left: 10.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
+                           Padding(
+                          padding: EdgeInsets.only(left: 0.w, right: 60.w,top: 20.h),
+                          child: Container(
+                            width: 250.w, // Keep fixed width for alignment
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Circle with red arc + gray background
+                                // Progress Indicator
                                 SizedBox(
                                   width: 110.w,
                                   height: 110.w,
@@ -442,17 +399,17 @@ Padding(
                                     alignment: Alignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 110.w,
-                                        height: 110.w,
-                                        child: CircularProgressIndicator(
-                                          value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
-                                          backgroundColor: Colors.grey,
-                                          color: const Color.fromARGB(255, 255, 0, 0),
-                                          strokeWidth: 10.w,
-                                        ),
+                                      width: 110.w,
+                                      height: 110.w,
+                                      child: CircularProgressIndicator(
+                                        value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
+                                        backgroundColor: Colors.grey,
+                                        color: const Color.fromARGB(255, 255, 0, 0),
+                                        strokeWidth: 10.w,
                                       ),
+                                    ),
                                       Text(
-                                        "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
+                                        "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
                                         style: TextStyle(
                                           fontSize: 20.sp,
                                           fontWeight: FontWeight.bold,
@@ -462,26 +419,38 @@ Padding(
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 10.h),
 
-                                // Illness text directly underneath
-                                Text(
-                                topDiagnoses[0]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                        Transform.translate(
+                          offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 250.w,
+                            ),
+                            child: Text(
+                              topDiagnoses[0]['illness'] ?? "",
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              maxLines: 4,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
 
+              
+                                      
 
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
+                    padding: EdgeInsets.only(top: 10.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
@@ -501,8 +470,13 @@ Padding(
                     padding: EdgeInsets.only(top: 5.h, left: 200.w),
                     child: ElevatedButton(
                         onPressed: () {
-                          // Your logic here
-                        },
+                           Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[0]['illness']),
+                          ),
+                        );
+                                                },
                         style: ElevatedButton.styleFrom(
                           elevation: 0,                       // Removes shadow
                           backgroundColor: Colors.transparent, // Makes background transparent
@@ -524,23 +498,23 @@ Padding(
                   
 
 
-              if (topDiagnoses.length > 1)  
-                Padding(
-                padding: EdgeInsets.only(top: 15.h, left: 10.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Circle with red arc + gray background
-                        SizedBox(
-                          width: 110.w,
-                          height: 110.w,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
+                   if (topDiagnoses.length > 1)  
+                                  
+                     Padding(
+                    padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
+                    child: Container(
+                      width: 250.w, // Keep fixed width for alignment
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Progress Indicator
+                          SizedBox(
+                            width: 110.w,
+                            height: 110.w,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
                                 width: 110.w,
                                 height: 110.w,
                                 child: CircularProgressIndicator(
@@ -550,37 +524,48 @@ Padding(
                                   strokeWidth: 10.w,
                                 ),
                               ),
-                              Text(
-                                "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
-                                style: TextStyle(
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                Text(
+                                  "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 10.h),
 
-                        // Illness text directly underneath
-                        Text(
-                        topDiagnoses[1]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  Transform.translate(
+                    offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 250.w,
+                      ),
+                      child: Text(
+                        topDiagnoses[1]['illness'] ?? "",
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        maxLines: 4,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
+                        ],
+                      ),
+                    ),
+                  ),
+
+              
                   
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
+                    padding: EdgeInsets.only(top: 10.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
@@ -600,7 +585,12 @@ Padding(
                     padding: EdgeInsets.only(top: 5.h, left: 200.w),
                     child: ElevatedButton(
                         onPressed: () {
-                          // Your logic here
+                           Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[1]['illness']),
+                          ),
+                        );
                         },
                         style: ElevatedButton.styleFrom(
                           elevation: 0,                       // Removes shadow
@@ -625,62 +615,73 @@ Padding(
                   //progress indicator 3
                                   
                 if (topDiagnoses.length > 2)                   
-                  Padding(
-                  padding: EdgeInsets.only(top: 15.h, left: 10.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start, // Left-align the column
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
+              Padding(
+              padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
+              child: Container(
+                width: 250.w, // Keep fixed width for alignment
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Progress Indicator
+                    SizedBox(
+                      width: 110.w,
+                      height: 110.w,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          // Circle with red arc + gray background
                           SizedBox(
-                            width: 110.w,
-                            height: 110.w,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 110.w,
-                                  height: 110.w,
-                                  child: CircularProgressIndicator(
-                                    value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
-                                    backgroundColor: Colors.grey,
-                                    color: const Color.fromARGB(255, 255, 0, 0),
-                                    strokeWidth: 10.w,
-                                  ),
-                                ),
-                                Text(
-                                  "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%", // e.g. "${((value)*100).round()}%"
-                                  style: TextStyle(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          width: 110.w,
+                          height: 110.w,
+                          child: CircularProgressIndicator(
+                            value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
+                            backgroundColor: Colors.grey,
+                            color: const Color.fromARGB(255, 255, 0, 0),
+                            strokeWidth: 10.w,
                           ),
-                          SizedBox(height: 10.h),
-
-                          // Illness text directly underneath
+                        ),
                           Text(
-                          topDiagnoses[2]['illness'] ?? "", // e.g. topDiagnoses[x]['illness'] ?? ""
+                            "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
                             style: TextStyle(
-                              fontSize: 18.sp,
-                              color: Colors.black,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
+
+            Transform.translate(
+              offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 250.w,
+                ),
+                child: Text(
+                  topDiagnoses[2]['illness'] ?? "",
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                  maxLines: 4,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
+              ),
+            ),
+
+                  ],
+                ),
+              ),
+            ),
+
+                          
 
                  
                   Padding(
-                    padding: EdgeInsets.only(top: 5.h),
+                    padding: EdgeInsets.only(top: 10.h),
                     child: SizedBox(
                       width: 340.w,
                       child: Text(
@@ -700,7 +701,12 @@ Padding(
                     padding: EdgeInsets.only(top: 5.h, left: 200.w),
                     child: ElevatedButton(
                         onPressed: () {
-                          // Your logic here
+                           Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[2]['illness']),
+                          ),
+                        );
                         },
                         style: ElevatedButton.styleFrom(
                           elevation: 0,                       // Removes shadow

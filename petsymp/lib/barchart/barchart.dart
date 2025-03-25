@@ -76,7 +76,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
               child: BarChart(
                 BarChartData(
                   maxY: 100,
-                  groupsSpace: 40,     
+                  groupsSpace: 20,     
                   barGroups: showingBarGroups,
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
@@ -84,7 +84,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         final algorithm = ['FC', 'GB', 'AB'][rodIndex];
                         return BarTooltipItem(
                           '$algorithm: ${rod.toY.toStringAsFixed(0)}',
-                          const TextStyle(color: Colors.white),
+                           TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
                         );
                       },
                     ),
@@ -117,7 +117,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         reservedSize: 40, 
                         getTitlesWidget: (value, meta) => Text(
                           '${value.toInt()}',
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.grey.shade700),
                         ),
                       ),
                     ),
@@ -136,7 +136,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                             meta: meta,
                             child: Text(
                               label,
-                              style: const TextStyle(fontSize: 15, color: Colors.white),
+                              style:  TextStyle(fontSize: 15, color: Colors.grey.shade700),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 3,
                               textAlign: TextAlign.center,
@@ -225,29 +225,37 @@ class _BarChartSample2State extends State<BarChartSample2> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(29, 29, 44, 1.0),
+        color: const Color.fromARGB(0, 29, 29, 44),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _legendItem(widget.fcColor, "FC"),
+          _legendItem(widget.fcColor, "Forward Chaining"),
           const SizedBox(width: 12),
-          _legendItem(widget.gbColor, "GB"),
+          _legendItem(widget.gbColor, "Gradient Boosting"),
           const SizedBox(width: 12),
-          _legendItem(widget.abColor, "AB"),
+          _legendItem(widget.abColor, "Ada Boost"),
         ],
       ),
     );
   }
 
-  Widget _legendItem(Color color, String label) {
-    return Row(
-      children: [
-        Container(width: 14, height: 14, color: color),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: Colors.white)),
-      ],
-    );
-  }
+ Widget _legendItem(Color color, String label) {
+  return Row(
+    children: [
+      Container(
+        width: 14,
+        height: 14,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20), // adjust radius as desired
+        ),
+      ),
+      const SizedBox(width: 4),
+      Text(label, style:  TextStyle(color: Colors.grey.shade700)),
+    ],
+  );
+}
+
 }
