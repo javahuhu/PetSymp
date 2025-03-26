@@ -84,7 +84,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         final algorithm = ['FC', 'GB', 'AB'][rodIndex];
                         return BarTooltipItem(
                           '$algorithm: ${rod.toY.toStringAsFixed(0)}',
-                           TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                           const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                         );
                       },
                     ),

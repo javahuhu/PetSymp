@@ -18,7 +18,7 @@ class UserData with ChangeNotifier {
   final List<String> _newSymptoms = [];
 
   // Symptom-specific QA
-  Map<String, String> _symptomDurations = {};
+  final Map<String, String> _symptomDurations = {};
   String _selectedSymptom = "";
   List<Map<String, dynamic>> _diagnosisResults = [];
   List<String> _questions = [];
@@ -160,35 +160,45 @@ class UserData with ChangeNotifier {
     return _symptomQuestions.keys.toList();
   }
 
+
   void updateQuestions() {
-    final key = _selectedSymptom.toLowerCase();
-    if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
-      _questions = List<String>.from(_symptomQuestions[key]["questions"]);
-      _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
+  final key = _selectedSymptom.toLowerCase();
+  if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
+    _questions = List<String>.from(_symptomQuestions[key]["questions"]);
+    _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
 
-      List<String> impactDaysChoices = [];
-      List<String> impactSymptomChoices = [];
+    List<String> impactDaysChoices = [];
+    List<String> impactSymptomChoices = [];
 
-      if (_symptomQuestions[key].containsKey("impactDays")) {
-        impactDaysChoices = List<String>.from(
-            (_symptomQuestions[key]["impactDays"] as Map<String, dynamic>).keys);
+    if (_symptomQuestions[key].containsKey("impactDays")) {
+      var impactDaysValue = _symptomQuestions[key]["impactDays"];
+      if (impactDaysValue is List) {
+        impactDaysChoices = List<String>.from(impactDaysValue);
+      } else if (impactDaysValue is Map<String, dynamic>) {
+        impactDaysChoices = List<String>.from(impactDaysValue.keys);
       }
-      if (_symptomQuestions[key].containsKey("impactSymptom")) {
-        impactSymptomChoices = List<String>.from(
-            (_symptomQuestions[key]["impactSymptom"] as Map<String, dynamic>).keys);
-      }
-
-      _impactChoices = [impactDaysChoices, impactSymptomChoices];
-    } else {
-      _questions = [];
-      _impactChoices = [[], []];
-      _questionSymptoms = [];
     }
+    if (_symptomQuestions[key].containsKey("impactSymptom")) {
+      var impactSymptomValue = _symptomQuestions[key]["impactSymptom"];
+      if (impactSymptomValue is List) {
+        impactSymptomChoices = List<String>.from(impactSymptomValue);
+      } else if (impactSymptomValue is Map<String, dynamic>) {
+        impactSymptomChoices = List<String>.from(impactSymptomValue.keys);
+      }
+    }
+
+    _impactChoices = [impactDaysChoices, impactSymptomChoices];
+  } else {
+    _questions = [];
+    _impactChoices = [[], []];
+    _questionSymptoms = [];
   }
+}
+
 
   // Call Flask API to get diagnosis results
   Future<void> fetchDiagnosis() async {
-    final Uri url = Uri.parse("http://192.168.1.101:8000/diagnose");
+    final Uri url = Uri.parse("http://10.0.2.2:8000/diagnose");
     final allTypedSymptoms = [..._finalizedSymptoms];
     final uniqueSymptoms = allTypedSymptoms.toSet().toList();
 

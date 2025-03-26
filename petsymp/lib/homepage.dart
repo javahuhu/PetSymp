@@ -129,7 +129,7 @@ class HomePageScreenState extends State<HomePageScreen> {
           // Rotated Image Positioned at the Bottom with Animation
           if (_selectedIndex == 0)
               AnimatedAlign(
-            alignment: _isAnimated ? Alignment(1.0, 0.9) : Alignment(2, 1), 
+            alignment: _isAnimated ? const Alignment(1.0, 0.9) : const Alignment(2, 1), 
             // 🔹 Moves the image further right when animated
             
             duration: const Duration(seconds: 2),

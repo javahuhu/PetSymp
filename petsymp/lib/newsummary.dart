@@ -364,7 +364,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
              Positioned(
               top: 0.h,
               child: Center( child: 
-              Container(
+              SizedBox(
               width: 350.w, 
               child: Card(
                   margin: EdgeInsets.zero,
@@ -386,7 +386,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         if (topDiagnoses.isNotEmpty)         
                            Padding(
                           padding: EdgeInsets.only(left: 0.w, right: 60.w,top: 20.h),
-                          child: Container(
+                          child: SizedBox(
                             width: 250.w, // Keep fixed width for alignment
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,7 +502,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                   
                      Padding(
                     padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
-                    child: Container(
+                    child: SizedBox(
                       width: 250.w, // Keep fixed width for alignment
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -617,7 +617,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 if (topDiagnoses.length > 2)                   
               Padding(
               padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
-              child: Container(
+              child: SizedBox(
                 width: 250.w, // Keep fixed width for alignment
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,7 +737,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 15.h),
               child: Center( child: 
-              Container(
+              SizedBox(
               width: 350.w, 
               child: Card(
                   margin: EdgeInsets.zero,
@@ -814,6 +814,176 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 ],
               ),
             ))))),
+
+
+
+             Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 19, 19, 44),
+                    borderRadius: BorderRadius.circular(0),
+                  ),
+                  height: 250.h,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Consumer<UserData>(
+                      builder: (_, userData, __) {
+                        final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
+                          ..sort((a, b) => (b['confidence_ab'] as num).compareTo((a['confidence_ab'] as num)));
+                        final top10 = diagnoses.take(10).toList();
+                        while (top10.length < 10) {
+                          top10.add({
+                            'illness': '',
+                            'confidence_fc': 0.0,
+                            'confidence_gb': 0.0,
+                            'confidence_ab': 0.0,
+                            'subtype_coverage': 0.0
+                          });
+                        }
+ 
+                        final labels = top10.map((d) => d['illness'] as String).toList();
+                        final fc = top10.map((d) => (d['confidence_fc'] as num).toDouble()).toList();
+                        final gb = top10.map((d) => (d['confidence_gb'] as num).toDouble()).toList();
+                        final ab = top10.map((d) => (d['confidence_ab'] as num).toDouble()).toList();
+ 
+                        final double groupWidth = 20.w;
+                        final double gapWidth = 90.w;
+                        final double totalRequiredWidth =
+                            (groupWidth * labels.length) + (gapWidth * (labels.length - 1));
+                        final double screenWidth = MediaQuery.of(context).size.width - 20.w;
+                        final double chartWidth =
+                            totalRequiredWidth < screenWidth ? screenWidth : totalRequiredWidth;
+ 
+                        return SizedBox(
+                          width: chartWidth,
+                          child: BarChartSample2(
+                            illnessLabels: labels,
+                            fcScores: fc,
+                            gbScores: gb,
+                            abScores: ab,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+ 
+
+
+
+            Padding(
+                padding: EdgeInsets.only(top: 0.h),
+                child: Center(
+                  child: Container(
+                    color: const Color.fromARGB(255, 19, 19, 44),
+                    height: 300.h,
+                    width: 360.w,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            "Illness Comparison",
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFE8F2F5),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 40.h,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Row(
+                              children: [
+                                _legendDot(Colors.blue, "Confidence Score"),
+                                SizedBox(width: 24.w),
+                                _legendDot(Colors.green, "Weighted Symptoms Matches"),
+                                SizedBox(width: 24.w),
+                                _legendDot(Colors.orange, "ML Score Adjustment"),
+                                SizedBox(width: 24.w),
+                                _legendDot(Colors.purple, "Subtype Coverage Score"),
+                              ],
+                            ),
+                          ),
+                        ),
+ 
+                        SizedBox(
+                          width: 400.w,
+                          child: Builder(
+                            builder: (context) {
+                              if (topDiagnoses.length < 2) {
+                                return Padding(
+                                  padding: EdgeInsets.all(10.w),
+                                  child: Text(
+                                    "Not enough illnesses to compare (need at least 2).",
+                                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
+                                  ),
+                                );
+                              }
+ 
+                              final ill1 = topDiagnoses[0];
+                              final ill2 = topDiagnoses[1];
+ 
+                              final double confAb1 = (ill1['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+                              final double confAb2 = (ill2['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+                              final double confFc1 = (ill1['confidence_fc'] as num?)?.toDouble() ?? 0.0;
+                              final double confFc2 = (ill2['confidence_fc'] as num?)?.toDouble() ?? 0.0;
+                              final double mlScore1 = confAb1 - confFc1;
+                              final double mlScore2 = confAb2 - confFc2;
+ 
+                              // Use the computed subtype coverage from the diagnosis JSON.
+                              final double coverage1 = (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+                              final double coverage2 = (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+ 
+                              return Table(
+                                border: TableBorder(
+                                  verticalInside: BorderSide(color: Colors.grey.shade700, width: 1),
+                                ),
+                                children: [
+                                  // 1st Row: Confidence Score
+                                  TableRow(
+                                    children: [
+                                      _smallCell(ill1['illness'], confAb1.toStringAsFixed(2), Colors.blue),
+                                      _smallCell(ill2['illness'], confAb2.toStringAsFixed(2), Colors.blue),
+                                    ],
+                                  ),
+                                  // 2nd Row: Weighted Symptoms Matches
+                                  TableRow(
+                                    children: [
+                                      _smallCell(ill1['illness'], confFc1.toStringAsFixed(2), Colors.green),
+                                      _smallCell(ill2['illness'], confFc2.toStringAsFixed(2), Colors.green),
+                                    ],
+                                  ),
+                                  // 3rd Row: ML Score Adjustment
+                                  TableRow(
+                                    children: [
+                                      _smallCell(ill1['illness'], mlScore1.toStringAsFixed(2), Colors.orange),
+                                      _smallCell(ill2['illness'], mlScore2.toStringAsFixed(2), Colors.orange),
+                                    ],
+                                  ),
+                                  // 4th Row: Subtype Coverage Score
+                                  TableRow(
+                                    children: [
+                                      _smallCell(ill1['illness'], coverage1.toStringAsFixed(2), Colors.purple),
+                                      _smallCell(ill2['illness'], coverage2.toStringAsFixed(2), Colors.purple),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+ 
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             SizedBox(height: 50.h),
           ],
         ),
@@ -828,6 +998,37 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
     }
   }
 }
+
+ 
+  Widget _smallCell(String illness, String score, Color textColor) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.1.h, horizontal: 15.w),
+      child: Text(
+        '$illness: $score',
+        style: TextStyle(color: textColor, fontSize: 15.sp),
+      ),
+    );
+  }
+ 
+  Widget _legendDot(Color color, String label) {
+    return Row(
+      children: [
+        Container(
+          width: 12.w,
+          height: 12.w,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(width: 6.w),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14.sp, color: Colors.white),
+        ),
+      ],
+    );
+  }
 
 class ListItem {
   final String title;

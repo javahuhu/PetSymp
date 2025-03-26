@@ -335,7 +335,7 @@ Widget _buildInputCardclone(String emoji, String label, String value) {
         return AlertDialog(
           backgroundColor: const Color.fromARGB(255, 243, 240, 240),
           contentPadding: EdgeInsets.zero,
-          insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 170),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 170),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Top Diagnosis', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
           content: topDiagnosis != null

@@ -72,7 +72,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
+              SizedBox(
                 height: screenHeight * 0.1,
                 child: Stack(
                   children: [
@@ -144,7 +144,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                     SizedBox(height: screenHeight * 0.03),
                   ],
                 );
-              }).toList(),
+              }),
               // Add standard symptoms that aren't in the user's input.
               if (!matchedSymptoms.contains("Reduced Appetite") &&
                   !widget.symptoms.any((s) =>

@@ -61,7 +61,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Back Button
-              Container(
+              SizedBox(
                 height: screenHeight * 0.1,
                 child: Stack(
                   children: [
