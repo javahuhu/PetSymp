@@ -3,7 +3,7 @@ import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 class SearchsymptomsScreen extends StatefulWidget {
   final List<String> symptoms;
 
@@ -130,7 +130,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: screenHeight * 0.05),
+              SizedBox(height: 70.h),
               // Dynamic symptom containers for matched symptoms
               ...matchedSymptoms.map((symptom) {
                 return Column(
@@ -141,7 +141,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                       ["Tap to select this symptom and answer questions"],
                       context,
                     ),
-                    SizedBox(height: screenHeight * 0.03),
+                    SizedBox(height: 5.h),
                   ],
                 );
               }),
@@ -160,7 +160,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                       ],
                       context,
                     ),
-                    SizedBox(height: screenHeight * 0.03),
+                    SizedBox(height: 5.h),
                   ],
                 ),
               if (!matchedSymptoms.contains("Low Energy") &&

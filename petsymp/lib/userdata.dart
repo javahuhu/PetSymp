@@ -198,7 +198,7 @@ class UserData with ChangeNotifier {
 
   // Call Flask API to get diagnosis results
   Future<void> fetchDiagnosis() async {
-    final Uri url = Uri.parse("http://10.0.2.2:8000/diagnose");
+    final Uri url = Uri.parse("http://192.168.1.101:8000/diagnose");
     final allTypedSymptoms = [..._finalizedSymptoms];
     final uniqueSymptoms = allTypedSymptoms.toSet().toList();
 

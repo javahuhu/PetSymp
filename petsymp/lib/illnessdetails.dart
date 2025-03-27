@@ -73,127 +73,144 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
       }
       return "No information available.";
     }
- 
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      body:  SingleChildScrollView(
-          child: Stack(
-            children: [
-              // Top bar with back button and title
-              Padding(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top + 20,
-                  left: 8,
-                  right: 8,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_sharp,
-                        size: 30,
-                        color: Color(0xFFE8F2F5),
+ return Scaffold(
+  backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+  body: SingleChildScrollView(
+    child: Stack(
+      children: [
+        // Chart container
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 60.h),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(0, 19, 19, 44),
+              borderRadius: BorderRadius.circular(0),
+            ),
+            height: 370.h,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: Consumer<UserData>(
+                builder: (_, userData, __) {
+                  final diagnosis = userData.diagnosisResults.firstWhere(
+                    (d) => d['illness'] == widget.illnessName,
+                    orElse: () => {
+                      'illness': widget.illnessName,
+                      'confidence_fc': 0.0,
+                      'confidence_gb': 0.0,
+                      'confidence_ab': 0.0,
+                      'subtype_coverage': 0.0,
+                    },
+                  );
+                  final labels = [diagnosis['illness'] as String];
+                  final fc = [(diagnosis['confidence_fc'] as num).toDouble()];
+                  final gb = [(diagnosis['confidence_gb'] as num).toDouble()];
+                  final ab = [(diagnosis['confidence_ab'] as num).toDouble()];
+
+                  final double chartWidth = MediaQuery.of(context).size.width - 50.w;
+
+                  return Center(
+                    child: SizedBox(
+                      width: chartWidth,
+                      child: BarChartSample3(
+                        illnessLabels: labels,
+                        fcScores: fc,
+                        gbScores: gb,
+                        abScores: ab,
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    SizedBox(width: screenWidth * 0.11),
-                    Text(
-                      "Illness Information",
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
-                        color: const Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
- 
-               Padding(
-  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 60.h),
-  child: Container(
-    decoration: BoxDecoration(
-      color: const Color.fromARGB(0, 19, 19, 44),
-      borderRadius: BorderRadius.circular(0),
-    ),
-    height: 350.h,
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const NeverScrollableScrollPhysics(),
-      child: Consumer<UserData>(
-        builder: (_, userData, __) {
-          // Filter the diagnosis for the selected illness using widget.illnessName
-          final diagnosis = userData.diagnosisResults.firstWhere(
-            (d) => d['illness'] == widget.illnessName,
-            orElse: () => {
-              'illness': widget.illnessName,
-              'confidence_fc': 0.0,
-              'confidence_gb': 0.0,
-              'confidence_ab': 0.0,
-              'subtype_coverage': 0.0,
-            },
-          );
-
-          // Build single-item lists for the chart
-          final labels = [diagnosis['illness'] as String];
-          final fc = [(diagnosis['confidence_fc'] as num).toDouble()];
-          final gb = [(diagnosis['confidence_gb'] as num).toDouble()];
-          final ab = [(diagnosis['confidence_ab'] as num).toDouble()];
-
-          // Set the chart width to the screen width plus 130.w for alignment
-          final double chartWidth = MediaQuery.of(context).size.width - 50.w;
-
-          return Center(
-            child: SizedBox(
-              width: chartWidth,
-              child: BarChartSample3(
-                illnessLabels: labels,
-                fcScores: fc,
-                gbScores: gb,
-                abScores: ab,
+                  );
+                },
               ),
             ),
-          );
-        },
+          ),
+        ),
+
+        Padding(
+  padding: EdgeInsets.only(top: 390.h, left: 20.w, right: 5.w),
+  child: Text.rich(
+    TextSpan(
+      style: TextStyle(
+        color: const Color.fromARGB(255, 127, 127, 127),
+        fontSize: 15.sp,
       ),
+      children: const [
+        TextSpan(text: "Note: The graph above illustrates the results of different algorithms used in illness analysis. "),
+        TextSpan(text: "Forward Chaining (FC)", style:  TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: " provides the initial diagnosis, "),
+        TextSpan(text: "Gradient Boosting (GB)", style:  TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: " refines the ranking, and "),
+        TextSpan(text: "AdaBoost (AB)", style: TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: " delivers the final result."),
+      ],
     ),
   ),
 ),
 
+        // Expansion cards container
+        Padding(
+          padding: EdgeInsets.only(top: 520.h),
+          child: Column(
+            children: [
+              SizedBox(height: 20.h),
+              Column(
+                children: infoKeys.map((key) {
+                  return _buildExpansionCard(
+                    title: key,
+                    description: details != null && details.containsKey(key)
+                        ? detailToString(details[key])
+                        : "No information available.",
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 50.h),
+            ],
+          ),
+        ),
 
-              Padding(
-                padding: EdgeInsets.only(top: 350.h),
-                child: Column(
-                  children: [
-                    SizedBox(height: 20.h),
-                    Column(
-                      children: infoKeys.map((key) {
-                        return _buildExpansionCard(
-                          title: key,
-                          description: details != null && details.containsKey(key)
-                              ? detailToString(details[key])
-                              : "No information available.",
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 50.h),
-                  ],
+        // Top bar with back button (placed last to ensure it's on top)
+        Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 20,
+            left: 8,
+            right: 8,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_sharp,
+                  size: 30,
+                  color: Color(0xFFE8F2F5),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              SizedBox(width: screenWidth * 0.13),
+              Text(
+                "Illness Information",
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Oswald',
+                  color: const Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
             ],
           ),
         ),
-      
-    );
+      ],
+    ),
+  ),
+);
+
   }
 
  
   Widget _buildExpansionCard({required String title, required String description}) {
   return Container(
     width: double.infinity, // full available width
-    margin: EdgeInsets.symmetric(horizontal: 16.w), // optional horizontal margin
+    margin: EdgeInsets.symmetric(horizontal: 0.w), // optional horizontal margin
     decoration: const BoxDecoration(
       border: Border(
         bottom: BorderSide(color: Colors.grey, width: 2.0), // bottom border

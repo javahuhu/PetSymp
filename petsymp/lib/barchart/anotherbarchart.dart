@@ -139,7 +139,7 @@ class _BarChartSample3State extends State<BarChartSample3> {
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.center,  // Centers the bar group.
-                  maxY: 18,
+                  maxY: 100,
                   groupsSpace: 20,
                   barGroups: showingBarGroups,
                   barTouchData: BarTouchData(
@@ -147,7 +147,7 @@ class _BarChartSample3State extends State<BarChartSample3> {
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final algorithm = ['FC', 'GB', 'AB'][rodIndex];
                         return BarTooltipItem(
-                          '$algorithm: ${rod.toY.toStringAsFixed(0)}',
+                          '$algorithm: ${rod.toY.toStringAsFixed(1)}',
                           const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                         );
                       },
@@ -173,41 +173,76 @@ class _BarChartSample3State extends State<BarChartSample3> {
                       });
                     },
                   ),
+
+                  
                   titlesData: FlTitlesData(
+
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 20,
+                        reservedSize: 40, 
+                        getTitlesWidget: (value, meta) => Text(
+                          '${value.toInt()}',
+                          style: TextStyle(color: const Color.fromARGB(221, 160, 222, 241)),
+                        ),
+                      ),
+                    ),
+
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                         reservedSize: 30.h,
                         getTitlesWidget: (value, meta) {
-  final i = value.toInt();
-  if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
+                        final i = value.toInt();
+                        if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
 
-  // Use the complete illness name without truncating it.
-  String label = widget.illnessLabels[i];
+                        // Use the complete illness name without truncating it.
+                        String label = widget.illnessLabels[i];
 
-  return SideTitleWidget(
-    space: 3,
-    meta: meta,
-    child: Text(
-      label,
-      style: TextStyle(fontSize: 18.sp, color:Color.fromARGB(255, 97, 195, 188)),
-      // Option 1: Allow wrapping if you want to see the full text on multiple lines.
-      softWrap: true,
-      textAlign: TextAlign.center,
-      
-      // Option 2: If you prefer a single line, you could set maxLines to 1 
-      // and let the text scale down or overflow (choose one):
-      // maxLines: 1,
-      // overflow: TextOverflow.visible,
-    ),
-  );
-},
+                        return SideTitleWidget(
+                          space: 3.h,
+                          meta: meta,
+                          child: Text(
+                            label,
+                            style: TextStyle(fontSize: 18.sp, color:const Color.fromARGB(255, 214, 59, 59), fontFamily: 'Inter',),
+                            // Option 1: Allow wrapping if you want to see the full text on multiple lines.
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            
+                            // Option 2: If you prefer a single line, you could set maxLines to 1 
+                            // and let the text scale down or overflow (choose one):
+                            // maxLines: 1,
+                            // overflow: TextOverflow.visible,
+                          ),
+                        );
+                      },
 
                       ),
                     ),
                     rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
-                  gridData: const FlGridData(show: false),
+                   gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  drawVerticalLine: true,
+                    horizontalInterval: 20, 
+                  getDrawingHorizontalLine: (value) {
+                    return const FlLine(
+                      color:  Color.fromARGB(192, 160, 222, 241),
+                      strokeWidth: 1.5,
+                      dashArray: [5, 5], // 5 pixels on, 5 pixels off
+                    );
+                  },
+                  getDrawingVerticalLine: (value) {
+                    return const FlLine(
+                      color:  Color.fromARGB(178, 160, 222, 241),
+                      strokeWidth: 1.5,
+                      dashArray: [5, 5],
+                    );
+                  },
+                ),
                   borderData: FlBorderData(show: false),
                 ),
               ),
@@ -235,9 +270,9 @@ class _BarChartSample3State extends State<BarChartSample3> {
 
   Widget _buildLegend() {
     return Padding(
-      padding: EdgeInsets.only(left: 100.w),
+      padding: EdgeInsets.only(left: 95.w),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: const Color.fromARGB(0, 29, 29, 44),
           borderRadius: BorderRadius.circular(100),
@@ -261,8 +296,8 @@ class _BarChartSample3State extends State<BarChartSample3> {
     return Row(
       children: [
         Container(
-          width: 14,
-          height: 14,
+          width: 14.w,
+          height: 14.w,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(20),

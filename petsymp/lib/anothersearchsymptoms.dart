@@ -3,7 +3,7 @@ import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 class AnothersearchsymptomsScreen extends StatefulWidget {
   const AnothersearchsymptomsScreen({super.key});
 
@@ -115,7 +115,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   ],
                 ),
               ),
-              SizedBox(height: screenHeight * 0.05),
+              SizedBox(height:  70.h),
               // Show summary of the current (latest) symptom.
               buildSymptomsContainer(
                 screenWidth,
@@ -123,7 +123,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ["Tap to select and answer questions for new symptoms"],
                 const QoneScreen(),
               ),
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height:  5.h),
               // Additional standard symptom containers (if needed)
               buildSymptomsContainer(
                 screenWidth,
@@ -131,14 +131,14 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ["Loose, watery stools."],
                 const QoneScreen(),
               ),
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height:  5.h),
               buildSymptomsContainer(
                 screenWidth,
                 "Frequent Episodes",
                 ["Repeated vomiting over a short period"],
                 const QoneScreen(),
               ),
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height: 0.01.h),
             ],
           ),
         ),

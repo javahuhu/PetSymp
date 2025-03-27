@@ -142,6 +142,11 @@ flutter:
       fonts:
         - asset: assets/fonts/Inter-Bold.ttf
         - asset: assets/fonts/Inter-Regular.ttf
+
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/Oswald-SemiBold.ttf
+        
       
       
       

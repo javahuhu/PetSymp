@@ -2,7 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Profilescreen extends StatefulWidget {
    const Profilescreen({super.key});
@@ -60,6 +60,34 @@ class ProfilescreenState extends State<Profilescreen> {
   }
 }
 
+final Map< String, Map<String, String>> profilelist = {
+  "img1": {
+    "image": "assets/security.png",
+   
+   
+  },
+  "img2": {
+    "image": "assets/support.png",
+     
+  },
+  "img3": {
+    "image": "assets/condition.png",
+    
+  },
+  "img4": {
+    "image": "assets/editprofile.png",
+     
+  },
+  "img5": {
+    "image": "assets/restore.png",
+     
+  },
+  "img6": {
+    "image": "assets/logout.png",
+    
+}
+};
+
 
   
 
@@ -89,9 +117,9 @@ class ProfilescreenState extends State<Profilescreen> {
                       // Circular Image
                         Container(
                         width: screenWidth * 1, // 15% of screen width
-                        height: screenWidth * 0.8, // Equal height for circular image 
+                        height: screenWidth * 0.5, // Equal height for circular image 
                         decoration: const BoxDecoration(color: Color.fromARGB(255, 219, 230, 233), 
-                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(100), bottomLeft: Radius.circular(100))),
+                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(200), bottomLeft: Radius.circular(200))),
 
                         child: Stack(
                            fit: StackFit.expand,
@@ -104,174 +132,106 @@ class ProfilescreenState extends State<Profilescreen> {
 
                         // 📌 "Summary of Input" Title Inside Yellow Background
                         Positioned(
-                          top: 50,
-                          left: screenWidth * 0.34,
+                          top: 100.h,
+                          left: 113.5.w,
+                          child: Container(
+                          width: 150.w, // Adjust as needed
+                          height: 150.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 95, 94, 94), // Border color
+                              width: 3,            // Border width
+                            ),
+                          ),
                           child: const CircleAvatar(
-                          radius: 75.0,
-                          backgroundColor: Color.fromARGB(136, 0, 0, 0),
-                          backgroundImage: AssetImage('assets/profile.jpg'),
+                            backgroundImage: AssetImage('assets/profile.jpg'),
+                            backgroundColor: Colors.grey, // fallback color
+                          ),
                         ),
                         ),
 
-                        Positioned(
-                          top: 200,
-                          left: screenWidth * 0.25,
-                          child: Container(
-                    width: screenWidth * 0.5,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+
+                       Positioned(
+                  top: 250.h,
+                  left: 0.04.w,
+                  child: Container(
+                    width: 510,
+                    height: screenHeight * 0.6,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(0, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(20),
+                      color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
+                      borderRadius: BorderRadius.circular(25), // Optional rounded corners
                      
                     ),
-                     child:  Center(
-                    child: Text(
-                      nickname, // ✅ Longer text will still be centered
-                      textAlign: TextAlign.center, // ✅ Ensures center alignment
-                      style:  const TextStyle(
-                        fontSize: 28, // Adjust size if needed
-                        fontWeight: FontWeight.normal,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                  ),
-                        ),
-
-                        ),
-                        
-                        
-                        Positioned(
-                          top: 250,
-                          left: screenWidth * 0.25,
-                          child: Container(
-                    width: screenWidth * 0.5,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(0, 255, 255, 255),
-                      borderRadius: BorderRadius.circular(20),
-                     
-                    ),
-                     child:  Center(
-                    child: Text(
-                      email, // ✅ Longer text will still be centered
-                      textAlign: TextAlign.center, // ✅ Ensures center alignment
-                      style: const TextStyle(
-                        fontSize: 20, // Adjust size if needed
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                  ),
-                        ),
-
-                        ),
-
-                      
-
-
-                  
-                        
-
-
-                        /*
-                         Positioned(
-                          top: 306,
-                          left: screenWidth * 0.1,
-                          child: Container(
-                            height: screenHeight  * 0.15,
-                    width: screenWidth * 0.8,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 245, 245, 245),
-                      borderRadius: BorderRadius.circular(5),
-                     
-                    ),
-                     
-                        ),
-
-                        ),*/
-
-                       
-                        
+                    child: Padding(
+                      padding: const EdgeInsets.all(10), // Add padding inside container
+                      child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildInputCard("img1", nickname),
+                          _buildInputCard("img2", email),
+                          _buildInputCard("img3",  "Title"),
+                          _buildInputCard("img4",  "Title"),
+                          _buildInputCard("img5",  "Title"),
+                           _buildInputCard("img6",  "Title"),
+                           
                         ],
-                       
-                    ),
-                       
                       ),
-
-
-
-                  
-                   
-        
-                     
-                    ],
-                   ),
-
-                  
-
-                  
-
-                  
-
-                 
+                    ),
+                  ),
+),],),),], ),
                 ],
               ),
             ),
-
-            
-
-
-           
-
-              
-
-          // Rotated Image Positioned at the Bottom with Animation
-
-          // Placeholder for other tabs
-          // Display corresponding content for other tabs
-
-           Stack( children: [
-                      
-                      Positioned( top:screenHeight * 0.4, left: screenWidth * 0.05, width: screenWidth * 5,
-                        child:  Text("Nickname: $nickname", 
-                        style: const TextStyle(fontSize: 26, 
-                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),),
-                        ),
-
-                        const Column(children: [
-                           Divider(height: 20, thickness: 5, indent: 0, endIndent: 0, color: Color.fromARGB(255, 219, 230, 233),)
-                        ],),
-                        
-                        Positioned( top:screenHeight * 0.5, left: screenWidth * 0.05, width: screenWidth * 5,
-                        child:  const Text("Age:", 
-                        style:  TextStyle(fontSize: 26, 
-                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
-
-                        Positioned( top:screenHeight * 0.6, left: screenWidth * 0.05, width: screenWidth * 5,
-                        child:  const Text("Number:", 
-                        style:  TextStyle(fontSize: 26, 
-                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
-
-                        Positioned( top:screenHeight * 0.7, left: screenWidth * 0.05, width: screenWidth * 5,
-                        child:  const Text("Gender:", 
-                        style:  TextStyle(fontSize: 26, 
-                        fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),)),
-                   ],)
-             
         ],
         
       ),
 
-      
-
-      
-      
     );
 
-    
-
-    
   }
 
+Widget _buildInputCard(String index, String fallbackTitle) {
+  final profile = profilelist[index];
+
+  if (profile == null) {
+    return const SizedBox(); // Return empty if profile doesn't exist
+  }
+
+  return Card(
+    elevation: 0,
+    color: Colors.transparent,
+    margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+    child: Container( 
+      decoration: BoxDecoration( border: Border(bottom: BorderSide(color: Colors.white,width: 1) )),
+      child: 
+    Padding(
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        children: [
+          Image.asset(
+            profile["image"] ?? "",
+            width: 30,
+            height: 30,
+            fit: BoxFit.contain,
+            color: const Color.fromRGBO(82, 170, 164, 1),
+          ),
+          SizedBox(width: 100.w), // spacing between image and text
+          Text(
+            profile["Title"] ?? fallbackTitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ));
 }
+
+  
+
+}
+

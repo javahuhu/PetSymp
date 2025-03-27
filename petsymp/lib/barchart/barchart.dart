@@ -61,9 +61,9 @@ class _BarChartSample2State extends State<BarChartSample2> {
                 const SizedBox(
                   width: 38,
                 ),
-                const Text(
+                Text(
                   'Confidence Comparison',
-                  style: TextStyle(color: Colors.white, fontSize: 22),
+                  style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 22.sp,  fontFamily: 'Oswald',),
                 ),
                 const SizedBox(
                   width: 4,
@@ -84,9 +84,12 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         final algorithm = ['FC', 'GB', 'AB'][rodIndex];
                         return BarTooltipItem(
                           '$algorithm: ${rod.toY.toStringAsFixed(0)}',
-                           const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                           const TextStyle(color: Color.fromARGB(255, 0, 0, 0),)
+                           ,
                         );
+
                       },
+                      
                     ),
                     touchCallback: (event, response) {
                       if (response == null || response.spot == null) {
@@ -117,7 +120,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         reservedSize: 40, 
                         getTitlesWidget: (value, meta) => Text(
                           '${value.toInt()}',
-                          style: TextStyle(color: Colors.grey.shade700),
+                          style: const TextStyle(color:  Color.fromARGB(255, 0, 0, 0)),
                         ),
                       ),
                     ),
@@ -136,7 +139,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                             meta: meta,
                             child: Text(
                               label,
-                              style:  TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                              style:  const TextStyle(fontSize: 15, color:  Color.fromARGB(255, 0, 0, 0)),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 3,
                               textAlign: TextAlign.center,
@@ -148,7 +151,28 @@ class _BarChartSample2State extends State<BarChartSample2> {
                     rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
-                  gridData: const FlGridData(show: false),
+                  gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  drawVerticalLine: true,
+                  horizontalInterval: 20,
+                  getDrawingHorizontalLine: (value) {
+                    return const FlLine(
+                      color:  Color.fromARGB(192, 0, 0, 0),
+                      strokeWidth: 1.5,
+                      dashArray: [5, 5], // Explicitly defined dash array
+                    );
+                  },
+                  getDrawingVerticalLine: (value) {
+                    return const FlLine(
+                      color:  Color.fromARGB(177, 0, 0, 0),
+                      strokeWidth: 1.5,
+                      dashArray: [5, 5], // Explicitly defined dash array
+                    );
+
+                    
+                  },
+                ),
                   borderData: FlBorderData(show: false),
                 ),
               ),
@@ -170,7 +194,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
         ),
         const SizedBox(
           width: space,
@@ -178,7 +202,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
         ),
         const SizedBox(
           width: space,
@@ -186,7 +210,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 42,
-          color: Colors.white.withOpacity(1),
+          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(1),
         ),
         const SizedBox(
           width: space,
@@ -194,7 +218,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
         ),
         const SizedBox(
           width: space,
@@ -202,7 +226,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
         ),
       ],
     );
@@ -253,7 +277,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
         ),
       ),
       const SizedBox(width: 4),
-      Text(label, style:  TextStyle(color: Colors.grey.shade700)),
+      Text(label, style:  TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
     ],
   );
 }
