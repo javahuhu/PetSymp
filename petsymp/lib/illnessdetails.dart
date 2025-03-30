@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/barchart/anotherbarchart.dart';
-import 'dart:math' as math;
 import 'userdata.dart';
 import 'package:provider/provider.dart';
 import 'symptomsdescriptions.dart'; // Contains your illnessInformation map.

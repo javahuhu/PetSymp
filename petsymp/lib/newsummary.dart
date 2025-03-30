@@ -7,9 +7,7 @@ import 'package:petsymp/profile.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'barchart/barchart.dart';
-import 'dart:math' as math;
 
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
@@ -387,7 +385,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                     color: const Color.fromARGB(0, 19, 19, 44),
                     borderRadius: BorderRadius.circular(0),
                   ),
-                  height: 350.h,
+                  height: 300.h,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Consumer<UserData>(

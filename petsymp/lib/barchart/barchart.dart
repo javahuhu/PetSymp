@@ -3,6 +3,7 @@ import 'barresources.dart';
 import 'barcolorextension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 class BarChartSample2 extends StatefulWidget {
   final List<String> illnessLabels;
   final List<double> fcScores;
@@ -30,10 +31,11 @@ class _BarChartSample2State extends State<BarChartSample2> {
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
   int touchedGroupIndex = -1;
+  late List<_ChartData> data;
+
 
   @override
   void initState() {
-    super.initState();
     rawBarGroups = List.generate(widget.illnessLabels.length, (index) {
       return makeGroupData(
         index,
@@ -42,8 +44,21 @@ class _BarChartSample2State extends State<BarChartSample2> {
         widget.abScores[index],
       );
     });
+
     showingBarGroups = List.of(rawBarGroups);
+
+     data = [
+      _ChartData('David', 25),
+      _ChartData('Steve', 38),
+      _ChartData('Jack', 34),
+      _ChartData('Others', 52)
+    ];
+    
+
+    super.initState();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -74,108 +89,503 @@ class _BarChartSample2State extends State<BarChartSample2> {
              SizedBox(height: 20.h),
             Expanded(
               child: BarChart(
-                BarChartData(
-                  maxY: 100,
-                  groupsSpace: 20,     
-                  barGroups: showingBarGroups,
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final algorithm = ['FC', 'GB', 'AB'][rodIndex];
-                        return BarTooltipItem(
-                          '$algorithm: ${rod.toY.toStringAsFixed(0)}',
-                           const TextStyle(color: Color.fromARGB(255, 0, 0, 0),)
-                           ,
-                        );
-
-                      },
-                      
+  BarChartData(
+    maxY: 100,
+    groupsSpace: 20,     
+    barGroups: showingBarGroups,
+    barTouchData: BarTouchData(
+      touchTooltipData: BarTouchTooltipData(
+        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+          final algorithm = ['FC', 'GB', 'AB'][rodIndex];
+          return BarTooltipItem(
+            '$algorithm: ${rod.toY.toStringAsFixed(0)}',
+            const TextStyle(
+              color: Color.fromARGB(255, 0, 0, 0),
+            ),
+          );
+        },
+      ),
+      touchCallback: (event, response) {
+        if (response == null || response.spot == null) {
+          setState(() {
+            touchedGroupIndex = -1;
+            showingBarGroups = List.of(rawBarGroups);
+          });
+          return;
+        }
+        final index = response.spot!.touchedBarGroupIndex;
+        // Show a pop-up dialog when the user lifts the tap
+        if (event is FlTapUpEvent) {
+         showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      title: Text("Why ${widget.illnessLabels[index]} ?"),
+      content: SizedBox(
+        width: 500.w,
+        height: 600.h,
+        child: 
+        SingleChildScrollView( child:
+        Column(
+          children: [
+            // Container for the chart with fixed size
+            SizedBox(
+              height: 250.w,
+              width: 250.w,
+              child: SfCircularChart(
+                tooltipBehavior: TooltipBehavior(enable: true),
+                series: <CircularSeries<_ChartData, String>>[
+                  DoughnutSeries<_ChartData, String>(
+                    dataSource: data,
+                    xValueMapper: (_ChartData data, _) => data.x,
+                    yValueMapper: (_ChartData data, _) => data.y,
+                  )
+                ],
+              ),
+            ),
+            
+            Center(
+              child: Text(
+                "Symptoms Doughnut Graph",
+                style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            // Wrap the table in a horizontally scrolling view
+             SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Table(
+                  // Force each column to have a fixed width so the table is wider than the available space
+                  defaultColumnWidth: const FixedColumnWidth(200),
+                  textDirection: TextDirection.ltr,
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: TableBorder.all(width: 2, color: const Color.fromARGB(255, 0, 0, 0)),
+                  children:  [
+                   const TableRow(
+                      children: [
+                        Center(child: Text("Symptom", textScaleFactor: 1.8, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("Base Weight", textScaleFactor: 1.8, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("Severity", textScaleFactor: 1.8, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("Priority", textScaleFactor: 1.8, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                      ],
                     ),
-                    touchCallback: (event, response) {
-                      if (response == null || response.spot == null) {
-                        setState(() {
-                          touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
-                        });
-                        return;
-                      }
-                      final index = response.spot!.touchedBarGroupIndex;
-                      setState(() {
-                        if (!event.isInterestedForInteractions) {
-                          touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
-                        } else {
-                          touchedGroupIndex = index;
-                          // No averaging — just highlight by copying original group
-                          showingBarGroups = List.of(rawBarGroups);
-                        }
-                      });
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 20,
-                        reservedSize: 40, 
-                        getTitlesWidget: (value, meta) => Text(
-                          '${value.toInt()}',
-                          style: const TextStyle(color:  Color.fromARGB(255, 0, 0, 0)),
-                        ),
-                      ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("Education", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("Institution name", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                      ],
                     ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final i = value.toInt();
-                          if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
-
-                          String label = widget.illnessLabels[i];
-                          if (label.length > 10) label = '${label.substring(0, 10)}…';
-
-                          return SideTitleWidget(
-                            space: 3,
-                            meta: meta,
-                            child: Text(
-                              label,
-                              style:  const TextStyle(fontSize: 15, color:  Color.fromARGB(255, 0, 0, 0)),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        },
-                      ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("Education", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("Institution name", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                      ],
                     ),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  ),
-                  gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  drawVerticalLine: true,
-                  horizontalInterval: 20,
-                  getDrawingHorizontalLine: (value) {
-                    return const FlLine(
-                      color:  Color.fromARGB(192, 0, 0, 0),
-                      strokeWidth: 1.5,
-                      dashArray: [5, 5], // Explicitly defined dash array
-                    );
-                  },
-                  getDrawingVerticalLine: (value) {
-                    return const FlLine(
-                      color:  Color.fromARGB(177, 0, 0, 0),
-                      strokeWidth: 1.5,
-                      dashArray: [5, 5], // Explicitly defined dash array
-                    );
-
-                    
-                  },
-                ),
-                  borderData: FlBorderData(show: false),
+                    TableRow(
+                      children: [
+                        Center(child: Text("Education", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("Institution name", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("University", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter',fontSize: 15.sp))),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+            
+
+                        Padding(
+              padding: EdgeInsets.only(top: 25.h, left: 20.w, right: 5.w),
+              child: Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                    fontSize: 15.sp,
+                  ),
+                  children: const [
+                    TextSpan(text: "Note: The graph above illustrates the Smptoms input with their Base Weight. "),
+                    TextSpan(text: "Forward Chaining (FC)", style:  TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: " provides the initial diagnosis, "),
+                    TextSpan(text: "Gradient Boosting (GB)", style:  TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: " refines the ranking, and "),
+                    TextSpan(text: "AdaBoost (AB)", style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(text: " delivers the final result."),
+                  ],
+                ),
+              ),
+            ),
+
+              SizedBox(height: 15.h,),
+              Center(
+                  child: Text(
+                        "Forward Chaining",
+                        style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
+                      ),
+                    ),
+
+
+
+
+                SizedBox(height: 10.h,),
+                 Table(
+                  // Force each column to have a fixed width so the table is wider than the available space
+                  defaultColumnWidth: const FixedColumnWidth(150),
+                  textDirection: TextDirection.ltr,
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: TableBorder.all(width: 2, color: const Color.fromARGB(255, 0, 0, 0)),
+                  children:  [
+                   const TableRow(
+                      children: [
+                        Center(child: Text("Base Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("FC Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    
+                  ],
+                ),
+
+
+                SizedBox(height: 15.h,),
+              Padding(
+                padding: EdgeInsets.only(right: 210.w),
+                  child: Text(
+                        "Formula:",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
+                      ),
+                    ),
+
+
+                SizedBox(height: 10.h,),
+              Center(
+                  child: Text(
+                        "Base × Severity × Priority",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                      ),
+                    ),
+
+
+
+
+
+                  SizedBox(height: 50.h,),
+                  Center(
+                      child: Text(
+                            "Gradient Boosting",
+                            style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                          ),
+                        ),
+
+
+                    SizedBox(height: 10.h,),
+                 Table(
+                  // Force each column to have a fixed width so the table is wider than the available space
+                  defaultColumnWidth: const FixedColumnWidth(150),
+                  textDirection: TextDirection.ltr,
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: TableBorder.all(width: 2, color: const Color.fromARGB(255, 0, 0, 0)),
+                  children:  [
+                   const TableRow(
+                      children: [
+                        Center(child: Text("GB Adjustment", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("GB Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    
+                  ],
+                ),
+
+
+                SizedBox(height: 15.h,),
+              Padding(
+                padding: EdgeInsets.only(right: 210.w),
+                  child: Text(
+                        "Formula:",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
+                      ),
+                    ),
+
+
+                SizedBox(height: 10.h,),
+              Center(
+                  child: Text(
+                        "FC Weight + GB Adjustment",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                      ),
+                    ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     SizedBox(height: 50.h,),
+                  Center(
+                      child: Text(
+                            "Ada Boost",
+                            style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
+                          ),
+                        ),
+
+
+                    SizedBox(height: 10.h,),
+                 Table(
+                  // Force each column to have a fixed width so the table is wider than the available space
+                  defaultColumnWidth: const FixedColumnWidth(150),
+                  textDirection: TextDirection.ltr,
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  border: TableBorder.all(width: 2, color: const Color.fromARGB(255, 0, 0, 0)),
+                  children:  [
+                   const TableRow(
+                      children: [
+                        Center(child: Text("AB Factor", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        Center(child: Text("AB Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Center(child: Text("1.0", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp))),
+                        Center(child: Text("0.8", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter' ,fontSize: 15.sp))),
+                        
+                      ],
+                    ),
+                    
+                  ],
+                ),
+
+
+                SizedBox(height: 15.h,),
+              Padding(
+                padding: EdgeInsets.only(right: 210.w),
+                  child: Text(
+                        "Formula:",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
+                      ),
+                    ),
+
+
+                SizedBox(height: 10.h,),
+              Center(
+                  child: Text(
+                        "GB Weight × AB Factor",
+                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                      ),
+                    ),
+              
+              
+
+          ],
+        ),
+      ),
+    ));
+  },
+);
+
+
+
+
+        }
+        setState(() {
+          if (!event.isInterestedForInteractions) {
+            touchedGroupIndex = -1;
+            showingBarGroups = List.of(rawBarGroups);
+          } else {
+            touchedGroupIndex = index;
+            // No averaging — just highlight by copying original group
+            showingBarGroups = List.of(rawBarGroups);
+          }
+        });
+      },
+    ),
+    titlesData: FlTitlesData(
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          interval: 20,
+          reservedSize: 40, 
+          getTitlesWidget: (value, meta) => Text(
+            '${value.toInt()}',
+            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+          ),
+        ),
+      ),
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          getTitlesWidget: (value, meta) {
+            final i = value.toInt();
+            if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
+
+            String label = widget.illnessLabels[i];
+            if (label.length > 10) label = '${label.substring(0, 10)}…';
+
+            return SideTitleWidget(
+              space: 3,
+              meta: meta,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+                textAlign: TextAlign.center,
+              ),
+            );
+          },
+        ),
+      ),
+      rightTitles: const AxisTitles(
+        sideTitles: SideTitles(showTitles: false),
+      ),
+      topTitles: const AxisTitles(
+        sideTitles: SideTitles(showTitles: false),
+      ),
+    ),
+    gridData: FlGridData(
+      show: true,
+      drawHorizontalLine: true,
+      drawVerticalLine: true,
+      horizontalInterval: 20,
+      getDrawingHorizontalLine: (value) {
+        return const FlLine(
+          color: Color.fromARGB(192, 0, 0, 0),
+          strokeWidth: 1.5,
+          dashArray: [5, 5],
+        );
+      },
+      getDrawingVerticalLine: (value) {
+        return const FlLine(
+          color: Color.fromARGB(177, 0, 0, 0),
+          strokeWidth: 1.5,
+          dashArray: [5, 5],
+        );
+      },
+    ),
+    borderData: FlBorderData(show: false),
+  ),
+)
+
             ),
             const SizedBox(height: 10),
             _buildLegend(),
@@ -282,4 +692,10 @@ class _BarChartSample2State extends State<BarChartSample2> {
   );
 }
 
+}
+
+class _ChartData {
+  _ChartData(this.x, this.y);
+  final String x;
+  final double y;
 }
