@@ -231,14 +231,14 @@ class _BarChartSample3State extends State<BarChartSample3> {
                   getDrawingHorizontalLine: (value) {
                     return const FlLine(
                       color:  Color.fromARGB(192, 160, 222, 241),
-                      strokeWidth: 1.5,
+                      strokeWidth: 1.2,
                       dashArray: [5, 5], // 5 pixels on, 5 pixels off
                     );
                   },
                   getDrawingVerticalLine: (value) {
                     return const FlLine(
                       color:  Color.fromARGB(178, 160, 222, 241),
-                      strokeWidth: 1.5,
+                      strokeWidth: 1.2,
                       dashArray: [5, 5],
                     );
                   },
