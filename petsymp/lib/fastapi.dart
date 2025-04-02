@@ -1,25 +1,11 @@
+// lib/api_service.dart
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'dynamicconnections.dart'; // Import our config file
 
 class ApiService {
-  // Detect server IP address automatically
-  static Future<String> getServerIP() async {
-    try {
-      for (var interface in await NetworkInterface.list()) {
-        for (var addr in interface.addresses) {
-          if (addr.address.startsWith("192.")) {
-            return addr.address;
-          }
-        }
-      }
-    } catch (e) {
-      print("⚠️ Error detecting IP: $e");
-    }
-    return "192.168.1.101"; // Default IP if auto-detection fails
-  }
-
   // Main diagnosis function
   static Future<Map<String, dynamic>?> diagnosePet({
     required String userName,
@@ -29,11 +15,10 @@ class ApiService {
     required String size,
     required Map<String, Map<String, String>> userAnswers,
   }) async {
-    final String serverIP = await getServerIP();
-    final Uri url = Uri.parse("http://$serverIP:8000/diagnose");
+    // Use the URL from AppConfig
+    final Uri url = Uri.parse(AppConfig.diagnoseURL);
 
-    // Prepare the fact base according to backend expectations.
-    // Note: The key "owner" is used (instead of "userName")
+    // Prepare the fact base (backend expects "owner" as key)
     final Map<String, dynamic> factBase = {
       "owner": userName.trim().isNotEmpty ? userName : "Unknown",
       "symptoms": symptoms.isNotEmpty ? symptoms : ["None"],
@@ -76,31 +61,27 @@ class ApiService {
   // Validate pet size
   static String _validateSize(String size) {
     final validSizes = ["Small", "Medium", "Large"];
-    String formattedSize = size.trim().isNotEmpty ? size.capitalize() : "Medium";
+    String formattedSize =
+        size.trim().isNotEmpty ? size.capitalize() : "Medium";
     return validSizes.contains(formattedSize) ? formattedSize : "Medium";
   }
 
   // Debug endpoint to test connectivity
   static Future<bool> testConnection() async {
     try {
-      final String serverIP = await getServerIP();
-      final Uri url = Uri.parse("http://$serverIP:8000/debug/all-symptoms");
-      
+      final Uri url = Uri.parse(AppConfig.allSymptomsURL);
       final response = await http.get(url).timeout(const Duration(seconds: 5));
-      
       return response.statusCode == 200;
     } catch (e) {
       print("🚨 Connection test failed: $e");
       return false;
     }
   }
-  
+
   // Get all symptoms from the backend
   static Future<List<String>> getAllSymptoms() async {
     try {
-      final String serverIP = await getServerIP();
-      final Uri url = Uri.parse("http://$serverIP:8000/debug/all-symptoms");
-      
+      final Uri url = Uri.parse(AppConfig.allSymptomsURL);
       final response = await http.get(url);
       
       if (response.statusCode == 200) {
@@ -126,7 +107,6 @@ class ApiService {
   }
 }
 
-// Helper extension to capitalize strings
 extension StringCasingExtension on String {
   String capitalize() =>
       isNotEmpty ? "${this[0].toUpperCase()}${substring(1).toLowerCase()}" : "";

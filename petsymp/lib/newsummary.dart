@@ -8,6 +8,9 @@ import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'barchart/barchart.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
@@ -99,7 +102,10 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
       abScores.add((item['confidence_ab'] as num).toDouble());
     }
 
-    return Scaffold(
+    
+    return PopScope(
+    canPop: false, 
+    child: Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: SingleChildScrollView(
         child: Column(
@@ -163,7 +169,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 alignment: Alignment.center,
                 children: [
                   // **Circular Image**
-                  Positioned(
+                   Positioned(
                     left: 10.w,
                     top: 100.h,
                     child: Container(
@@ -177,10 +183,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: Image.asset(
-                          "assets/sampleimage.jpg",
-                          fit: BoxFit.cover,
-                        ),
+                        child: userData.profileImage != null &&
+                                userData.profileImage!.isNotEmpty
+                            ? Image.network(
+                                userData.profileImage!,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "assets/sampleimage.jpg",
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                   ),
@@ -1027,55 +1039,74 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               ),
             ))))),
 
-            Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-            child:
-            Align(
-                alignment: Alignment.centerRight,// Adjust dynamically for right alignment
-                child: SizedBox( // Wrap with SizedBox to ensure correct width
-                  width: 120, // Adjust as needed
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(
+                  width: 120,
                   child: ElevatedButton(
-                    onPressed: () {
-                 
-                       Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomePageScreen()),
-                      );
-                    },
+                    onPressed: () async {
+                        // Save the summary data to Firestore under a new "History" subcollection.
+                        final String? userId = FirebaseAuth.instance.currentUser?.uid;
+                        if (userId != null) {
+                          final historyData = {
+                            'date': DateTime.now(),
+                            'petName': userData.userName,
+                            'petDetails': petDetails,
+                            'petImage': 
+                                userData.profileImage?.isNotEmpty == true
+                            ? userData.profileImage
+                            : "assets/sampleimage.jpg",
+                                 // your petDetails list
+                            'diagnosisResults': diagnoses, // your diagnosis results list
+                            'allSymptoms': allSymptoms, // the joined string of symptoms
+                          };
+                          await FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(userId)
+                              .collection('History')
+                              .add(historyData);
+
+                          // Clear all user input and details.
+                          Provider.of<UserData>(context, listen: false).clearData();
+                        }
+                        // Then navigate directly to HomePageScreen.
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+                        );
+                      },
+
                     style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
+                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.pressed)) {
+                          return const Color.fromARGB(255, 0, 0, 0);
                         }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
+                        return Colors.transparent;
+                      }),
+                      foregroundColor: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.pressed)) {
+                          return const Color.fromARGB(255, 255, 255, 255);
                         }
-                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Color.fromRGBO(82, 170, 164, 1),
-                        width: 2.0,
+                        return const Color.fromRGBO(29, 29, 44, 1.0);
+                      }),
+                      shadowColor: MaterialStateProperty.all(Colors.transparent),
+                      side: MaterialStateProperty.all(
+                        const BorderSide(
+                          color: Color.fromRGBO(82, 170, 164, 1),
+                          width: 2.0,
+                        ),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(100)),
+                        ),
+                      ),
+                      fixedSize: MaterialStateProperty.all(
+                        const Size(100, 55),
                       ),
                     ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
-                  ),
                     child: const Text(
                       "Finish",
                       style: TextStyle(
@@ -1085,15 +1116,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                     ),
                   ),
                 ),
-              )),
+              ),
+            ),
 
 
 
-            SizedBox(height: 50.h),
+            SizedBox(height: 10.h),
           ],
         ),
       ),
-    );
+    ));
   }
 
   Future<void> _launchURL(String urlString) async {

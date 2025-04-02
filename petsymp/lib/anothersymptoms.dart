@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/mentionsymptoms.dart';
-import 'package:petsymp/newsummary.dart';
+import 'report.dart';
+import 'package:provider/provider.dart';
+import 'package:petsymp/userdata.dart';
 
 
 class AnothersympScreen extends StatefulWidget {
@@ -120,7 +122,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
                 buildAnimatedButton(
                     screenHeight, screenWidth, 0.35, "Yes", const MentionsympScreen(), 0),
                 buildAnimatedButton(
-                screenHeight, screenWidth, 0.42, "No", const NewSummaryScreen(), 1, replace: true),
+                screenHeight, screenWidth, 0.42, "No", const ReportScreen(), 1, replace: true),
 
               
               ],
@@ -141,12 +143,42 @@ class AnothersympScreenState extends State<AnothersympScreen> {
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
       left: screenWidth * 0.29 - 50,
       child: ElevatedButton(
-       onPressed: () {
+       onPressed: () async {
+        final bool confirmed = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Are you sure?"),
+            content: const Text(
+                "Once you proceed, you won't be able to go back and edit previous answers."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text("Confirm"),
+              ),
+            ],
+          ),
+        );
+
+        if (!confirmed) return;
+
+        // ✅ FINALIZE the symptom here
+        final userData = Provider.of<UserData>(context, listen: false);
+        final prevSymptom = userData.selectedSymptom;
+        if (prevSymptom.isNotEmpty) {
+          userData.finalizeSymptom(prevSymptom);
+          print("✅ Finalized in confirmation: $prevSymptom");
+        }
+
+        // ✅ Proceed with navigation
         if (replace) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => destination),
-          ); // ✅ Replaces instead of pushing a new stack
+          );
         } else {
           Navigator.push(
             context,
@@ -154,6 +186,7 @@ class AnothersympScreenState extends State<AnothersympScreen> {
           );
         }
       },
+
         style: ButtonStyle(
                     // Dynamic background color based on button state
                     backgroundColor: WidgetStateProperty.resolveWith(

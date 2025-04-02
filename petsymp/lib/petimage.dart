@@ -1,11 +1,15 @@
+// lib/petimage.dart
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
 import 'assesment.dart';
+import 'package:provider/provider.dart';
+import 'userdata.dart';
 
 class PetimageScreen extends StatefulWidget {
   const PetimageScreen({super.key});
@@ -16,56 +20,54 @@ class PetimageScreen extends StatefulWidget {
 
 class PetimageScreenState extends State<PetimageScreen> {
   File? _image;
-  final ImagePicker picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickImage() async {
-    final XFile? pickedImage =
-        await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
+  // This function picks an image and uploads it to Cloudinary.
+  Future<void> _pickAndUploadImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        _image = File(pickedImage.path);
+        _image = File(pickedFile.path);
       });
+      // Upload image to Cloudinary.
+      String? uploadedUrl = await _uploadImageToCloudinary(pickedFile);
+      if (uploadedUrl != null) {
+        // Update the provider so that NewSummaryScreen can display the image.
+        Provider.of<UserData>(context, listen: false).setProfileImage(uploadedUrl);
 
-      // Upload image to Firebase (No print statements)
-      await _uploadImageToFirebase();
+        // Also update Firestore with the new profile image URL.
+        final String? userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) {
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(userId)
+              .update({'PetImage': uploadedUrl});
+        }
+
+        // Automatically navigate to the Assessment screen.
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AssesmentScreen()),
+        );
+      }
     }
   }
 
-  Future<void> _uploadImageToFirebase() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not logged in!")),
-        );
-        return;
-      }
-
-      String fileName = "user_pets/${user.uid}.jpg"; // Unique pet image file
-      Reference ref = FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = ref.putFile(_image!);
-
-      TaskSnapshot snapshot = await uploadTask;
-      String downloadURL = await snapshot.ref.getDownloadURL();
-
-      // Store pet image URL in Firestore under the user's pet collection
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("pets")
-          .doc("pet_image")
-          .set({
-        "imageUrl": downloadURL,
-      }, SetOptions(merge: true));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Pet image uploaded successfully!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to upload pet image: $e")),
-      );
+  // Uploads the image using an unsigned preset "Petsymp" to your Cloudinary account.
+  Future<String?> _uploadImageToCloudinary(XFile imageFile) async {
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/dntn2fqjo/image/upload');
+    final request = http.MultipartRequest('POST', url)
+      ..fields['upload_preset'] = 'Petsymp'
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    final response = await request.send();
+    final res = await http.Response.fromStream(response);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data['secure_url'];
+    } else {
+      print('Upload failed: ${res.body}');
+      return null;
     }
   }
 
@@ -86,12 +88,10 @@ class PetimageScreenState extends State<PetimageScreen> {
               fit: BoxFit.contain, // Keep aspect ratio
             ),
           ),
-
           // Foreground UI
           Column(
             children: [
               SizedBox(height: 200.h), // Space from the top
-              
               // Circular Image Container
               Container(
                 height: 250.w,
@@ -109,16 +109,14 @@ class PetimageScreenState extends State<PetimageScreen> {
                           _image!,
                           fit: BoxFit.cover,
                         )
-                      : const Center(child: Text("meow")),
+                      : const Center(child: Text("")),
                 ),
               ),
-
               SizedBox(height: 150.h),
-
               // Upload Button
               Center(
                 child: ElevatedButton(
-                  onPressed: _pickImage,
+                  onPressed: _pickAndUploadImage,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(66, 134, 130, 1.0),
                     foregroundColor: Colors.white,
@@ -136,9 +134,7 @@ class PetimageScreenState extends State<PetimageScreen> {
                   ),
                 ),
               ),
-
               SizedBox(height: 15.h),
-
               // Skip Button
               Center(
                 child: ElevatedButton(

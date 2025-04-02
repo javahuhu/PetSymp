@@ -1,179 +1,150 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:petsymp/historyassesment.dart';
+import 'package:petsymp/termsandcondition.dart';
 import 'homepage.dart';
 
-
 class Settingscreen extends StatefulWidget {
-   const Settingscreen({super.key});
-
+  const Settingscreen({super.key});
 
   @override
   SettingscreenState createState() => SettingscreenState();
 }
 
 class SettingscreenState extends State<Settingscreen> {
-  // State to track the selected tab
-  // State to track the selected tab
-   // Animation toggle
-
-
-Map<String, Map<String, dynamic>> hashmap = {
-  "img1": {
-    "image": "assets/security.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img2": {
-    "image": "assets/support.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img3": {
-    "image": "assets/condition.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img4": {
-    "image": "assets/editprofile.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img5": {
-    "image": "assets/restore.png",
-    "screen": (BuildContext context) => const HomePageScreen(),
-  },
-  "img6": {
-    "image": "assets/logout.png",
-    "screen": (BuildContext context) => const HomePageScreen(), // Call logout function
-  },
-  
-};
-
-
-
-
-
-  
+  Map<String, Map<String, dynamic>> hashmap = {
+    "img1": {
+      "image": "assets/security.png",
+      "screen": (BuildContext context) => const HomePageScreen(),
+    },
+    "img2": {
+      "image": "assets/support.png",
+      "screen": (BuildContext context) => const HomePageScreen(),
+    },
+    "img3": {
+      "image": "assets/condition.png",
+      "screen": (BuildContext context) => const TermsandconditionScreen(),
+    },
+    "img4": {
+      "image": "assets/editprofile.png",
+      "screen": (BuildContext context) => const HomePageScreen(),
+    },
+    "img5": {
+      "image": "assets/restore.png",
+      "screen": (BuildContext context) => const HistoryassesmentScreen(),
+    },
+    "img6": {
+      "image": "assets/logout.png",
+      "screen": (BuildContext context) => const HomePageScreen(),
+    },
+  };
 
   @override
   Widget build(BuildContext context) {
-    // Screen dimensions
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-       backgroundColor:const Color.fromRGBO(29, 29, 44, 1.0),
-      body: Stack(
+      backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(top: screenHeight * 0.05),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Column(
+            children: [
+              // First Group
+              _buildCardContainer([
+                _buildInputCard("img1", "Security"),
+                _buildInputCard("img2", "Help and Support"),
+                _buildInputCard("img3", "Terms and Conditions", isLast: true),
+              ]),
 
-        
-        children: [
+              SizedBox(height: 20.h),
 
-             Positioned(
-                  top: screenHeight * 0.04,
-                  left: screenWidth * -0.04,
-                  child: Container(
-                    width: 510,
-                    height: screenHeight * 0.6,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(0, 255, 255, 255), // Set Background Color
-                      borderRadius: BorderRadius.circular(25), // Optional rounded corners
-                     
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10), // Add padding inside container
-                      child: ListView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          _buildInputCard("img1", "Security"),
-                          _buildInputCard("img2", "Help and Support"),
-                          _buildInputCard("img3",  "Terms and Conditions"),
-                          _buildInputCard("img4",  "Edit Profile"),
-                          _buildInputCard("img5",  "History"),
-                           _buildInputCard("img6",  "Log out"),
-                           
-                        ],
-                      ),
-                    ),
-                  ),
-),
-
-              
-
-          // Rotated Image Positioned at the Bottom with Animation
-
-          // Placeholder for other tabs
-          // Display corresponding content for other tabs
-             
-        ],
-        
+              // Second Group
+              _buildCardContainer([
+                _buildInputCard("img4", "Edit Profile"),
+                _buildInputCard("img5", "History"),
+                _buildInputCard("img6", "Log out", isLast: true),
+              ]),
+            ],
+          ),
+        ),
       ),
-
-      
-
-      
-      
     );
-
-    
-
-    
   }
 
-  Widget _buildInputCard(String index, String value) {
-  return GestureDetector(
-    onTap: () {
-      if (hashmap.containsKey(index)) {
-        var screenFunction = hashmap[index]!["screen"];
-        if (screenFunction is Widget Function(BuildContext)) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screenFunction(context)),
-          );
-        } 
-      }
-    },
-    child: Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      color: const Color.fromARGB(0, 179, 16, 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
+  // Container Wrapper
+  Widget _buildCardContainer(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(36, 36, 55, 1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  // Individual Card Builder
+  Widget _buildInputCard(String index, String value, {bool isLast = false}) {
+    return GestureDetector(
+      onTap: () {
+        if (hashmap.containsKey(index)) {
+          var screenFunction = hashmap[index]!["screen"];
+          if (screenFunction is Widget Function(BuildContext)) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => screenFunction(context)),
+            );
+          }
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: isLast
+                ? BorderSide.none
+                : const BorderSide(
+                    color: Color.fromARGB(255, 142, 142, 142),
+                    width: 0.4,
+                  ),
+          ),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns text and trailing
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Leading Icon & Text
+            // Icon + Label
             Row(
               children: [
-                if (hashmap.containsKey(index))
-                  Image.asset(
-                    hashmap[index]!["image"], // Fetch image path from hashmap
-                    width: 30, // Adjust as needed
-                    height: 30,
-                    fit: BoxFit.contain,
+                Image.asset(
+                  hashmap[index]!["image"],
+                  width: 22.w,
+                  height: 22.h,
+                  fit: BoxFit.contain,
+                  color: const Color.fromRGBO(82, 170, 164, 1),
+                ),
+                SizedBox(width: 14.w),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w400,
                     color: const Color.fromRGBO(82, 170, 164, 1),
                   ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      value,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.normal, color: Color.fromRGBO(82, 170, 164, 1)),
-                    ),
-                  ],
                 ),
               ],
             ),
-            // **Trailing Icon (Example: Arrow Icon)**
-            Image.asset(
-              "assets/arrowright.png",
-              width: 30,
-              height: 30,
-              fit: BoxFit.contain,
-              color: const Color.fromRGBO(82, 170, 164, 1),
+
+            // Arrow icon
+            Icon(
+              Icons.chevron_right,
+              size: 20.sp,
+              color: Colors.grey.withOpacity(0.6),
             ),
           ],
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 }

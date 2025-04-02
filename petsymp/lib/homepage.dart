@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/settings.dart';
 import 'assesment.dart';
 import 'profile.dart';
+import 'petimage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -105,7 +106,7 @@ class HomePageScreenState extends State<HomePageScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const AssesmentScreen()),
+                          MaterialPageRoute(builder: (context) => const PetimageScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(

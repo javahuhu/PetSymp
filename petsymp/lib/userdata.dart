@@ -1,7 +1,10 @@
+// lib/userdata.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'symptomsquestions.dart';
+import 'dynamicconnections.dart'; // Import our connection config
+
 class UserData with ChangeNotifier {
   // Basic user info
   String _userName = '';
@@ -10,6 +13,7 @@ class UserData with ChangeNotifier {
   int _petAge = 0;
   String _breed = '';
   String _anotherSymptom = '';
+  String? _profileImage;
 
   // Symptom lists
   final List<String> _pendingSymptoms = [];
@@ -31,6 +35,7 @@ class UserData with ChangeNotifier {
   String get size => _petSize;
   int get age => _petAge;
   String get anotherSymptom => _anotherSymptom;
+  String? get profileImage => _profileImage;
 
   List<String> get pendingSymptoms => _pendingSymptoms;
   List<String> get finalizedSymptoms => _finalizedSymptoms;
@@ -78,6 +83,11 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
+  void setProfileImage(String imageUrl) {
+  _profileImage = imageUrl;
+  notifyListeners();
+}
+
   // Add/remove symptoms
   void addPendingSymptom(String symptom) {
     final normalized = symptom.trim().toLowerCase();
@@ -115,9 +125,13 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
+
+  
+
   void addNewPetSymptom(String symptom) {
     final normalized = symptom.trim().toLowerCase();
-    if (!_finalizedSymptoms.contains(normalized) && !_pendingSymptoms.contains(normalized)) {
+    if (!_finalizedSymptoms.contains(normalized) &&
+        !_pendingSymptoms.contains(normalized)) {
       _pendingSymptoms.add(normalized);
     }
     notifyListeners();
@@ -151,53 +165,50 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
-  // Symptom-question mapping
-   // Mapping for symptom questions and impact values.
+  // Mapping for symptom questions and impact values.
   final Map<String, dynamic> _symptomQuestions = symptomQuestions;
 
   List<String> getPredefinedSymptoms() {
     return _symptomQuestions.keys.toList();
   }
 
-
   void updateQuestions() {
-  final key = _selectedSymptom.toLowerCase();
-  if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
-    _questions = List<String>.from(_symptomQuestions[key]["questions"]);
-    _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
+    final key = _selectedSymptom.toLowerCase();
+    if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
+      _questions = List<String>.from(_symptomQuestions[key]["questions"]);
+      _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
 
-    List<String> impactDaysChoices = [];
-    List<String> impactSymptomChoices = [];
+      List<String> impactDaysChoices = [];
+      List<String> impactSymptomChoices = [];
 
-    if (_symptomQuestions[key].containsKey("impactDays")) {
-      var impactDaysValue = _symptomQuestions[key]["impactDays"];
-      if (impactDaysValue is List) {
-        impactDaysChoices = List<String>.from(impactDaysValue);
-      } else if (impactDaysValue is Map<String, dynamic>) {
-        impactDaysChoices = List<String>.from(impactDaysValue.keys);
+      if (_symptomQuestions[key].containsKey("impactDays")) {
+        var impactDaysValue = _symptomQuestions[key]["impactDays"];
+        if (impactDaysValue is List) {
+          impactDaysChoices = List<String>.from(impactDaysValue);
+        } else if (impactDaysValue is Map<String, dynamic>) {
+          impactDaysChoices = List<String>.from(impactDaysValue.keys);
+        }
       }
-    }
-    if (_symptomQuestions[key].containsKey("impactSymptom")) {
-      var impactSymptomValue = _symptomQuestions[key]["impactSymptom"];
-      if (impactSymptomValue is List) {
-        impactSymptomChoices = List<String>.from(impactSymptomValue);
-      } else if (impactSymptomValue is Map<String, dynamic>) {
-        impactSymptomChoices = List<String>.from(impactSymptomValue.keys);
+      if (_symptomQuestions[key].containsKey("impactSymptom")) {
+        var impactSymptomValue = _symptomQuestions[key]["impactSymptom"];
+        if (impactSymptomValue is List) {
+          impactSymptomChoices = List<String>.from(impactSymptomValue);
+        } else if (impactSymptomValue is Map<String, dynamic>) {
+          impactSymptomChoices = List<String>.from(impactSymptomValue.keys);
+        }
       }
-    }
 
-    _impactChoices = [impactDaysChoices, impactSymptomChoices];
-  } else {
-    _questions = [];
-    _impactChoices = [[], []];
-    _questionSymptoms = [];
+      _impactChoices = [impactDaysChoices, impactSymptomChoices];
+    } else {
+      _questions = [];
+      _impactChoices = [[], []];
+      _questionSymptoms = [];
+    }
   }
-}
 
-
-  // Call Flask API to get diagnosis results
+  // Updated fetchDiagnosis using AppConfig from dynamicconnections.dart
   Future<void> fetchDiagnosis() async {
-    final Uri url = Uri.parse("http://192.168.1.101:8000/diagnose");
+    final Uri url = Uri.parse(AppConfig.diagnoseURL);
     final allTypedSymptoms = [..._finalizedSymptoms];
     final uniqueSymptoms = allTypedSymptoms.toSet().toList();
 
@@ -221,7 +232,8 @@ class UserData with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        final illnesses = List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
+        final illnesses =
+            List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
         setDiagnosisResults(illnesses);
       } else {
         print("❌ API Error: ${response.statusCode}");
@@ -230,4 +242,35 @@ class UserData with ChangeNotifier {
       print("🚨 Failed to connect: $e");
     }
   }
+
+
+
+  // Inside your UserData class
+// In userdata.dart inside your UserData class:
+
+void clearData() {
+  _userName = '';
+  _petSize = '';
+  _email = '';
+  _petAge = 0;
+  _breed = '';
+  _anotherSymptom = '';
+  _profileImage = null;
+  
+  _pendingSymptoms.clear();
+  _finalizedSymptoms.clear();
+  _newSymptoms.clear();
+  _symptomDurations.clear();
+  _selectedSymptom = '';
+  _diagnosisResults.clear();
+  _questions.clear();
+  
+  // Instead of calling clear() on fixed-length lists, reassign empty lists:
+  _impactChoices = [];
+  _questionSymptoms = [];
+  
+  notifyListeners();
+}
+
+
 }

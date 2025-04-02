@@ -16,7 +16,6 @@ class IllnessdetailsScreen extends StatefulWidget {
 class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
  
    
@@ -79,7 +78,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
       children: [
         // Chart container
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 60.h),
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 100.h),
           child: Container(
             decoration: BoxDecoration(
               color: const Color.fromARGB(0, 19, 19, 44),
@@ -126,7 +125,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
         ),
 
         Padding(
-  padding: EdgeInsets.only(top: 390.h, left: 20.w, right: 5.w),
+  padding: EdgeInsets.only(top: 420.h, left: 20.w, right: 5.w),
   child: Text.rich(
     TextSpan(
       style: TextStyle(
@@ -148,7 +147,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
 
         // Expansion cards container
         Padding(
-          padding: EdgeInsets.only(top: 520.h),
+          padding: EdgeInsets.only(top: 550.h),
           child: Column(
             children: [
               SizedBox(height: 20.h),

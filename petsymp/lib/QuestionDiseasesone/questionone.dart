@@ -66,7 +66,8 @@ class QoneScreenState extends State<QoneScreen> {
       _triggerAnimation();
     } else {
       // All questions answered. Finalize the symptom to block re-entry:
-      _finalizeSymptom(userData, questionSymptom);
+
+      //_finalizeSymptom(userData, questionSymptom); if must finalized after answering question//
 
       // Then fetch diagnosis if needed and navigate onwards.
       userData.fetchDiagnosis().then((_) {

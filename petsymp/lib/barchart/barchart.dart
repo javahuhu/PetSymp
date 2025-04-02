@@ -9,6 +9,7 @@ import 'barcolorextension.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'dart:io';
+import 'package:petsymp/dynamicconnections.dart';
 
 class BarChartSample2 extends StatefulWidget {
   final List<String> illnessLabels;
@@ -88,40 +89,19 @@ class _BarChartSample2State extends State<BarChartSample2> {
   int touchedGroupIndex = -1;
 
  
-Future<String> getServerIP() async {
-  try {
-    // Loop over all available network interfaces.
-    for (var interface in await NetworkInterface.list()) {
-      for (var addr in interface.addresses) {
-        // Check if it's an IPv4 address and matches your LAN prefix.
-        if (addr.type == InternetAddressType.IPv4 && addr.address.startsWith("192.")) {
-          return addr.address;
-        }
-      }
+   Future<List<SymptomDetail>> _fetchKnowledgeDetailsForIllness(String illness) async {
+    final url = Uri.parse(AppConfig.getKnowledgeDetailsURL(illness));
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> detailsJson = data["knowledge"] as List<dynamic>;
+      return detailsJson
+          .map((item) => SymptomDetail.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception("Failed to load knowledge details");
     }
-  } catch (e) {
-    print("Error detecting IP: $e");
   }
-  // Fallback IP address if auto-detection fails.
-  return "192.168.1.101";
-}
-
-Future<List<SymptomDetail>> _fetchKnowledgeDetailsForIllness(String illness) async {
-  final ip = await getServerIP();
-  final url = Uri.parse(
-    "http://$ip:8000/debug/knowledge-details?illness=${Uri.encodeComponent(illness)}"
-  );
-  final response = await http.get(url);
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    final List<dynamic> detailsJson = data["knowledge"] as List<dynamic>;
-    return detailsJson
-        .map((item) => SymptomDetail.fromJson(item as Map<String, dynamic>))
-        .toList();
-  } else {
-    throw Exception("Failed to load knowledge details");
-  }
-}
 
 
   @override

@@ -157,12 +157,10 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your username';
                               }
-                              if (value.length < 8) {
-                                return "Username must contain at least 8 letters";
+                              if (value.length > 20) {
+                                return "Username must contain at least 20 letters Only";
                               }
-                              if (value.length != 8) {
-                                return "Username must be exactly 8 characters";
-                              }
+                              
                               return null;
                             },
                           ),
