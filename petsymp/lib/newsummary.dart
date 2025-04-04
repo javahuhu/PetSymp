@@ -183,10 +183,10 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: userData.profileImage != null &&
-                                userData.profileImage!.isNotEmpty
+                        child: userData.petImage != null &&
+                                userData.petImage!.isNotEmpty
                             ? Image.network(
-                                userData.profileImage!,
+                                userData.petImage!,
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
@@ -1055,8 +1055,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             'petName': userData.userName,
                             'petDetails': petDetails,
                             'petImage': 
-                                userData.profileImage?.isNotEmpty == true
-                            ? userData.profileImage
+                                userData.petImage?.isNotEmpty == true
+                            ? userData.petImage
                             : "assets/sampleimage.jpg",
                                  // your petDetails list
                             'diagnosisResults': diagnoses, // your diagnosis results list

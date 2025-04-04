@@ -50,24 +50,29 @@ void initState() {
 }
 
 
-  void navigateToNextPage() {
+  void navigateToNextPage() async {
   if (_formKey.currentState?.validate() ?? false) {
     final userData = Provider.of<UserData>(context, listen: false);
     final inputText = _symptomController.text.trim().toLowerCase();
 
-    // 1) Mark the typed symptom as "pending" (not finalized):
+    // 1. Add to pending temporarily
     userData.addPendingSymptom(inputText);
-
-    // 2) Optionally store it in "anotherSymptom," if that’s your logic:
     userData.setAnotherSymptom(inputText);
 
-    // Then proceed to your AnothersearchsymptomsScreen:
-    Navigator.push(
+    // 2. Navigate and wait for result
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const AnothersearchsymptomsScreen()),
     );
+
+    // 3. Cleanup if user backed out without selecting
+    if (userData.pendingSymptoms.contains(inputText)) {
+      userData.removePendingSymptom(inputText);
+      debugPrint("🗑️ Removed $inputText from pending (user backed out)");
+    }
   }
 }
+
 
 
   @override
@@ -83,6 +88,22 @@ void initState() {
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
+
+          Positioned(
+            top: screenHeight * 0.03,
+            left: screenWidth * 0.01,
+            child: ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_sharp,
+                  color:  Color.fromRGBO(61, 47, 40, 1),
+                  size: 40.0,),
+                  label: const Text(''),
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),), 
+
           AnimatedPositioned(
             duration: const Duration(seconds: 1),
             curve: Curves.easeInOut,
@@ -153,30 +174,36 @@ void initState() {
                         ),
                       ),
                       validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the symptom of the pet';
-                      }
-                      if (value.contains(',') || value.contains('+')) {
-                        return 'Please enter only one symptom at a time';
-                      }
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the symptom of the pet';
+                            }
+                            if (value.contains(',') || value.contains('+')) {
+                              return 'Please enter only one symptom at a time';
+                            }
 
-                      final inputLower = value.trim().toLowerCase();
-                      final userData = Provider.of<UserData>(context, listen: false);
+                            final inputLower = value.trim().toLowerCase();
+                            final userData = Provider.of<UserData>(context, listen: false);
 
-                      // Check if it’s a recognized (predefined) symptom:
-                      final List<String> predefinedLower =
-                          userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
-                      if (!predefinedLower.contains(inputLower)) {
-                        return 'No such symptom found';
-                      }
+                            // Check if it's in the list of predefined symptoms
+                            final List<String> predefinedLower =
+                                userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
+                            if (!predefinedLower.contains(inputLower)) {
+                              return 'No such symptom found';
+                            }
 
-                      // **NEW**: If it’s in the finalizedSymptoms list, block it:
-                      if (userData.finalizedSymptoms.contains(inputLower)) {
-                        return 'This symptom is already added/finalized';
-                      }
+                            // ✅ NEW: Prevent duplicates (already inputted but not finalized)
+                            if (userData.pendingSymptoms.contains(inputLower)) {
+                              return 'This symptom is already pending';
+                            }
 
-                      return null;
-                    },
+                            // ✅ Already finalized check
+                            if (userData.finalizedSymptoms.contains(inputLower)) {
+                              return 'This symptom is already added/finalized';
+                            }
+
+                            return null;
+                          }
+
 
                     ),
                   ),

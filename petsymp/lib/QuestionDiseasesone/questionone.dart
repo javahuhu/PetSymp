@@ -43,8 +43,6 @@ class QoneScreenState extends State<QoneScreen> {
   void nextQuestion(BuildContext context, String selectedAnswer) {
     final userData = Provider.of<UserData>(context, listen: false);
 
-    // Use questionSymptoms for the current question label if available;
-    // fall back to selectedSymptom if not.
     final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
             currentQuestionIndex < userData.questionSymptoms.length
         ? userData.questionSymptoms[currentQuestionIndex]
@@ -52,55 +50,27 @@ class QoneScreenState extends State<QoneScreen> {
 
     final currentQuestion = userData.questions[currentQuestionIndex];
 
-    // Save the answer for this symptom question.
-    userData.setSymptomDuration(questionSymptom, selectedAnswer);
+    userData.addSymptomAnswer(questionSymptom, userData.questions[currentQuestionIndex], selectedAnswer);
 
     print("✅ Question: $currentQuestion");
     print("✅ Answer: $selectedAnswer");
 
-    // Move to the next question if there is one; otherwise finalize the symptom.
     if (currentQuestionIndex < userData.questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
       _triggerAnimation();
     } else {
-      // All questions answered. Finalize the symptom to block re-entry:
-
-      //_finalizeSymptom(userData, questionSymptom); if must finalized after answering question//
-
-      // Then fetch diagnosis if needed and navigate onwards.
       userData.fetchDiagnosis().then((_) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const AnothersympScreen(),
-          ),
-        );
-      });
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AnothersympScreen(),
+              ),
+            );
+          });
+
     }
-  }
-
-  void _finalizeSymptom(UserData userData, String symptom) {
-    // A new method that marks this symptom as "finalized" so the user can't re-enter it.
-    // We'll define finalizeSymptom in your userData, which moves from pending → finalized.
-    // e.g.: userData.finalizeSymptom(symptom);
-
-    // If your userData does not yet have finalizeSymptom(...), add it:
-    // 
-    //   void finalizeSymptom(String symptom) {
-    //     final normalized = symptom.trim().toLowerCase();
-    //     _pendingSymptoms.remove(normalized);
-    //     if (!_finalizedSymptoms.contains(normalized)) {
-    //       _finalizedSymptoms.add(normalized);
-    //     }
-    //     notifyListeners();
-    //   }
-    // 
-    // If you're not using that approach, see prior instructions for the "pending vs. finalized" logic.
-
-    userData.finalizeSymptom(symptom);
-    print("✅ Finalized Symptom: $symptom");
   }
 
   void previousQuestion() {
@@ -122,105 +92,113 @@ class QoneScreenState extends State<QoneScreen> {
     final questions = userData.questions;
     final impactChoices = userData.impactChoices;
 
-    // Current label for the question
     final String questionSymptom = userData.questionSymptoms.isNotEmpty &&
             currentQuestionIndex < userData.questionSymptoms.length
         ? userData.questionSymptoms[currentQuestionIndex]
         : userData.selectedSymptom;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFE8F2F5),
-      body: Stack(
-        children: [
-          Stack(
-            children: [
-              // Back Button
-              Positioned(
-                top: screenHeight * 0.03,
-                left: screenWidth * 0.01,
-                child: ElevatedButton.icon(
-                  onPressed: previousQuestion,
-                  icon: const Icon(
-                    Icons.arrow_back_sharp,
-                    color: Color.fromRGBO(61, 47, 40, 1),
-                    size: 40.0,
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (didPop && currentQuestionIndex == 0) {
+          final userData = Provider.of<UserData>(context, listen: false);
+          final lastPending = userData.pendingSymptoms.isNotEmpty
+              ? userData.pendingSymptoms.last
+              : '';
+          if (lastPending.isNotEmpty) {
+            userData.removePendingSymptom(lastPending);
+            debugPrint("🔙 Removed pending symptom: $lastPending");
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE8F2F5),
+        body: Stack(
+          children: [
+            Stack(
+              children: [
+                Positioned(
+                  top: screenHeight * 0.03,
+                  left: screenWidth * 0.01,
+                  child: ElevatedButton.icon(
+                    onPressed: previousQuestion,
+                    icon: const Icon(
+                      Icons.arrow_back_sharp,
+                      color: Color.fromRGBO(61, 47, 40, 1),
+                      size: 40.0,
+                    ),
+                    label: const Text(''),
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                    ),
                   ),
-                  label: const Text(''),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
+                ),
+                AnimatedPositioned(
+                  duration: const Duration(seconds: 1),
+                  curve: Curves.easeInOut,
+                  top: _isAnimated ? screenHeight * 0.13 : -100,
+                  left: screenWidth * 0.1,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: screenWidth * 0.15,
+                        height: screenWidth * 0.15,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          'assets/paw.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.05),
+                    ],
                   ),
                 ),
-              ),
-
-              // Animated Paw
-              AnimatedPositioned(
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeInOut,
-                top: _isAnimated ? screenHeight * 0.13 : -100,
-                left: screenWidth * 0.1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: screenWidth * 0.15,
-                      height: screenWidth * 0.15,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
+                Positioned(
+                  top: screenHeight * 0.22,
+                  left: screenWidth * 0.03,
+                  right: screenWidth * 0.02,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "About the $questionSymptom",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
                       ),
-                      child: Image.asset(
-                        'assets/paw.png',
-                        fit: BoxFit.contain,
+                      const SizedBox(height: 10),
+                      Text(
+                        questions.isNotEmpty &&
+                                currentQuestionIndex < questions.length
+                            ? questions[currentQuestionIndex]
+                            : "No questions available",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
                       ),
-                    ),
-                    SizedBox(width: screenWidth * 0.05),
-                  ],
+                      const SizedBox(height: 50),
+                    ],
+                  ),
                 ),
-              ),
-
-              // Question UI
-              Positioned(
-                top: screenHeight * 0.22,
-                left: screenWidth * 0.03,
-                right: screenWidth * 0.02,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "About the $questionSymptom",
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      questions.isNotEmpty && currentQuestionIndex < questions.length
-                          ? questions[currentQuestionIndex]
-                          : "No questions available",
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                  ],
-                ),
-              ),
-
-              // Buttons for answers
-              if (_buttonsVisible)
-                buildImpactButtons(
-                  screenHeight * 0.5,
-                  screenWidth,
-                  context,
-                  impactChoices,
-                ),
-            ],
-          ),
-        ],
+                if (_buttonsVisible)
+                  buildImpactButtons(
+                    screenHeight * 0.5,
+                    screenWidth,
+                    context,
+                    impactChoices,
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -247,7 +225,7 @@ class QoneScreenState extends State<QoneScreen> {
             child: ElevatedButton(
               onPressed: () {
                 print("✅ Selected Impact Choice: $choice");
-                nextQuestion(context, choice); // Save answer and move on
+                nextQuestion(context, choice);
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {

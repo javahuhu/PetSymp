@@ -34,7 +34,7 @@ class PetimageScreenState extends State<PetimageScreen> {
       String? uploadedUrl = await _uploadImageToCloudinary(pickedFile);
       if (uploadedUrl != null) {
         // Update the provider so that NewSummaryScreen can display the image.
-        Provider.of<UserData>(context, listen: false).setProfileImage(uploadedUrl);
+        Provider.of<UserData>(context, listen: false).setPetImage(uploadedUrl);
 
         // Also update Firestore with the new profile image URL.
         final String? userId = FirebaseAuth.instance.currentUser?.uid;

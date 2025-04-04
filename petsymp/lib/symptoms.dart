@@ -43,26 +43,31 @@ class SymptomsScreenState extends State<SymptomsScreen> {
     });
   }
 
- void navigateToNextPage() {
+ void navigateToNextPage() async {
   if (_formKey.currentState?.validate() ?? false) {
     final userData = Provider.of<UserData>(context, listen: false);
     final inputText = _symptomsController.text.trim().toLowerCase();
 
-    // 1) Mark it as a pending symptom (instead of permanently adding to petSymptoms)
+    // 1. Add to pending temporarily
     userData.addPendingSymptom(inputText);
-
-    // 2) Also store it if you want "anotherSymptom," etc.
     userData.setAnotherSymptom(inputText);
 
-    // Then navigate
-    Navigator.push(
+    // 2. Navigate and wait for return
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SearchsymptomsScreen(symptoms: [inputText]),
       ),
     );
+
+    // 3. Remove if not selected
+    if (userData.pendingSymptoms.contains(inputText)) {
+      userData.removePendingSymptom(inputText);
+      debugPrint("🗑️ Removed $inputText since user backed out without selecting");
+    }
   }
 }
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -175,7 +180,6 @@ class SymptomsScreenState extends State<SymptomsScreen> {
   if (value == null || value.isEmpty) {
     return 'Please enter the symptom of the pet';
   }
-  // Single-symptom check as you had:
   if (value.trim().split(RegExp(r'\s+')).length > 1) {
     return 'Please enter only one symptom at a time';
   }
@@ -183,19 +187,19 @@ class SymptomsScreenState extends State<SymptomsScreen> {
   final userData = Provider.of<UserData>(context, listen: false);
   final inputLower = value.trim().toLowerCase();
 
-  // Make sure it exists in your predefinedSymptoms...
   final List<String> predefLower = userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
   if (!predefLower.contains(inputLower)) {
     return 'No such symptom found';
   }
 
-  // **NEW**: If it's in the finalized list, block it:
+  // ✅ This part blocks already-added symptoms:
   if (userData.finalizedSymptoms.contains(inputLower)) {
     return 'This symptom is already finalized';
   }
 
   return null;
-},
+}
+
 
                     ),
                   ),

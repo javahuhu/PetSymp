@@ -37,7 +37,22 @@ class TermsandconditionScreenState extends State<TermsandconditionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       backgroundColor: const Color.fromARGB(255, 219, 230, 233),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 219, 230, 233),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title:  Padding(padding: EdgeInsets.only(left:74.w),child:   Text(
+                "Terms and Condition",
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Oswald',
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+              )),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
 
@@ -47,29 +62,6 @@ class TermsandconditionScreenState extends State<TermsandconditionScreen> {
               
               children: [
 
-  Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                icon:  Icon(
-                  Icons.arrow_back_sharp,
-                  size: 30.sp,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              SizedBox(width:  50.w),
-              Text(
-                "Terms and Condition",
-                style: TextStyle(
-                  fontSize: 25.sp,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Oswald',
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-              ),
-            ],
-          ),
           
 
          Padding(

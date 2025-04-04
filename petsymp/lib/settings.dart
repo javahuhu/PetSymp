@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:petsymp/helpandsupport.dart';
 import 'package:petsymp/historyassesment.dart';
 import 'package:petsymp/termsandcondition.dart';
 import 'homepage.dart';
@@ -19,7 +20,7 @@ class SettingscreenState extends State<Settingscreen> {
     },
     "img2": {
       "image": "assets/support.png",
-      "screen": (BuildContext context) => const HomePageScreen(),
+      "screen": (BuildContext context) => const HelpandsupportScreen(),
     },
     "img3": {
       "image": "assets/condition.png",

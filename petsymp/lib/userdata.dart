@@ -13,7 +13,7 @@ class UserData with ChangeNotifier {
   int _petAge = 0;
   String _breed = '';
   String _anotherSymptom = '';
-  String? _profileImage;
+  String? _petImage;
 
   // Symptom lists
   final List<String> _pendingSymptoms = [];
@@ -21,7 +21,7 @@ class UserData with ChangeNotifier {
   final List<String> _newSymptoms = [];
 
   // Symptom-specific QA
-  final Map<String, String> _symptomDurations = {};
+  final Map<String, Map<String, String>> _symptomDurations = {};
   String _selectedSymptom = "";
   List<Map<String, dynamic>> _diagnosisResults = [];
   List<String> _questions = [];
@@ -35,12 +35,12 @@ class UserData with ChangeNotifier {
   String get size => _petSize;
   int get age => _petAge;
   String get anotherSymptom => _anotherSymptom;
-  String? get profileImage => _profileImage;
+  String? get petImage => _petImage;
 
   List<String> get pendingSymptoms => _pendingSymptoms;
   List<String> get finalizedSymptoms => _finalizedSymptoms;
   List<String> get newSymptoms => _newSymptoms;
-  Map<String, String> get symptomDurations => _symptomDurations;
+  Map<String, Map<String, String>> get symptomDurations => _symptomDurations;
   String get selectedSymptom => _selectedSymptom;
   List<Map<String, dynamic>> get diagnosisResults => _diagnosisResults;
   List<String> get questions => _questions;
@@ -83,8 +83,8 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
-  void setProfileImage(String imageUrl) {
-  _profileImage = imageUrl;
+  void setPetImage(String imageUrl) {
+  _petImage = imageUrl;
   notifyListeners();
 }
 
@@ -107,10 +107,11 @@ class UserData with ChangeNotifier {
   }
 
   void removePendingSymptom(String symptom) {
-    final normalized = symptom.trim().toLowerCase();
-    _pendingSymptoms.remove(normalized);
-    notifyListeners();
-  }
+  final normalized = symptom.trim().toLowerCase();
+  _pendingSymptoms.remove(normalized);
+  _symptomDurations.remove(normalized); // ✅ Deletes associated answers
+  notifyListeners();
+}
 
   void addNewSymptom(String symptom) {
     final normalized = symptom.trim().toLowerCase();
@@ -137,27 +138,41 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
-  // Q&A logic
   void setSelectedSymptom(String symptom) {
-    _selectedSymptom = symptom.trim().toLowerCase();
+  _selectedSymptom = symptom.trim().toLowerCase();
+
+  // Only update if this is a new symptom not yet asked
+  if (!_questionSymptoms.contains(_selectedSymptom)) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateQuestions();
       notifyListeners();
     });
   }
+}
 
   void setSymptomDuration(String symptom, String duration) {
-    _symptomDurations[symptom.trim().toLowerCase()] = duration;
-    notifyListeners();
+  final key = symptom.trim().toLowerCase();
+  if (!_symptomDurations.containsKey(key)) {
+    _symptomDurations[key] = {};
   }
+  _symptomDurations[key]!['duration'] = duration;
+  notifyListeners();
+}
 
-  void addSymptomAnswer(String symptom, String answer) {
-    _symptomDurations[symptom.trim().toLowerCase()] = answer;
-    notifyListeners();
+
+  void addSymptomAnswer(String symptom, String question, String answer) {
+  final key = symptom.trim().toLowerCase();
+  if (!_symptomDurations.containsKey(key)) {
+    _symptomDurations[key] = {};
   }
+  _symptomDurations[key]![question] = answer;
+  notifyListeners();
+}
 
-  Map<String, String> getSymptomDurations() {
-    return _symptomDurations;
+
+
+  Map<String, Map<String, String>> getSymptomDurations() {
+  return _symptomDurations;
   }
 
   void setDiagnosisResults(List<Map<String, dynamic>> results) {
@@ -172,39 +187,52 @@ class UserData with ChangeNotifier {
     return _symptomQuestions.keys.toList();
   }
 
-  void updateQuestions() {
-    final key = _selectedSymptom.toLowerCase();
-    if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
-      _questions = List<String>.from(_symptomQuestions[key]["questions"]);
-      _questionSymptoms = List.filled(_questions.length, _selectedSymptom);
+void updateQuestions() {
+  final key = _selectedSymptom.toLowerCase();
 
-      List<String> impactDaysChoices = [];
-      List<String> impactSymptomChoices = [];
+  if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
+    final newQuestions = List<String>.from(_symptomQuestions[key]["questions"]);
 
-      if (_symptomQuestions[key].containsKey("impactDays")) {
-        var impactDaysValue = _symptomQuestions[key]["impactDays"];
-        if (impactDaysValue is List) {
-          impactDaysChoices = List<String>.from(impactDaysValue);
-        } else if (impactDaysValue is Map<String, dynamic>) {
-          impactDaysChoices = List<String>.from(impactDaysValue.keys);
-        }
-      }
-      if (_symptomQuestions[key].containsKey("impactSymptom")) {
-        var impactSymptomValue = _symptomQuestions[key]["impactSymptom"];
-        if (impactSymptomValue is List) {
-          impactSymptomChoices = List<String>.from(impactSymptomValue);
-        } else if (impactSymptomValue is Map<String, dynamic>) {
-          impactSymptomChoices = List<String>.from(impactSymptomValue.keys);
-        }
-      }
+    // Clear previous question data to avoid duplication
+    _questions.clear();
+    _impactChoices.clear();
+    _questionSymptoms.clear();
 
-      _impactChoices = [impactDaysChoices, impactSymptomChoices];
-    } else {
-      _questions = [];
-      _impactChoices = [[], []];
-      _questionSymptoms = [];
+    _questions.addAll(newQuestions);
+    _questionSymptoms.addAll(List.filled(newQuestions.length, key));
+
+    List<String> impactDaysChoices = [];
+    List<String> impactSymptomChoices = [];
+
+    if (_symptomQuestions[key].containsKey("impactDays")) {
+      var impactDaysValue = _symptomQuestions[key]["impactDays"];
+      impactDaysChoices = impactDaysValue is List
+          ? List<String>.from(impactDaysValue)
+          : List<String>.from((impactDaysValue as Map).keys);
     }
+
+    if (_symptomQuestions[key].containsKey("impactSymptom")) {
+      var impactSymptomValue = _symptomQuestions[key]["impactSymptom"];
+      impactSymptomChoices = impactSymptomValue is List
+          ? List<String>.from(impactSymptomValue)
+          : List<String>.from((impactSymptomValue as Map).keys);
+    }
+
+    // Match each question to the appropriate choice list
+    for (int i = 0; i < newQuestions.length; i++) {
+      if (i == 0) {
+        _impactChoices.add(impactDaysChoices);
+      } else {
+        _impactChoices.add(impactSymptomChoices);
+      }
+    }
+
+    notifyListeners();
   }
+}
+
+
+
 
   // Updated fetchDiagnosis using AppConfig from dynamicconnections.dart
   Future<void> fetchDiagnosis() async {
@@ -255,7 +283,7 @@ void clearData() {
   _petAge = 0;
   _breed = '';
   _anotherSymptom = '';
-  _profileImage = null;
+  _petImage = null;
   
   _pendingSymptoms.clear();
   _finalizedSymptoms.clear();
