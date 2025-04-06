@@ -467,7 +467,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 40.h,
+                          height: 30.h,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -1125,7 +1125,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
           ],
         ),
       ),
-    ));
+    floatingActionButton: FloatingActionButton(
+    onPressed: () {
+      // Add your onPressed code here!
+      print("Small Floating Action Button pressed!");
+    },
+    child: const Icon(Icons.menu_book_sharp),
+  ),
+  floatingActionButtonLocation: CustomFABLocation(topOffset: 600.0.h, rightOffset: 16.0.w),
+    )
+    );
   }
 
   Future<void> _launchURL(String urlString) async {
@@ -1183,4 +1192,19 @@ class ListItem {
     required this.isExternal,
     required this.imageUrl,
   });
+}
+
+class CustomFABLocation extends FloatingActionButtonLocation {
+  final double topOffset;
+  final double rightOffset;
+
+  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final fabSize = scaffoldGeometry.floatingActionButtonSize;
+    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
+    final double y = topOffset;
+    return Offset(x, y);
+  }
 }

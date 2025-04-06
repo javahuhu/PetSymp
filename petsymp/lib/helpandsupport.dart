@@ -14,7 +14,7 @@ class HelpandsupportScreenState extends State<HelpandsupportScreen> {
     return PopScope(
       canPop: true, 
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: const Color.fromARGB(255, 219, 230, 233),
          appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 219, 230, 233),
         elevation: 0,
@@ -198,34 +198,34 @@ class HelpandsupportScreenState extends State<HelpandsupportScreen> {
   }
   
   // Method to build expandable cards
-  Widget _buildExpandableCard({
-    required String title,
-    required IconData icon,
-    required Widget content,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
+ Widget _buildExpandableCard({
+  required String title,
+  required IconData icon,
+  required Widget content,
+}) {
+  return Container(
+    margin: EdgeInsets.only(bottom: 10.h),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      // Remove boxShadow property completely
+    ),
+    child: Material(
+      color: Colors.transparent, // Make material transparent
+      elevation: 0, // Ensure no elevation shadow
+      borderRadius: BorderRadius.circular(20),
       child: Theme(
         data: Theme.of(context).copyWith(
           dividerColor: Colors.transparent,
-          shadowColor: Colors.transparent, // Remove shadow effect
+          shadowColor: Colors.transparent,
+          splashColor: Colors.transparent, // Disable splash effect
+          highlightColor: Colors.transparent, // Disable highlight effect
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: ExpansionTile(
             backgroundColor: Colors.white,
-            collapsedBackgroundColor: Colors.white, // Keep consistent background when collapsed
+            collapsedBackgroundColor: Colors.white,
             leading: Icon(
               icon,
               color: const Color(0xFF52AAA4),
@@ -242,13 +242,15 @@ class HelpandsupportScreenState extends State<HelpandsupportScreen> {
             initiallyExpanded: false,
             childrenPadding: EdgeInsets.all(15.w),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
-            tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h), // More consistent padding
-            maintainState: true, // Maintain widget state when collapsed
+            tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+            maintainState: true,
             children: [
               content,
             ],
           ),
+        ),
       ),
-    ));
-  }
+    ),
+  );
+}
 }

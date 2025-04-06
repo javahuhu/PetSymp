@@ -132,7 +132,12 @@ flutter:
       - assets/youtube1.jpg
       - assets/takingpicture.png
       - assets/sampleimage.jpg
+      - assets/noprofile.jpg
       - assets/wavy.json
+      - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
+      - assets/imgsymptomcatalog/abdominalpain.jpg
+      - assets/imgsymptomcatalog/abdominalenlargment.jpg
+
 
   fonts:
     - family: BigShouldersDisplay

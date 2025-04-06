@@ -79,8 +79,8 @@ class GetstartedScreenState extends State<GetstartedScreen> {
                       children: [
                         // Outer Large Circle
                         Container(
-                          width: 325.w,
-                          height: 320.h,
+                          width: 315.w,
+                          height: 315.h,
                           decoration: const BoxDecoration(shape: BoxShape.circle),
                           child: ClipOval(
                             child: Image.asset(

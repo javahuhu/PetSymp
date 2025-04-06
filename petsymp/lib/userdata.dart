@@ -140,15 +140,12 @@ class UserData with ChangeNotifier {
 
   void setSelectedSymptom(String symptom) {
   _selectedSymptom = symptom.trim().toLowerCase();
-
-  // Only update if this is a new symptom not yet asked
-  if (!_questionSymptoms.contains(_selectedSymptom)) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateQuestions();
-      notifyListeners();
-    });
-  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    updateQuestions();
+    notifyListeners();
+  });
 }
+
 
   void setSymptomDuration(String symptom, String duration) {
   final key = symptom.trim().toLowerCase();

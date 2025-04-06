@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:petsymp/searchsymptoms.dart';
 import 'package:provider/provider.dart';
+import 'package:petsymp/symptomscatalog.dart';
 import 'userdata.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 /// Custom TextInputFormatter to capitalize only the first letter.
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -177,28 +178,31 @@ class SymptomsScreenState extends State<SymptomsScreen> {
                         ),
                       ),
                       validator: (value) {
-  if (value == null || value.isEmpty) {
-    return 'Please enter the symptom of the pet';
-  }
-  if (value.trim().split(RegExp(r'\s+')).length > 1) {
-    return 'Please enter only one symptom at a time';
-  }
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the symptom of the pet';
+                        }
+                        // Only check for commas or plus signs
+                        if (value.contains(',') || value.contains('+')) {
+                          return 'Please enter only one symptom at a time';
+                        }
 
-  final userData = Provider.of<UserData>(context, listen: false);
-  final inputLower = value.trim().toLowerCase();
+                        final userData = Provider.of<UserData>(context, listen: false);
+                        final inputLower = value.trim().toLowerCase();
 
-  final List<String> predefLower = userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
-  if (!predefLower.contains(inputLower)) {
-    return 'No such symptom found';
-  }
+                        // Check if it's in the list of predefined symptoms
+                        final List<String> predefinedLower =
+                            userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
+                        if (!predefinedLower.contains(inputLower)) {
+                          return 'No such symptom found';
+                        }
 
-  // ✅ This part blocks already-added symptoms:
-  if (userData.finalizedSymptoms.contains(inputLower)) {
-    return 'This symptom is already finalized';
-  }
+                        // Prevent duplicates (already inputted but not finalized)
+                        if (userData.finalizedSymptoms.contains(inputLower)) {
+                          return 'This symptom is already finalized';
+                        }
 
-  return null;
-}
+                        return null;
+                      },
 
 
                     ),
@@ -254,6 +258,40 @@ class SymptomsScreenState extends State<SymptomsScreen> {
           ),
         ],
       ),
+
+    floatingActionButton: FloatingActionButton(
+
+    onPressed: () {
+       Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SymptomscatalogScreen(),
+                  ));
+    },
+    backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0), // Changes the button color to red.
+    foregroundColor: const Color(0xFFE8F2F5),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(100.r), // Circular shape
+    ),
+    child: const Icon(Icons.menu_book_sharp),
+  ),
+  floatingActionButtonLocation: CustomFABLocation(topOffset: 650.0.h, rightOffset: 16.0.w),
     );
   }
 }
+
+class CustomFABLocation extends FloatingActionButtonLocation {
+  final double topOffset;
+  final double rightOffset;
+
+  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final fabSize = scaffoldGeometry.floatingActionButtonSize;
+    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
+    final double y = topOffset;
+    return Offset(x, y);
+  }
+}
+

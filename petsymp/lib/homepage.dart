@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/settings.dart';
-import 'assesment.dart';
+import 'package:petsymp/symptomscatalog.dart';
 import 'profile.dart';
 import 'petimage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -123,6 +123,9 @@ class HomePageScreenState extends State<HomePageScreen> {
                       ),
                     ),
                   ),
+
+
+                  
                 ],
               ),
             ),
@@ -172,6 +175,39 @@ class HomePageScreenState extends State<HomePageScreen> {
         onTap: _onItemTapped,
         backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       ),
+
+    floatingActionButton: FloatingActionButton(
+
+    onPressed: () {
+       Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SymptomscatalogScreen(),
+                  ));
+    },
+    backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0), // Changes the button color to red.
+    foregroundColor: const Color(0xFFE8F2F5),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(100.r), // Circular shape
+    ),
+    child: const Icon(Icons.menu_book_sharp),
+  ),
+  floatingActionButtonLocation: CustomFABLocation(topOffset: 650.0.h, rightOffset: 16.0.w),
     );
+  }
+}
+
+class CustomFABLocation extends FloatingActionButtonLocation {
+  final double topOffset;
+  final double rightOffset;
+
+  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final fabSize = scaffoldGeometry.floatingActionButtonSize;
+    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
+    final double y = topOffset;
+    return Offset(x, y);
   }
 }

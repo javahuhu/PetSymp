@@ -34,7 +34,7 @@ class Profilescreen extends StatefulWidget {
 class ProfilescreenState extends State<Profilescreen> {
   String nickname = "Loading...";
   String email = "Loading...";
-  String profileImageUrl = "assets/profile.jpg";
+  String profileImageUrl = "assets/noprofile.jpg";
   bool isAssetImage = true;
   
   // Controllers for editing
@@ -42,7 +42,7 @@ class ProfilescreenState extends State<Profilescreen> {
   final TextEditingController _emailController = TextEditingController();
   
   // Additional controllers for the other fields
-  final TextEditingController _PetName = TextEditingController(text: "Pet Name");
+  final TextEditingController _petName = TextEditingController();
   final TextEditingController _titleController2 = TextEditingController(text: "Support");
   final TextEditingController _titleController3 = TextEditingController(text: "Terms & Conditions");
   
@@ -62,66 +62,69 @@ class ProfilescreenState extends State<Profilescreen> {
   void dispose() {
     _nicknameController.dispose();
     _emailController.dispose();
-    _PetName.dispose();
+    _petName.dispose();
     _titleController2.dispose();
     _titleController3.dispose();
     super.dispose();
   }
 
   Future<void> fetchUserData() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
-        String userId = user.uid;
+    if (user != null) {
+      String userId = user.uid;
 
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(userId)
-            .get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
 
-        if (userDoc.exists) {
-          setState(() {
-            nickname = userDoc.get('Username') ?? "No Username";
-            email = userDoc.get('Email') ?? "No Email";
-            
-            // Check if profile image URL exists from Cloudinary
-            if (userDoc.data() != null && 
-                (userDoc.data() as Map<String, dynamic>).containsKey('ProfileImageUrl')) {
-              // Get the Cloudinary URL from Firestore
-              profileImageUrl = userDoc.get('ProfileImageUrl');
-              isAssetImage = false;
-              print("Loaded profile image from Cloudinary: $profileImageUrl");
-            } else {
-              // Use default image if no Cloudinary URL exists
-              profileImageUrl = "assets/profile.jpg";
-              isAssetImage = true;
-            }
-            
-            // Set the controllers with current values
-            _nicknameController.text = nickname;
-            _emailController.text = email;
-          });
-        } else {
-          setState(() {
-            nickname = "User Not Found";
-            email = "Email Not Found";
-          });
-        }
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data() as Map<String, dynamic>;
+
+        setState(() {
+          nickname = data['Username'] ?? "No Username";
+          email = data['Email'] ?? "No Email";
+          _petName.text = data['Pet Name'] ?? "No Pet";
+
+          // Check if profile image URL exists from Cloudinary
+          if (data.containsKey('ProfileImageUrl') &&
+              (data['ProfileImageUrl'] as String).isNotEmpty) {
+            profileImageUrl = data['ProfileImageUrl'];
+            isAssetImage = false;
+            print("Loaded profile image from Cloudinary: $profileImageUrl");
+          } else {
+            // Use default image if no Cloudinary URL exists
+            profileImageUrl = "assets/noprofile.jpg";
+            isAssetImage = true;
+          }
+
+          // Set the controllers with current values
+          _nicknameController.text = nickname;
+          _emailController.text = email;
+        });
       } else {
         setState(() {
-          nickname = "Not Logged In";
-          email = "Not Logged In";
+          nickname = "User Not Found";
+          email = "Email Not Found";
         });
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.toString()}")),
-        );
-      }
+    } else {
+      setState(() {
+        nickname = "Not Logged In";
+        email = "Not Logged In";
+      });
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
     }
   }
+}
+
   
   Future<void> _pickAndUploadImage() async {
     setState(() {
@@ -196,7 +199,7 @@ class ProfilescreenState extends State<Profilescreen> {
             .doc(user.uid)
             .update({
             'ProfileImageUrl': cloudinaryUrl,
-            'Pet Name': _PetName.text.trim(),
+            'Pet Name': _petName.text.trim(),
         });
         
         setState(() {
@@ -399,6 +402,7 @@ class ProfilescreenState extends State<Profilescreen> {
             .update({
           'Username': formattedUsername,
           'Email': _emailController.text,
+          'Pet Name': _petName.text.trim(),
         });
         
         // Update Firebase Auth email if changed
@@ -716,7 +720,7 @@ class ProfilescreenState extends State<Profilescreen> {
                   children: [
                     _buildProfileField("img1", "Username", _nicknameController, editable: true),
                     _buildProfileField("img2", "Email", _emailController, editable: true),
-                    _buildProfileField("img3", "Pet Name", _PetName, editable: true),
+                    _buildProfileField("img3", "Pet Name", _petName, editable: true),
                     _buildProfileField("img4", "Support", _titleController2, editable: false),
                     _buildProfileField("img5", "Terms & Conditions", _titleController3, editable: false),
                   ],
@@ -882,7 +886,8 @@ class ProfilescreenState extends State<Profilescreen> {
                         )
                       : Text(
                           label == "Username" ? nickname :
-                          label == "Email" ? email : label,
+                          label == "Email" ? email : 
+                          label == "Pet Name" ? _petName.text : label,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16.sp,
