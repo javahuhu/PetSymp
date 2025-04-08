@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/Prevmedication.dart';
+import 'package:petsymp/symptoms.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 
@@ -57,7 +57,7 @@ class BreedScreenState extends State<BreedScreen> {
       // Navigate only if the input is valid
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const PrevmedScreen()),
+        MaterialPageRoute(builder: (context) => const SymptomsScreen()),
       );
     }
   }

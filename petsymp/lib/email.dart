@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/Prevmedication.dart';
 import 'package:petsymp/recovery.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
@@ -39,6 +38,9 @@ class EmailScreenState extends State<EmailScreen> {
       );
     }
   }
+
+
+  
 
   
 
@@ -224,6 +226,26 @@ class EmailScreenState extends State<EmailScreen> {
         ],
       ),
       
+    );
+  }
+}
+
+
+class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue, 
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
+
+    final firstLetter = newValue.text[0].toUpperCase();
+    final remainingText = newValue.text.substring(1);
+    final newText = firstLetter + remainingText;
+
+    return newValue.copyWith(
+      text: newText,
+      selection: newValue.selection,
     );
   }
 }

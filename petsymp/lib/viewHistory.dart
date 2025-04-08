@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/Illnessdetails.dart';
@@ -6,12 +7,12 @@ import 'package:petsymp/profile.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'barchart/barchart.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'barchart/barfirebasegraph.dart';
+
 
 class ViewhistoryScreen extends StatefulWidget {
-  const ViewhistoryScreen({super.key});
+  final Map<String, dynamic> historyData; // Data passed from the history card
+  const ViewhistoryScreen({Key? key, required this.historyData}) : super(key: key);
 
   @override
   ViewhistoryScreenState createState() => ViewhistoryScreenState();
@@ -28,7 +29,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     ),
     const ListItem(
       title: 'How to Easily Give Your Pet Medicine Without Stress!',
-      subtitle: "Learn simple techniques to give your pet medicine, ensuring their health and comfort",
+      subtitle:
+          "Learn simple techniques to give your pet medicine, ensuring their health and comfort",
       route: Profilescreen(),
       isExternal: false,
       imageUrl: 'assets/youtube1.jpg',
@@ -42,14 +44,16 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     ),
     const ListItem(
       title: 'How to Hide Medicine in Treats for Your Pet!',
-      subtitle: 'Learn safe ways to hide pills in treats so your pet takes medicine without noticing',
+      subtitle:
+          'Learn safe ways to hide pills in treats so your pet takes medicine without noticing',
       route: HomePageScreen(),
       isExternal: false,
       imageUrl: 'assets/youtube1.jpg',
     ),
     const ListItem(
       title: 'The Right Way to Give Your Pet Liquid Medicine!',
-      subtitle: "Master techniques to give your pet liquid medicine without mess",
+      subtitle:
+          "Master techniques to give your pet liquid medicine without mess",
       route: Profilescreen(),
       isExternal: false,
       imageUrl: 'assets/youtube1.jpg',
@@ -58,456 +62,384 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Wrap entire UI in a StreamBuilder to fetch the saved history data.
-    final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('Users')
-          .doc(userId)
-          .collection('History')
-          .orderBy('date', descending: true)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Scaffold(
-            backgroundColor: const Color(0xFFF5F7FA),
-            body: Center(child: CircularProgressIndicator()),
-          );
+    // Use the passed historyData instead of reloading via StreamBuilder.
+    final Map<String, dynamic> historyData = widget.historyData;
+    final String petName = historyData['petName'] ?? "Unknown";
+    final List<Map<String, String>> petDetails =
+        (historyData['petDetails'] as List<dynamic>?)
+                ?.map((e) => Map<String, String>.from(e as Map))
+                .toList() ??
+            [
+              {"icon": "🎂", "label": "Pet", "value": "Unknown"},
+              {"icon": "🎂", "label": "Age", "value": "0"},
+              {"icon": "📏", "label": "Size", "value": "0"},
+              {"icon": "🐶", "label": "Breed", "value": "Unknown"},
+              {"icon": "☣️", "label": "Symptoms", "value": ""},
+            ];
+    final List<Map<String, dynamic>> diagnoses =
+        List<Map<String, dynamic>>.from(historyData['diagnosisResults'] ?? []);
+    List<Map<String, dynamic>> topDiagnoses = [];
+    if (diagnoses.isNotEmpty) {
+      topDiagnoses = diagnoses.length >= 3
+          ? diagnoses.sublist(0, 3)
+          : List<Map<String, dynamic>>.from(diagnoses);
+    }
+    final String allSymptoms = historyData['allSymptoms'] ?? "";
+    // Properly cast saved symptom details
+    final rawDetails = historyData['symptomDetails'] ?? {};
+    final Map<String, List<Map<String, dynamic>>> savedSymptomDetails = {};
+    if (rawDetails is Map) {
+      rawDetails.forEach((key, value) {
+        if (value is List) {
+          savedSymptomDetails[key] =
+              value.map((e) => Map<String, dynamic>.from(e)).toList();
         }
-        final historyDocs = snapshot.data!.docs;
-        if (historyDocs.isEmpty) {
-          return Scaffold(
-            backgroundColor: const Color(0xFFF5F7FA),
-            body: Center(child: Text("No history available")),
-          );
-        }
-        // Use the most recent saved history record.
-        final Map<String, dynamic> historyData =
-            historyDocs.first.data() as Map<String, dynamic>;
-        // Extract saved values.
-        final String petName = historyData['petName'] ?? "Unknown";
-        // Expecting petDetails to be stored as a List of maps.
-        final List<Map<String, String>> petDetails =
-            (historyData['petDetails'] as List<dynamic>?)
-                    ?.map((e) => Map<String, String>.from(e as Map))
-                    .toList() ??
-                [
-                  {"icon": "🎂", "label": "Age", "value": "0"},
-                  {"icon": "📏", "label": "Size", "value": "0"},
-                  {"icon": "🐶", "label": "Breed", "value": "Unknown"},
-                  {"icon": "☣️", "label": "Symptoms", "value": ""},
-                ];
-        final List<Map<String, dynamic>> diagnoses =
-            List<Map<String, dynamic>>.from(historyData['diagnosisResults'] ?? []);
-        List<Map<String, dynamic>> topDiagnoses = [];
-        if (diagnoses.isNotEmpty) {
-          topDiagnoses = diagnoses.length >= 3
-              ? diagnoses.sublist(0, 3)
-      : List<Map<String, dynamic>>.from(diagnoses);
-}
-        final String allSymptoms = historyData['allSymptoms'] ?? "";
-        // For the pet profile card overlay, we now use petName instead of userData.userName.
-        return PopScope(
-          canPop: true,
-          child: Scaffold(
-            backgroundColor: const Color(0xFFF5F7FA), // Lighter background for contrast
-            body: SingleChildScrollView(
-              child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 15.w, vertical: 25.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Date display (using saved date)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 10.h, horizontal: 15.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEBF2F7),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            historyData['date'] != null
-                                ? (historyData['date'] as Timestamp)
-                                    .toDate()
-                                    .toString()
-                                : "No Date",
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF3D4A5C),
-                            ),
-                          ),
-                          const Icon(
-                            Icons.calendar_today_rounded,
-                            color: Color(0xFF52AAA4),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    // Pet profile card with image and details
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Pet image section remains unchanged.
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(20)),
-                            child: Container(
-                              height: 200.h,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    const Color.fromARGB(255, 82, 107, 106)
-                                        .withOpacity(0.7),
-                                    const Color(0xFF52AAA4),
-                                  ],
-                                ),
-                              ),
-                              child: Stack(
-                                children: [
-                                  Center(
-                                    child: Container(
-                                      width: 150.w,
-                                      height: 150.w,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 4,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black
-                                                .withOpacity(0.2),
-                                            blurRadius: 10,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipOval(
-                                          child: (historyData['petImage'] != null &&
-                                                  (historyData['petImage'] as String).isNotEmpty)
-                                              ? ((historyData['petImage'] as String).startsWith("http")
-                                                  ? Image.network(
-                                                      historyData['petImage'],
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                  : Image.asset(
-                                                      historyData['petImage'],
-                                                      fit: BoxFit.cover,
-                                                    ))
-                                              : Image.asset(
-                                                  "assets/sampleimage.jpg",
-                                                  fit: BoxFit.cover,
-                                                ),
-                                        ),
+      });
+    }
 
-                                    ),
-                                  ),
-                                  // Pet name overlay now shows the saved petName.
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10.h),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                          colors: [
-                                            Colors.black.withOpacity(0.5),
-                                            Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          petName,
-                                          style: TextStyle(
-                                            fontSize: 22.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // Pet details grid using saved petDetails and allSymptoms.
-                          Padding(
-                            padding: EdgeInsets.all(15.w),
-                            child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Pet Details",
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF3D4A5C),
-                                  ),
-                                ),
-                                SizedBox(height: 15.h),
-                                GridView.count(
-                                  shrinkWrap: true,
-                                  physics:
-                                      const NeverScrollableScrollPhysics(),
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 2.5,
-                                  crossAxisSpacing: 10.w,
-                                  mainAxisSpacing: 10.h,
-                                  children: petDetails.map((detail) {
-                                    return Container(
-                                      padding: EdgeInsets.all(5.w),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFEBF2F7),
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            detail["label"]!,
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight:
-                                                  FontWeight.w500,
-                                              color: const Color(
-                                                  0xFF52AAA4),
-                                            ),
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          Text(
-                                            detail["value"]!,
-                                            style: TextStyle(
-                                              fontSize: 15.sp,
-                                              fontWeight:
-                                                  FontWeight.bold,
-                                              color: const Color(
-                                                  0xFF3D4A5C),
-                                            ),
-                                            maxLines: 1,
-                                            overflow:
-                                                TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+    // Build the UI exactly as before, using the passed data
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 25.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Date display
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEBF2F7),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        historyData['date'] != null
+                            ? (historyData['date'] as Timestamp)
+                                .toDate()
+                                .toString()
+                            : "No Date",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF3D4A5C),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 25.h),
-                    // Diagnosis results section using saved diagnoses.
-                    if (topDiagnoses.isNotEmpty)
-                      _buildDiagnosisSection(topDiagnoses),
-                    SizedBox(height: 25.h),
-                    // Statistics expandable card (same as before)
-                    _buildExpandableCard(
-                      title: "Statistics & Analysis",
-                      icon: Icons.bar_chart_rounded,
-                      content: Column(
-                        children: [
-                          Container(
-                            height: 300.h,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 5.w, vertical: 15.h),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(
-                                  255, 245, 245, 245),
-                              borderRadius:
-                                  BorderRadius.circular(15),
-                              border: Border.all(
-                                color:
-                                    const Color(0xFFEBF2F7),
-                                width: 1,
-                              ),
-                            ),
-                            child: SingleChildScrollView(
-                              scrollDirection:
-                                  Axis.horizontal,
-                              child: Consumer<UserData>(
-                                builder: (_, userData, __) {
-                                  final diagnoses =
-                                      List<Map<String, dynamic>>.from(
-                                          historyData['diagnosisResults']
-                                              as List? ?? []);
-                                  diagnoses.sort((a, b) => (b['confidence_ab'] as num)
-                                      .compareTo((a['confidence_ab'] as num)));
-                                  final top10 = diagnoses.take(10).toList();
-                                  while (top10.length < 10) {
-                                    top10.add({
-                                      'illness': '',
-                                      'confidence_fc': 0.0,
-                                      'confidence_gb': 0.0,
-                                      'confidence_ab': 0.0,
-                                      'subtype_coverage': 0.0
-                                    });
-                                  }
-
-                                  final labels = top10
-                                      .map((d) => d['illness'] as String)
-                                      .toList();
-                                  final fc = top10
-                                      .map((d) =>
-                                          (d['confidence_fc'] as num)
-                                              .toDouble())
-                                      .toList();
-                                  final gb = top10
-                                      .map((d) =>
-                                          (d['confidence_gb'] as num)
-                                              .toDouble())
-                                      .toList();
-                                  final ab = top10
-                                      .map((d) =>
-                                          (d['confidence_ab'] as num)
-                                              .toDouble())
-                                      .toList();
-
-                                  final double groupWidth = 20.w;
-                                  final double gapWidth = 90.w;
-                                  final double totalRequiredWidth =
-                                      (groupWidth * labels.length) +
-                                          (gapWidth *
-                                              (labels.length - 1));
-                                  final double screenWidth =
-                                      MediaQuery.of(context).size.width - 20.w;
-                                  final double chartWidth =
-                                      totalRequiredWidth < screenWidth
-                                          ? screenWidth
-                                          : totalRequiredWidth;
-
-                                  return SizedBox(
-                                    width: chartWidth,
-                                    child: BarChartSample2(
-                                      illnessLabels: labels,
-                                      fcScores: fc,
-                                      gbScores: gb,
-                                      abScores: ab,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          Container(
-                            padding: EdgeInsets.all(12.w),
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(
-                                  255, 245, 245, 245),
-                              borderRadius:
-                                  BorderRadius.circular(15),
-                              border: Border.all(
-                                color:
-                                    const Color(0xFFEBF2F7),
-                                width: 1,
-                              ),
-                            ),
-                            child: Wrap(
-                              spacing: 20.w,
-                              runSpacing: 10.h,
-                              children: [
-                                _legendDot(const Color(0xFF4285F4),
-                                    "Confidence Score"),
-                                _legendDot(const Color(0xFF34A853),
-                                    "Weighted Symptoms"),
-                                _legendDot(const Color(0xFFFFA726),
-                                    "ML Score Adjustment"),
-                                _legendDot(const Color(0xFF7B1FA2),
-                                    "Subtype Coverage"),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          if (topDiagnoses.length >= 2)
-                            Container(
-                              padding: EdgeInsets.all(15.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.circular(15),
-                                border: Border.all(
-                                  color:
-                                      const Color(0xFFEBF2F7),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Top Diagnoses Comparison",
-                                    style: TextStyle(
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF3D4A5C),
-                                    ),
-                                  ),
-                                  SizedBox(height: 15.h),
-                                  _buildComparisonTable(topDiagnoses),
-                                ],
-                              ),
-                            ),
-                        ],
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Color(0xFF52AAA4),
                       ),
-                    ),
-                    SizedBox(height: 25.h),
-                    _buildExpandableCard(
-                      title: "Recommended Resources",
-                      icon: Icons.lightbulb_outline,
-                      content: Column(
-                        children: recommendations
-                            .map((item) => _buildRecommendationItem(item))
-                            .toList(),
-                      ),
-                    ),
-                    SizedBox(height: 30.h),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                SizedBox(height: 20.h),
+                // Pet Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        child: Container(
+                          height: 200.h,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                const Color.fromARGB(255, 82, 107, 106).withOpacity(0.7),
+                                const Color(0xFF52AAA4),
+                              ],
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 150.w,
+                                  height: 150.w,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 4,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: (historyData['petImage'] != null &&
+                                            (historyData['petImage'] as String).isNotEmpty)
+                                        ? ((historyData['petImage'] as String)
+                                                .startsWith("http")
+                                            ? Image.network(
+                                                historyData['petImage'],
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.asset(
+                                                historyData['petImage'],
+                                                fit: BoxFit.cover,
+                                              ))
+                                        : Image.asset(
+                                            "assets/sampleimage.jpg",
+                                            fit: BoxFit.cover,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(0.5),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      petName,
+                                      style: TextStyle(
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(15.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Pet Details",
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF3D4A5C),
+                              ),
+                            ),
+                            SizedBox(height: 15.h),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              childAspectRatio: 2.5,
+                              crossAxisSpacing: 10.w,
+                              mainAxisSpacing: 10.h,
+                              children: petDetails.map((detail) {
+                                return Container(
+                                  padding: EdgeInsets.all(5.w),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEBF2F7),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        detail["label"]!,
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xFF52AAA4),
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        detail["value"]!,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF3D4A5C),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 25.h),
+                if (topDiagnoses.isNotEmpty)
+                  _buildDiagnosisSection(topDiagnoses),
+                SizedBox(height: 25.h),
+                _buildExpandableCard(
+                  title: "Statistics & Analysis",
+                  icon: Icons.bar_chart_rounded,
+                  content: Column(
+                    children: [
+                      Container(
+                        height: 300.h,
+                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 15.h),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 245, 245, 245),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFFEBF2F7),
+                            width: 1,
+                          ),
+                        ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Consumer<UserData>(
+                            builder: (_, userData, __) {
+                              final diagnoses = List<Map<String, dynamic>>.from(
+                                  historyData['diagnosisResults'] as List? ?? []);
+                              diagnoses.sort((a, b) => (b['confidence_ab'] as num)
+                                  .compareTo((a['confidence_ab'] as num)));
+                              final top10 = diagnoses.take(10).toList();
+                              while (top10.length < 10) {
+                                top10.add({
+                                  'illness': '',
+                                  'confidence_fc': 0.0,
+                                  'confidence_gb': 0.0,
+                                  'confidence_ab': 0.0,
+                                  'subtype_coverage': 0.0
+                                });
+                              }
+                              final labels = top10.map((d) => d['illness'] as String).toList();
+                              final fc = top10.map((d) => (d['confidence_fc'] as num).toDouble()).toList();
+                              final gb = top10.map((d) => (d['confidence_gb'] as num).toDouble()).toList();
+                              final ab = top10.map((d) => (d['confidence_ab'] as num).toDouble()).toList();
+                              final double groupWidth = 20.w;
+                              final double gapWidth = 90.w;
+                              final double totalRequiredWidth =
+                                  (groupWidth * labels.length) +
+                                      (gapWidth * (labels.length - 1));
+                              final double screenWidth =
+                                  MediaQuery.of(context).size.width - 20.w;
+                              final double chartWidth = totalRequiredWidth < screenWidth
+                                  ? screenWidth
+                                  : totalRequiredWidth;
+                              return SizedBox(
+                                width: chartWidth,
+                                child: BarChartRetrieve(
+                                  illnessLabels: labels,
+                                  fcScores: fc,
+                                  gbScores: gb,
+                                  abScores: ab,
+                                  symptomDetails: savedSymptomDetails,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 245, 245, 245),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFFEBF2F7),
+                            width: 1,
+                          ),
+                        ),
+                        child: Wrap(
+                          spacing: 20.w,
+                          runSpacing: 10.h,
+                          children: [
+                            _legendDot(const Color(0xFF4285F4), "Confidence Score"),
+                            _legendDot(const Color(0xFF34A853), "Weighted Symptoms"),
+                            _legendDot(const Color(0xFFFFA726), "ML Score Adjustment"),
+                            _legendDot(const Color(0xFF7B1FA2), "Subtype Coverage"),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      if (topDiagnoses.length >= 2)
+                        Container(
+                          padding: EdgeInsets.all(15.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: const Color(0xFFEBF2F7),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Top Diagnoses Comparison",
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF3D4A5C),
+                                ),
+                              ),
+                              SizedBox(height: 15.h),
+                              _buildComparisonTable(topDiagnoses),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 25.h),
+                _buildExpandableCard(
+                  title: "Recommended Resources",
+                  icon: Icons.lightbulb_outline,
+                  content: Column(
+                    children: recommendations
+                        .map((item) => _buildRecommendationItem(item))
+                        .toList(),
+                  ),
+                ),
+                SizedBox(height: 30.h),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  // --- (Keep your diagnosis section, expandable card, recommendation, comparison table, legend dot, and _launchURL methods as before) ---
   Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
     return Container(
       padding: EdgeInsets.all(15.w),
@@ -608,8 +540,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         height: 60.w,
                         child: CircularProgressIndicator(
                           value: confidence,
-                          backgroundColor:
-                              Colors.grey.withOpacity(0.2),
+                          backgroundColor: Colors.grey.withOpacity(0.2),
                           color: isPrimary
                               ? const Color(0xFF52AAA4)
                               : const Color(0xFFFFA726),
@@ -633,8 +564,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
               SizedBox(width: 15.w),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       diagnosis['illness'] ?? "Unknown",
@@ -647,8 +577,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                     if (isPrimary)
                       Container(
                         margin: EdgeInsets.only(top: 5.h),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 3.h),
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF52AAA4),
                           borderRadius: BorderRadius.circular(10),
@@ -677,8 +606,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
           ),
           SizedBox(height: 15.h),
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton.icon(
                 onPressed: () {
@@ -705,11 +633,9 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                 ),
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 12.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
@@ -738,8 +664,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
         ],
       ),
       child: Theme(
-        data: Theme.of(context)
-            .copyWith(dividerColor: Colors.transparent),
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           backgroundColor: const Color.fromARGB(0, 0, 0, 0),
           leading: Icon(
@@ -802,8 +727,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                 SizedBox(width: 15.w),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item.title,
@@ -845,20 +769,14 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
   Widget _buildComparisonTable(List<Map<String, dynamic>> topDiagnoses) {
     final ill1 = topDiagnoses[0];
     final ill2 = topDiagnoses[1];
-    final double confAb1 =
-        (ill1['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-    final double confAb2 =
-        (ill2['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-    final double confFc1 =
-        (ill1['confidence_fc'] as num?)?.toDouble() ?? 0.0;
-    final double confFc2 =
-        (ill2['confidence_fc'] as num?)?.toDouble() ?? 0.0;
+    final double confAb1 = (ill1['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+    final double confAb2 = (ill2['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+    final double confFc1 = (ill1['confidence_fc'] as num?)?.toDouble() ?? 0.0;
+    final double confFc2 = (ill2['confidence_fc'] as num?)?.toDouble() ?? 0.0;
     final double mlScore1 = confAb1 - confFc1;
     final double mlScore2 = confAb2 - confFc2;
-    final double coverage1 =
-        (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
-    final double coverage2 =
-        (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+    final double coverage1 = (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+    final double coverage2 = (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
     return Table(
       border: TableBorder(
         horizontalInside: BorderSide(
@@ -917,8 +835,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   Widget _tableHeaderCell(String text) {
     return Padding(
-      padding:
-          EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
       child: Text(
         text,
         textAlign: TextAlign.center,
@@ -933,8 +850,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   Widget _tableCell(String text) {
     return Padding(
-      padding:
-          EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
       child: Text(
         text,
         style: TextStyle(
@@ -947,8 +863,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   Widget _tableScoreCell(double value, bool isHighlighted) {
     return Container(
-      padding:
-          EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
       color: isHighlighted
           ? const Color(0xFFEFF8F7).withOpacity(0.3)
           : Colors.transparent,
@@ -957,11 +872,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 14.sp,
-          fontWeight:
-              isHighlighted ? FontWeight.bold : FontWeight.normal,
-          color: isHighlighted
-              ? const Color(0xFF52AAA4)
-              : const Color(0xFF3D4A5C),
+          fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
+          color: isHighlighted ? const Color(0xFF52AAA4) : const Color(0xFF3D4A5C),
         ),
       ),
     );
@@ -993,8 +905,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url,
-        mode: LaunchMode.externalApplication)) {
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
   }

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:petsymp/anothersymptoms.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:petsymp/symptomscatalog.dart';
 class QoneScreen extends StatefulWidget {
   final String symptom;
   final List<String> questions;
@@ -21,6 +22,7 @@ class QoneScreen extends StatefulWidget {
 
 class _QoneScreenState extends State<QoneScreen> {
   bool _isAnimated = false;
+    bool _isNavigating = false;
   int currentQuestionIndex = 0;
   bool _buttonsVisible = false;
 
@@ -87,6 +89,19 @@ class _QoneScreenState extends State<QoneScreen> {
       Navigator.of(context).pop();
     }
   }
+
+
+  void _navigateToSymptomCatalog() {
+  if (_isNavigating) return;
+
+  _isNavigating = true;
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const SymptomscatalogScreen()),
+  ).then((_) {
+    _isNavigating = false;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +251,19 @@ class _QoneScreenState extends State<QoneScreen> {
                 }).toList(),
               ),
             ),
+
+            Positioned(
+            bottom: 100.h,
+            right: 16.w,
+            child: FloatingActionButton(
+              onPressed: _navigateToSymptomCatalog,
+              backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+              foregroundColor: const Color(0xFFE8F2F5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              child: const Icon(Icons.menu_book_sharp),
+            )),
         ],
       ),
     );

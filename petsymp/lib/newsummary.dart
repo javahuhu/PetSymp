@@ -10,8 +10,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'barchart/barchart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
+import 'package:petsymp/symptomscatalog.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:petsymp/dynamicconnections.dart';
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
 
@@ -20,6 +22,7 @@ class NewSummaryScreen extends StatefulWidget {
 }
 
 class NewSummaryScreenState extends State<NewSummaryScreen> {
+   bool _isNavigating = false;
   final List<ListItem> items = [
     const ListItem(
       title: 'Provide Medicine for Lethargy',
@@ -61,6 +64,49 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
       imageUrl: 'assets/youtube1.jpg',
     ),
   ];
+  
+
+
+  Future<void> _generateSymptomDetails(UserData userData) async {
+  final List<String> topIllnesses = userData.diagnosisResults.map((d) => d['illness'].toString()).toList();
+  final List<String> inputSymptoms = userData.petSymptoms.map((s) => s.toLowerCase()).toList();
+
+  Map<String, List<Map<String, dynamic>>> allDetails = {};
+
+  for (String illness in topIllnesses) {
+    try {
+      final url = Uri.parse(AppConfig.getKnowledgeDetailsURL(illness));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> knowledgeList = data["knowledge"];
+
+        // Filter only symptoms that match user input
+        final filtered = knowledgeList.where((entry) =>
+          inputSymptoms.contains(entry['name'].toString().toLowerCase()));
+
+        allDetails[illness] = filtered.map((entry) {
+          return {
+            "name": entry["name"],
+            "base_weight": entry["base_weight"],
+            "severity": entry["severity"],
+            "priority": entry["priority"],
+            "fc_weight": entry["fc_weight"],
+            "gb_adjustment": entry["gb_adjustment"],
+            "gb_weight": entry["gb_weight"],
+            "ab_factor": entry["ab_factor"],
+            "ab_weight": entry["ab_weight"],
+          };
+        }).toList();
+      }
+    } catch (e) {
+      print("⚠️ Failed to fetch knowledge for $illness: $e");
+    }
+  }
+
+  userData.setSymptomDetails(allDetails);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +119,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
 
 
     final List<Map<String, String>> petDetails = [
+      {"icon": "🎂", "label": "Pet", "value": userData.selectedPetType.toString()},
       {"icon": "🎂", "label": "Age", "value": userData.age.toString()},
       {"icon": "📏", "label": "Size", "value": userData.size.toString()},
       {"icon": "🐶", "label": "Breed", "value": userData.breed},
@@ -102,12 +149,27 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
       abScores.add((item['confidence_ab'] as num).toDouble());
     }
 
+
+      void navigateToSymptomCatalog() {
+  if (_isNavigating) return;
+
+  _isNavigating = true;
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const SymptomscatalogScreen()),
+  ).then((_) {
+    _isNavigating = false;
+  });
+}
+
     
     return PopScope(
     canPop: false, 
     child: Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
-      body: SingleChildScrollView(
+      body: 
+      Stack(children: [
+      SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -183,16 +245,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: userData.petImage != null &&
-                                userData.petImage!.isNotEmpty
-                            ? Image.network(
-                                userData.petImage!,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.asset(
-                                "assets/sampleimage.jpg",
-                                fit: BoxFit.cover,
-                              ),
+                        child: userData.petImage != null && userData.petImage!.isNotEmpty
+                      ? (userData.petImage!.startsWith("http")
+                          // a real network URL:
+                          ? Image.network(userData.petImage!, fit: BoxFit.cover)
+                          // otherwise assume it's an asset path:
+                          : Image.asset(userData.petImage!, fit: BoxFit.cover))
+                      // fallback if petImage is null/empty:
+                      : Image.asset("assets/sampleimage.jpg", fit: BoxFit.cover),
                       ),
                     ),
                   ),
@@ -1047,37 +1107,69 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                   width: 120,
                   child: ElevatedButton(
                     onPressed: () async {
-                        // Save the summary data to Firestore under a new "History" subcollection.
-                        final String? userId = FirebaseAuth.instance.currentUser?.uid;
-                        if (userId != null) {
-                          final historyData = {
-                            'date': DateTime.now(),
-                            'petName': userData.userName,
-                            'petDetails': petDetails,
-                            'petImage': 
-                                userData.petImage?.isNotEmpty == true
-                            ? userData.petImage
-                            : "assets/sampleimage.jpg",
-                                 // your petDetails list
-                            'diagnosisResults': diagnoses, // your diagnosis results list
-                            'allSymptoms': allSymptoms, // the joined string of symptoms
-                          };
-                          await FirebaseFirestore.instance
-                              .collection('Users')
-                              .doc(userId)
-                              .collection('History')
-                              .add(historyData);
-
-                          // Clear all user input and details.
-                          Provider.of<UserData>(context, listen: false).clearData();
-                        }
-                        // Then navigate directly to HomePageScreen.
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePageScreen()),
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(child: CircularProgressIndicator()),
                         );
-                      },
 
+                        try {
+                          final String? userId = FirebaseAuth.instance.currentUser?.uid;
+                          await _generateSymptomDetails(userData);
+
+                          if (userId != null) {
+                            final historyCol = FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(userId)
+                                  .collection('History');
+
+                              // Query for an existing document for this pet (using petName and petType)
+                              final existing = await historyCol
+                                  .where('petName', isEqualTo: userData.userName)
+                                  .where('petType', isEqualTo: userData.selectedPetType)
+                                  .limit(1)
+                                  .get();
+
+                              // Build a new assessment entry
+                              final assessmentEntry = {
+                                'date': Timestamp.now(),
+                                'diagnosisResults': diagnoses,
+                                'allSymptoms': allSymptoms,
+                                'symptomDetails': userData.symptomDetails,
+                              };
+
+                              if (existing.docs.isNotEmpty) {
+                                // If found, update that document by adding the new assessment entry to its 'assessments' array,
+                                // and update the top-level 'date' so sorting by date shows the latest update.
+                                final docRef = existing.docs.first.reference;
+                                await docRef.update({
+                                  'assessments': FieldValue.arrayUnion([assessmentEntry]),
+                                  'date': Timestamp.now(),
+                                });
+                              } else {
+                                // Otherwise, create a new History document with a single-item 'assessments' array.
+                                final newHistory = {
+                                  'date': Timestamp.now(),
+                                  'petType': userData.selectedPetType,
+                                  'petName': userData.userName,
+                                  'petDetails': petDetails,
+                                  'petImage': (userData.petImage?.isNotEmpty == true) ? userData.petImage : "assets/sampleimage.jpg",
+                                  'assessments': [assessmentEntry],
+                                };
+                                await historyCol.add(newHistory);
+                              }
+
+
+                            Provider.of<UserData>(context, listen: false).clearData();
+                          }
+
+                          Navigator.pop(context); // Close loading dialog
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePageScreen()));
+                        } catch (e) {
+                          Navigator.pop(context); // Close loading dialog
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Something went wrong: $e')));
+                        }
+                      },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith((states) {
                         if (states.contains(MaterialState.pressed)) {
@@ -1125,14 +1217,19 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
           ],
         ),
       ),
-    floatingActionButton: FloatingActionButton(
-    onPressed: () {
-      // Add your onPressed code here!
-      print("Small Floating Action Button pressed!");
-    },
-    child: const Icon(Icons.menu_book_sharp),
-  ),
-  floatingActionButtonLocation: CustomFABLocation(topOffset: 600.0.h, rightOffset: 16.0.w),
+      Positioned(
+            bottom: 100.h,
+            right: 16.w,
+            child: FloatingActionButton(
+              onPressed: navigateToSymptomCatalog,
+              backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+              foregroundColor: const Color(0xFFE8F2F5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              child: const Icon(Icons.menu_book_sharp),
+            )),
+      ],)
     )
     );
   }
@@ -1194,17 +1291,3 @@ class ListItem {
   });
 }
 
-class CustomFABLocation extends FloatingActionButtonLocation {
-  final double topOffset;
-  final double rightOffset;
-
-  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final fabSize = scaffoldGeometry.floatingActionButtonSize;
-    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
-    final double y = topOffset;
-    return Offset(x, y);
-  }
-}

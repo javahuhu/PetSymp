@@ -75,6 +75,10 @@ class SymptomDetail {
 }
 
 
+
+
+
+
 // Internal chart data model.
 class _ChartData {
   _ChartData(this.x, this.y);
@@ -104,6 +108,27 @@ class _BarChartSample2State extends State<BarChartSample2> {
   }
 
 
+    Map<String, double> _computeFinalScores(List<SymptomDetail> symptoms) {
+    double fc = 0.0;
+    double gb = 0.0;
+    double ab = 0.0;
+
+    for (var s in symptoms) {
+      final fcWeight = s.baseWeight * s.priority;
+      final gbWeight = fcWeight + s.gbAdjustment;
+      final abWeight = gbWeight * s.abFactor;
+      fc += fcWeight;
+      gb += gbWeight;
+      ab += abWeight;
+    }
+
+    return {
+      "confidence_fc": fc,
+      "confidence_gb": gb,
+      "confidence_ab": ab,
+    };
+  }
+
   @override
   void initState() {
     rawBarGroups = List.generate(widget.illnessLabels.length, (index) {
@@ -118,8 +143,12 @@ class _BarChartSample2State extends State<BarChartSample2> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
+
+ 
+
     return AspectRatio(
       aspectRatio: 1.3,
       child: Padding(
@@ -174,9 +203,11 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
+                            
                             return FutureBuilder<List<SymptomDetail>>(
                       future: _fetchKnowledgeDetailsForIllness(widget.illnessLabels[index]),
                       builder: (context, snapshot) {
+                        
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return AlertDialog(
                             title: const Text("Loading details..."),
@@ -195,10 +226,10 @@ class _BarChartSample2State extends State<BarChartSample2> {
                           // Get user input symptoms from the provider.
                           final userData = Provider.of<UserData>(context, listen: false);
                           final userSymptoms = userData.petSymptoms.map((s) => s.toLowerCase()).toList();
-
+   
                           // Filter the fetched details to only include symptoms that match the user input.
                           final filteredDetails = details.where((d) => userSymptoms.contains(d.name.toLowerCase())).toList();
-
+                          final scores = _computeFinalScores(filteredDetails);
                           // If no matching symptoms, you can show a message.
                           if (filteredDetails.isEmpty) {
                             return AlertDialog(
@@ -635,6 +666,115 @@ class _BarChartSample2State extends State<BarChartSample2> {
                               ),
                             ],
                           ),
+
+
+
+
+
+                          
+                                       SizedBox(height: 50.h,),
+                  Center(
+                      child: Text(
+                            "Total Result for each Algorithm",
+                            style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                          ),
+                           ),
+                            SizedBox(height: 20.h),
+                            Table(
+                              defaultColumnWidth: FixedColumnWidth(160.w),
+                              border: TableBorder.all(width: 1, color: Colors.grey),
+                              children: [
+                                const TableRow(
+                                  children: [
+                                    Center(child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("Algorithm", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                                    )),
+                                    Center(child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("Final Score", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                                    )),
+                                  ],
+                                ),
+                                TableRow(
+                                  children: [
+                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Forward Chaining", style: TextStyle(fontFamily: 'Inter')))),
+                                    Center(child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("${scores["confidence_fc"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                    )),
+                                  ],
+                                ),
+                                TableRow(
+                                  children: [
+                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Gradient Boosting", style: TextStyle(fontFamily: 'Inter')))),
+                                    Center(child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("${scores["confidence_gb"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                    )),
+                                  ],
+                                ),
+                                TableRow(
+                                  children: [
+                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("AdaBoost", style: TextStyle(fontFamily: 'Inter')))),
+                                    Center(child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("${scores["confidence_ab"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                    )),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 15.h,),
+                            Center(
+                              child: Text(
+                                "Final Score",
+                                style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                              ),
+                            ),
+                            SizedBox(height: 60.h,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blueAccent,
+                                  size: 24.sp,
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Text.rich(
+                                    TextSpan(
+                                      style: TextStyle(
+                                        color: const Color.fromARGB(255, 127, 127, 127),
+                                        fontSize: 12.sp,
+                                      ),
+                                      children: const [
+                                        TextSpan(
+                                            text: "Note: The table above illustrates the final scores computed using different algorithms. "),
+                                        TextSpan(
+                                            text: "Forward Chaining (FC)",
+                                            style: TextStyle(fontWeight: FontWeight.bold)),
+                                        TextSpan(text: ", "),
+                                        TextSpan(
+                                            text: "Gradient Boosting (GB)",
+                                            style: TextStyle(fontWeight: FontWeight.bold)),
+                                        TextSpan(text: ", and "),
+                                        TextSpan(
+                                            text: "AdaBoost (AB)",
+                                            style: TextStyle(fontWeight: FontWeight.bold)),
+                                        TextSpan(text: " are combined to produce the Final Score."),
+                                      ],
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 30),
 
 
               

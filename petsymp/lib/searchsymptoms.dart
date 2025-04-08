@@ -16,6 +16,7 @@ class SearchsymptomsScreen extends StatefulWidget {
 
 class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   bool _isAnimated = false;
+  bool _isNavigating = false;
 
   @override
   void initState() {
@@ -26,6 +27,21 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
       });
     });
   }
+
+  
+void _navigateToSymptomCatalog() {
+  if (_isNavigating) return;
+
+  _isNavigating = true;
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const SymptomscatalogScreen()),
+  ).then((_) {
+    _isNavigating = false;
+  });
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +82,9 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
-      body: SingleChildScrollView(
+      body: 
+      Stack(children: [
+      SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 10),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
@@ -175,27 +193,25 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
                   ],
                   context,
                 ),
+                 SizedBox(height: 80.h),
             ],
           ),
         ),
       ),
-       floatingActionButton: FloatingActionButton(
 
-    onPressed: () {
-       Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SymptomscatalogScreen(),
-                  ));
-    },
-    backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0), // Changes the button color to red.
-    foregroundColor: const Color(0xFFE8F2F5),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(100.r), // Circular shape
-    ),
-    child: const Icon(Icons.menu_book_sharp),
-  ),
-  floatingActionButtonLocation: CustomFABLocation(topOffset: 650.0.h, rightOffset: 16.0.w),
+        Positioned(
+            bottom:15.h,
+            right: 16.w,
+            child: FloatingActionButton(
+              onPressed: _navigateToSymptomCatalog,
+              backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+              foregroundColor: const Color(0xFFE8F2F5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+              child: const Icon(Icons.menu_book_sharp),
+            )),
+       ],)
     );
   }
 
@@ -315,18 +331,5 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen> {
   }
 }
 
-class CustomFABLocation extends FloatingActionButtonLocation {
-  final double topOffset;
-  final double rightOffset;
 
-  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final fabSize = scaffoldGeometry.floatingActionButtonSize;
-    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
-    final double y = topOffset;
-    return Offset(x, y);
-  }
-}
 

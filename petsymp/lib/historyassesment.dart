@@ -527,7 +527,9 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                         onPressed: () {
                           Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ViewhistoryScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => ViewhistoryScreen(historyData: data),
+                          ),
                         );
                         },
                         style: ElevatedButton.styleFrom(
