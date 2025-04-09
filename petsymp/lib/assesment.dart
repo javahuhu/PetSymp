@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/permission.dart';
 import 'userdata.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Custom TextInputFormatter to capitalize only the first letter
+// Custom TextInputFormatter remains unchanged
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -34,7 +36,7 @@ class AssesmentScreen extends StatefulWidget {
 }
 
 class AssesmentScreenState extends State<AssesmentScreen> {
-  bool _isAnimated = false; // Animation toggle// State to track the selected tab
+  bool _isAnimated = false; // Animation toggle
   final TextEditingController _usernamecontroller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -61,58 +63,165 @@ class AssesmentScreenState extends State<AssesmentScreen> {
     }
   }
 
- 
-  
-
-  
-
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F2F5),
-      body: Stack(
-        children: [
-          // Show this layout only on the first tab
+      body: Container(
+        // Enhanced gradient background
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromRGBO(225, 240, 243, 1.0),
+              Color.fromRGBO(201, 229, 231, 1.0),
+              Color(0xFFE8F2F5),
+            ],
+            stops: [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Decorative bubble elements
+            
+            // Large bubble top-right
+            Positioned(
+              top: -screenHeight * 0.05,
+              right: -screenWidth * 0.15,
+              child: Container(
+                width: screenWidth * 0.5,
+                height: screenWidth * 0.5,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromRGBO(66, 134, 129, 0.1),
+                ),
+              ),
+            ),
+            
+            // Medium bubble bottom-left
+            Positioned(
+              bottom: -screenHeight * 0.05,
+              left: -screenWidth * 0.15,
+              child: Container(
+                width: screenWidth * 0.4,
+                height: screenWidth * 0.4,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromRGBO(66, 134, 129, 0.1),
+                ),
+              ),
+            ),
+            
+            // Small circle top-left
+            Positioned(
+              top: screenHeight * 0.12,
+              left: screenWidth * 0.08,
+              child: Container(
+                width: screenWidth * 0.12,
+                height: screenWidth * 0.12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color.fromRGBO(66, 134, 129, 0.6),
+                    width: 2,
+                  ),
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+            
+            // Middle-right medium circle
+            Positioned(
+              top: screenHeight * 0.4,
+              right: -screenWidth * 0.1,
+              child: Container(
+                width: screenWidth * 0.3,
+                height: screenWidth * 0.3,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromRGBO(66, 134, 129, 0.1),
+                  border: Border.all(
+                    color: Color.fromRGBO(66, 134, 129, 0.3),
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            
+            // Bottom-center small dot
+            Positioned(
+              bottom: screenHeight * 0.15,
+              right: screenWidth * 0.3,
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromRGBO(72, 38, 163, 0.4),
+                ),
+              ),
+            ),
+            
+            // Middle-left small dot
+            Positioned(
+              top: screenHeight * 0.6,
+              left: screenWidth * 0.15,
+              child: Container(
+                width: 15,
+                height: 15,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromRGBO(72, 38, 163, 0.3),
+                ),
+              ),
+            ),
+            
+            // Your original UI unchanged
             Stack(
               children: [
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
-                  top: _isAnimated ? screenHeight * 0.13 : -100,
-                  left: screenWidth * 0.1,
+                  top: _isAnimated ? screenHeight * 0.13 : -200,
+                  left: screenWidth * 0.05,      
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: screenWidth * 0.15,
+                        width: screenWidth * 1,
                         height: screenWidth * 0.15,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                         ),
-                        child: Image.asset(
-                          'assets/paw.png',
-                          fit: BoxFit.contain,
-                        ),
+                        child: Text("Who's your Pet?", 
+                        style: TextStyle(fontFamily: 'Oswald', fontSize: 35.sp, color: const Color.fromARGB(255, 0, 0, 0) ),
+                        )
                       ),
                       SizedBox(width: screenWidth * 0.05),
                     ],
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.22,
+                  top: screenHeight * 0.25,
                   left: screenWidth * 0.12,
                   right: screenWidth * 0.02,
-                  child: Column(
+                  child: SlideInLeft(
+                          duration:const Duration(milliseconds: 1000),
+                          delay: const Duration(milliseconds: 300),
+                        from: 400,
+                  child:
+                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Before we start your assessment, input your USERNAME first.",
+                        "Before we start your assessment, input your PET USERNAME first.",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
+                          fontFamily: 'Inter',
                           color: Color.fromRGBO(29, 29, 44, 1.0),
                         ),
                       ),
@@ -168,11 +277,17 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                       ),
                     ],
                   ),
-                ),
+                )),
                 Positioned(
                 top: screenHeight * 0.9,
                 right: screenWidth * 0.02, // Adjust dynamically for right alignment
-                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                child:
+                SlideInUp(
+                          duration:const Duration(milliseconds: 1000),
+                          delay: const Duration(milliseconds: 300),
+                        from: 400,
+                  child:
+                 SizedBox( // Wrap with SizedBox to ensure correct width
                   width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: () => navigateToNextPage(context),
@@ -220,15 +335,12 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     ),
                   ),
                 ),
-              ),
+              )),
               ],
             ),
-
-            
-            
-        ],
+          ],
+        ),
       ),
-    
     );
   }
 }

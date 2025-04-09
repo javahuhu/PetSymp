@@ -31,9 +31,7 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
   }
 
   Future<void> _loadHeavySymptomMap() async {
-    // Simulate delay or heavy processing (optional for real logic)
     await Future.delayed(const Duration(milliseconds: 100));
-    // If needed, place heavy computation logic here.
   }
 
   void _filterSearchResults(String query) {
@@ -41,6 +39,10 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
         (symptomCatalog['CatalogSymptom'] as Map<String, dynamic>)
             .keys
             .toList();
+    
+    // Remove all whitespace from both the query and symptoms
+    final cleanQuery = query.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+    
     if (query.isEmpty) {
       setState(() {
         _filteredSymptom = List.from(allSymptoms);
@@ -48,7 +50,8 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
     } else {
       setState(() {
         _filteredSymptom = allSymptoms
-            .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+            .where((item) => 
+                item.replaceAll(RegExp(r'\s+'), '').toLowerCase().contains(cleanQuery))
             .toList();
       });
     }
@@ -59,20 +62,20 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
     return PopScope(
       canPop: true,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 219, 230, 233),
+        backgroundColor: const Color(0xFFF4F7FA),
         appBar: AppBar(
-          backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+          backgroundColor: const Color(0xFF1D1D2C),
           elevation: 0,
           automaticallyImplyLeading: false,
-          title: Padding(
-            padding: EdgeInsets.only(left: 85.5.w),
+          title: Center(
             child: Text(
               "Symptoms Catalog",
               style: TextStyle(
-                fontSize: 25.sp,
-                fontWeight: FontWeight.bold,
+                fontSize: 28.sp,
+                fontWeight: FontWeight.w700,
                 fontFamily: 'Oswald',
                 color: Colors.white,
+                letterSpacing: 1.2,
               ),
             ),
           ),
@@ -82,54 +85,68 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SpinKitFadingCube(
-                      color: const Color.fromRGBO(82, 170, 164, 1),
-                      size: 60.w,
+                    SpinKitPulse(
+                      color: const Color(0xFF52AAA4),
+                      size: 80.w,
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 25.h),
                     Text(
                       "Loading Symptoms...",
                       style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Oswald',
-                        color: const Color.fromRGBO(29, 29, 44, 1.0),
+                        color: const Color(0xFF1D1D2C),
+                        letterSpacing: 1.1,
                       ),
                     ),
                   ],
                 ),
               )
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 25.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: _searchsymptoms,
-                        onChanged: _filterSearchResults,
-                        decoration: InputDecoration(
-                          hintText: 'Search Symptoms',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                            borderSide: BorderSide(color: Colors.grey, width: 1.w),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                            borderSide: BorderSide(
-                              color: const Color.fromARGB(255, 172, 113, 220),
-                              width: 2.w,
-                            ),
+            : Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                    child: TextField(
+                      controller: _searchsymptoms,
+                      onChanged: _filterSearchResults,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.black87,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Search Symptoms',
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 16.sp,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: const Color(0xFF52AAA4),
+                          size: 26.w,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.r),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.r),
+                          borderSide: BorderSide(
+                            color: const Color(0xFF52AAA4),
+                            width: 2.w,
                           ),
                         ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                       ),
-                      SizedBox(height: 25.h),
-                      ListView.separated(
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: ListView.builder(
                         itemCount: _filteredSymptom.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) => SizedBox(height: 15.h),
                         itemBuilder: (context, index) {
                           final symptomName = _filteredSymptom[index];
                           final symptomData = symptomCatalog['CatalogSymptom'][symptomName];
@@ -142,53 +159,70 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
                               ? symptomImg.first
                               : 'assets/catanddog.jpg';
 
-                          return ExpansionTile(
-                            title: Text(symptomName),
-                            children: <Widget>[
-                              Column(
-                                children: [
-                                  SizedBox(height: 20.h),
-                                  Center(
-                                    child: Container(
-                                      width: 300.w,
-                                      height: 300.h,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20.r),
-                                        child: Image.asset(
-                                          symptomImage,
-                                          fit: BoxFit.cover,
-                                          width: 200.w,
-                                          height: 200.h,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.h),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          symptomDescription,
-                                          style: TextStyle(
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black87,
+                          return Card(
+                            elevation: 0,
+                            color: const Color(0xFF1D1D2C),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: 
+                            Theme(
+                            data: Theme.of(context).copyWith(dividerColor: Colors.transparent,
+                             highlightColor: Colors.transparent,
+                              splashColor: Colors.transparent,
+                              splashFactory: NoSplash.splashFactory,),
+                            child:
+                            ExpansionTile(
+                              title: Text(
+                                symptomName,
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFFE8F2F5),
+                                ),
+                              ),
+                              children: <Widget>[
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(
+                                      child: Container(
+                                        width: 300.w,
+                                        height: 300.h,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20.r),
+                                          child: Image.asset(
+                                            symptomImage,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 20.h),
-                                ],
-                              ),
-                            ],
+                                    ),
+                                    SizedBox(height: 20.h),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 15.w),
+                                      child: Text(
+                                        symptomDescription,
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color.fromRGBO(66, 134, 130, 1.0),
+                                          height: 1.5,
+                                        ),
+                                        textAlign: TextAlign.justify,
+                                      ),
+                                    ),
+                                    SizedBox(height: 15.h),
+                                  ],
+                                ),
+                              ],
+                            )),
                           );
                         },
                       ),
-                      SizedBox(height: 30.h),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
       ),
     );

@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/viewhistory.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
-
+import 'dart:math' show max;
 
 class PetProfileScreen extends StatefulWidget {
   const PetProfileScreen({Key? key}) : super(key: key);
@@ -154,21 +154,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 32.h),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.add),
-                    label: Text("Add Pet"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF52AAA4),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 24.w, vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    onPressed: () {
-                      // Add navigation to pet creation screen if needed.
-                    },
-                  ),
+                 
                 ],
               ),
             );
@@ -387,12 +373,19 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     List<Widget> healthRecords = [];
     if (assessments.isNotEmpty) {
       for (var assessment in assessments) {
-        // Use the symptom input stored in this assessment.
+        // Generate a unique ID for each assessment
+        String assessmentId = assessment['assessmentId'] ?? 
+                        assessment['date']?.toString() ?? 
+                        DateTime.now().millisecondsSinceEpoch.toString();
+                        
+        // Use the symptom input stored in this assessment
         final String inputSymptoms = assessment['allSymptoms'] ?? "";
-        // Get the diagnosis results from the assessment.
+        
+        // Get the diagnosis results from the assessment
         final List<dynamic> diag = assessment['diagnosisResults'] ?? [];
         String finalIllness = "No Result";
         Timestamp? assessTimestamp;
+        
         if (diag.isNotEmpty) {
           List<dynamic> sortedDiag = List.from(diag);
           sortedDiag.sort((a, b) => (b['confidence_ab'] as num)
@@ -402,29 +395,31 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               ? sortedDiag.first['date'] as Timestamp
               : null;
         }
+        
         final String assessDate = assessTimestamp != null
             ? "${assessTimestamp.toDate().day} ${_getMonthAbbr(assessTimestamp.toDate().month)} ${assessTimestamp.toDate().year}"
             : defaultDateStr;
 
-        // Create a deep copy of the petDetails list.
+        // Create a deep copy of the petDetails list
         List<dynamic> updatedPetDetails = (petData['petDetails'] as List<dynamic>?)
             ?.map((e) => Map<String, dynamic>.from(e))
             .toList() ?? [];
-        // Update or add the Symptoms detail for this assessment.
+            
+        // Update or add the Symptoms detail for this assessment
         if (updatedPetDetails.length >= 5) {
           updatedPetDetails[4]['value'] = inputSymptoms;
         } else {
           updatedPetDetails.add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
         }
 
-        // Merge the pet's basic data with the assessment-specific fields.
+        // Merge the pet's basic data with the assessment-specific fields
         Map<String, dynamic> mergedData = {
           'id': petData['id'], // Include document ID for editing
           'petName': petData['petName'] ?? "Unknown",
           'petDetails': updatedPetDetails,
           'petImage': petData['petImage'] ?? "assets/sampleimage.jpg",
           'petType': petData['petType'] ?? "",
-          // Overwrite/assign assessment-specific fields.
+          // Overwrite/assign assessment-specific fields
           'date': assessment['date'] ?? defaultDateStr,
           'diagnosisResults': assessment['diagnosisResults'] ?? [],
           'allSymptoms': inputSymptoms,
@@ -437,6 +432,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             date: assessDate,
             status: "Completed",
             isCompleted: true,
+            recordId: assessmentId, // Pass the assessment ID for deletion
+            petDocId: petData['id'],
             onTap: () {
               Navigator.push(
                 context,
@@ -469,15 +466,15 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color.fromARGB(188, 0, 0, 0),
       enableDrag: false, // Disable default dragging to use our custom implementation
       isDismissible: true,
       builder: (context) {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
-          initialHeight: screenSize.height * 0.85, // Start at 85% of screen height
-          minHeight: screenSize.height * 0.4, // Minimum height (40%)
-          maxHeight: screenSize.height * 0.95, // Maximum height (95%)
+          initialHeight: screenSize.height * 0.8, // Start at 85% of screen height
+          minHeight: screenSize.height * 0.7, // Minimum height (40%)
+          maxHeight: screenSize.height * 1, // Maximum height (95%)
           petData: petData,
           borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
           petBreed: breed,
@@ -554,13 +551,27 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         color: Colors.black87,
                       ),
                     ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.orange,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          "Swipe",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey[600],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          "See All",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -632,80 +643,308 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     );
   }
   
-  /// Builds a health record item.
+  /// Builds a health record item with swipe-to-delete functionality.
   Widget _buildHealthRecordItem({
     required String title,
     required String date,
     required String status,
     required bool isCompleted,
+    String? recordId,
+    String? petDocId,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 12.h),
-        child: Row(
+    // If no record ID is provided, don't make it dismissible
+    if (recordId == null || petDocId == null) {
+      return GestureDetector(
+        onTap: onTap,
+        child: _buildHealthRecordContent(
+          title: title,
+          date: date,
+          status: status,
+          isCompleted: isCompleted,
+        ),
+      );
+    }
+    
+    // Otherwise, wrap in Dismissible for swipe-to-delete
+    return Dismissible(
+      key: Key(recordId),
+      direction: DismissDirection.endToStart, // Right to left swipe
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20.w),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Status icon.
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isCompleted ? Icons.check_circle : Icons.access_time,
-                color: isCompleted ? Colors.green : Colors.orange,
-                size: 20.sp,
-              ),
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+              size: 24.sp,
             ),
-            SizedBox(width: 16.w),
-            // Title and date.
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    date,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Status label.
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: Text(
-                status,
-                style: TextStyle(
-                  color: isCompleted ? Colors.green : Colors.orange,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12.sp,
-                ),
+            SizedBox(height: 4.h),
+            Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12.sp,
               ),
             ),
           ],
         ),
       ),
+      confirmDismiss: (direction) async {
+        // Show confirmation dialog
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              title: Text(
+                "Confirm Deletion",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF3D4A5C),
+                ),
+              ),
+              content: Text(
+                "Are you sure you want to delete this health record?",
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16.sp,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      onDismissed: (direction) {
+        // Execute deletion when confirmed
+        _deleteHealthRecord(petDocId, recordId);
+      },
+      child: GestureDetector(
+        onTap: onTap,
+        child: _buildHealthRecordContent(
+          title: title,
+          date: date,
+          status: status,
+          isCompleted: isCompleted,
+        ),
+      ),
     );
   }
   
+  /// Builds the content of a health record item.
+  Widget _buildHealthRecordContent({
+    required String title,
+    required String date,
+    required String status,
+    required bool isCompleted,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        children: [
+          // Status icon.
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isCompleted ? Icons.check_circle : Icons.access_time,
+              color: isCompleted ? Colors.green : Colors.orange,
+              size: 20.sp,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          // Title and date.
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.sp,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  date,
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Status label.
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Text(
+              status,
+              style: TextStyle(
+                color: isCompleted ? Colors.green : Colors.orange,
+                fontWeight: FontWeight.w500,
+                fontSize: 12.sp,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// Delete a health record assessment from Firestore.
+  Future<void> _deleteHealthRecord(String petDocId, String assessmentId) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: const Color(0xFF52AAA4),
+            ),
+          );
+        },
+      );
+      
+      final String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("User is not signed in.");
+      }
+      
+      // Get the document reference
+      final docRef = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('History')
+          .doc(petDocId);
+      
+      // Get the current document data
+      final docSnapshot = await docRef.get();
+      if (!docSnapshot.exists) {
+        throw Exception("Pet document not found");
+      }
+      
+      final docData = docSnapshot.data() as Map<String, dynamic>;
+      
+      // Get the assessments array
+      List<dynamic> assessments = docData['assessments'] is List 
+          ? List.from(docData['assessments']) 
+          : [];
+      
+      // Find the index of the assessment to remove
+      final int indexToRemove = assessments.indexWhere(
+        (assessment) => assessment['assessmentId'] == assessmentId || 
+                        assessment['date']?.toString() == assessmentId
+      );
+      
+      if (indexToRemove != -1) {
+        // Remove the assessment from the array
+        assessments.removeAt(indexToRemove);
+        
+        // Update the document with the modified assessments array
+        await docRef.update({
+          'assessments': assessments,
+        });
+        
+        // Close loading dialog
+        Navigator.of(context).pop();
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Health record deleted successfully"),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+        
+        // Refresh the UI
+        setState(() {});
+      } else {
+        // Close loading dialog
+        Navigator.of(context).pop();
+        
+        // Show error message if assessment not found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Assessment not found in the record"),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still showing
+      Navigator.of(context).pop();
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error deleting health record: ${e.toString()}"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+        ),
+      );
+    }
+  }
+
   /// Builds an expandable card (UI remains unchanged).
   Widget _buildExpandableCard({
     required String title,
@@ -984,53 +1223,54 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
 
   // Add method to show edit dialog
   void _showEditDialog(BuildContext context) {
-    // Controllers for the text fields
-    final TextEditingController ageController = TextEditingController();
-    final TextEditingController sizeController = TextEditingController();
-    
-    // Get current values from petData to prefill
-    final List<dynamic> details = widget.petData['petDetails'] is List ? widget.petData['petDetails'] : [];
-    final String currentAge = details.length > 1 ? (details[1]['value']?.toString() ?? "") : "";
-    final String currentSize = details.length > 2 ? (details[2]['value']?.toString() ?? "") : "";
-    
-    // Set initial values
-    ageController.text = currentAge;
-    sizeController.text = currentSize;
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "Edit Pet Details",
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF3D4A5C),
-            ),
+  // Create the controllers inside the builder:
+  showDialog<void>(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      final ageController = TextEditingController(
+        text: (widget.petData['petDetails'] as List<dynamic>? ?? [])
+                .length > 1
+            ? (widget.petData['petDetails'][1]['value']?.toString() ?? '')
+            : '',
+      );
+      final sizeController = TextEditingController(
+        text: (widget.petData['petDetails'] as List<dynamic>? ?? [])
+                .length > 2
+            ? (widget.petData['petDetails'][2]['value']?.toString() ?? '')
+            : '',
+      );
+
+      return AlertDialog(
+        title: Text(
+          "Edit Pet Details",
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF3D4A5C),
           ),
-          content: Container(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: ageController,
-                  decoration: InputDecoration(
-                    labelText: 'Age',
-                    hintText: 'e.g. 2 yrs',
-                    prefixIcon: Icon(Icons.cake, color: Colors.amber),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: const Color(0xFF52AAA4), width: 2),
-                    ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,  // <-- shrink to fit
+            children: [
+              TextField(
+                controller: ageController,
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  hintText: 'e.g. 2 yrs',
+                  prefixIcon: Icon(Icons.cake, color: Colors.amber),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                    borderSide: BorderSide(
+                        color: const Color(0xFF52AAA4), width: 2),
                   ),
                 ),
-                SizedBox(height: 16.h),
-                TextField(
+              ),
+              SizedBox(height: 16.h),
+              TextField(
                 controller: sizeController,
                 inputFormatters: [
                   FirstLetterUpperCaseTextFormatter(),
@@ -1045,107 +1285,95 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.r),
-                    borderSide: BorderSide(color: const Color(0xFF52AAA4), width: 2),
+                    borderSide: BorderSide(
+                        color: const Color(0xFF52AAA4), width: 2),
                   ),
                 ),
               ),
-              ],
-            ),
+            ],
           ),
-          actions: [
-            TextButton(
-              child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF52AAA4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF52AAA4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Text(
-                "Save",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            child: Text(
+              "Save",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
               ),
-              onPressed: () async {
-                // Show loading indicator
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: const Color(0xFF52AAA4),
-                      ),
-                    );
-                  },
+            ),
+            onPressed: () async {
+              // Show loading
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => Center(
+                  child: CircularProgressIndicator(
+                    color: const Color(0xFF52AAA4),
+                  ),
+                ),
+              );
+
+              try {
+                await _updatePetDetails(
+                    ageController.text, sizeController.text);
+                Navigator.of(context).pop(); // close loading
+                Navigator.of(dialogContext).pop(); // close dialog
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text("Pet details updated successfully"),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
                 );
-                
-                try {
-                  // Update Firestore with new values
-                  await _updatePetDetails(ageController.text, sizeController.text);
-                  
-                  // Close loading dialog
-                  Navigator.of(context).pop();
-                  
-                  // Close edit dialog
-                  Navigator.of(context).pop();
-                  
-                  // Show success snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Pet details updated successfully"),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                  
-                  // Notify parent about the update
-                  if (widget.onPetDetailsUpdated != null) {
-                    widget.onPetDetailsUpdated!();
-                  }
-                } catch (e) {
-                  // Close loading dialog
-                  Navigator.of(context).pop();
-                  
-                  // Show error snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Error updating pet details: ${e.toString()}"),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
+                if (widget.onPetDetailsUpdated != null) {
+                  widget.onPetDetailsUpdated!();
                 }
-              },
-            ),
-          ],
-        );
-      },
-    ).then((_) {
-      // Dispose controllers when dialog is closed
-      ageController.dispose();
-      sizeController.dispose();
-    });
-  }
+              } catch (e) {
+                Navigator.of(context).pop(); // close loading
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        "Error updating pet details: ${e.toString()}"),
+                    backgroundColor: Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   // Add method to update Firestore
   Future<void> _updatePetDetails(String newAge, String newSize) async {
@@ -1227,16 +1455,25 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
               });
             },
             onVerticalDragUpdate: (details) {
-              // Calculate new height when dragging
-              final newHeight = _currentHeight - details.delta.dy;
-              
-              // Apply the fixed bottom limit
-              final limitedHeight = newHeight.clamp(_fixedBottomLimit, widget.maxHeight);
-              
-              setState(() {
-                _currentHeight = limitedHeight;
-              });
-            },
+           
+            final newHeight = _currentHeight - details.delta.dy;
+            
+            
+            final screenHeight = MediaQuery.of(context).size.height;
+            
+            
+            final minVisiblePortion = screenHeight * 0.3;
+            
+            
+            final effectiveBottomLimit = max(_fixedBottomLimit, minVisiblePortion);
+            
+          
+            final limitedHeight = newHeight.clamp(effectiveBottomLimit, widget.maxHeight);
+            
+            setState(() {
+              _currentHeight = limitedHeight;
+            });
+          },
             onVerticalDragEnd: (details) {
               setState(() {
                 _isDragging = false;
@@ -1248,7 +1485,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
             child: Stack(
               children: [
                 Container(
-                  height: 350.h,
+                  height: 400.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: widget.borderRadius,
@@ -1385,10 +1622,6 @@ class ListItem {
     required this.isExternal,
     required this.imageUrl,
   });
-
-
-  
-
 }
 
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -1412,6 +1645,3 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
     );
   }
 }
-
-
-

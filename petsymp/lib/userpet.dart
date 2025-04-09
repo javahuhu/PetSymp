@@ -70,32 +70,33 @@ class UserPetScreenState extends State<UserPetScreen>
   }
 
   void _navigateToSymptomScreen(int index) {
-    if (_isAnimating) return;
-    final userData = Provider.of<UserData>(context, listen: false);
-    final history = userData.history;
-    if (history.isNotEmpty) {
-      final entry = history[index];
-      final petDetails = entry['petDetails'] as List<dynamic>? ?? [];
-      final age = int.tryParse(petDetails.length > 1
-              ? petDetails[1]['value'] ?? ''
-              : '') ??
-          0;
-      final size = petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '';
-      final breed =
-          petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '';
-      userData
-        ..setUserName(entry['petName'] ?? '')
-        ..setpetAge(age)
-        ..setpetSize(size)
-        ..setpetBreed(breed)
-        ..setPetImage(entry['petImage'] ?? '')
-        ..setSelectedPetType(entry['petType'] ?? '');
-    }
+  if (_isAnimating) return;
+  final userData = Provider.of<UserData>(context, listen: false);
+  
+  // Filter the history to only include entries of the current pet type.
+  final filteredHistory = userData.history
+      .where((entry) => entry['petType'] == userData.selectedPetType)
+      .toList();
+  
+  if (filteredHistory.isNotEmpty && index < filteredHistory.length) {
+    final entry = filteredHistory[index];
+    final petDetails = entry['petDetails'] as List<dynamic>? ?? [];
+    final age = int.tryParse(petDetails.length > 1 ? petDetails[1]['value'] ?? '' : '') ?? 0;
+    final size = petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '';
+    final breed = petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '';
+    userData
+      ..setUserName(entry['petName'] ?? '')
+      ..setpetAge(age)
+      ..setpetSize(size)
+      ..setpetBreed(breed)
+      ..setPetImage(entry['petImage'] ?? '')
+      ..setSelectedPetType(entry['petType'] ?? '');
+    
     setState(() {
       _isAnimating = true;
-      // In this case _selectedPet is set only if history exists.
-      _selectedPet = history.isNotEmpty ? history[index]['petName'] : '';
+      _selectedPet = entry['petName'] ?? '';
     });
+    
     _animationController.reverse().then((_) {
       Navigator.push(
         context,
@@ -109,6 +110,8 @@ class UserPetScreenState extends State<UserPetScreen>
       });
     });
   }
+}
+
 
   void _navigateToNewPetScreen() {
     if (_isAnimating) return;
