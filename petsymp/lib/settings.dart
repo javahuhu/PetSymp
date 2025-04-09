@@ -4,6 +4,7 @@ import 'package:petsymp/helpandsupport.dart';
 import 'package:petsymp/historyassesment.dart';
 import 'package:petsymp/termsandcondition.dart';
 import 'homepage.dart';
+import 'profile.dart';
 
 class Settingscreen extends StatefulWidget {
   const Settingscreen({super.key});
@@ -28,7 +29,7 @@ class SettingscreenState extends State<Settingscreen> {
     },
     "img4": {
       "image": "assets/editprofile.png",
-      "screen": (BuildContext context) => const HomePageScreen(),
+      "screen": (BuildContext context) => const Profilescreen(),
     },
     "img5": {
       "image": "assets/restore.png",
@@ -48,7 +49,7 @@ class SettingscreenState extends State<Settingscreen> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: screenHeight * 0.05),
+        padding: EdgeInsets.only(top: screenHeight * 0.09),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Column(

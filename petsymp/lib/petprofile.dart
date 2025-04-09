@@ -2,14 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:petsymp/viewhistory.dart'; // Update with your actual path to ViewhistoryScreen
+import 'package:petsymp/viewhistory.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
+
+
 class PetProfileScreen extends StatefulWidget {
   const PetProfileScreen({Key? key}) : super(key: key);
 
   @override
   _PetProfileScreenState createState() => _PetProfileScreenState();
 }
+
+
 
 class _PetProfileScreenState extends State<PetProfileScreen> {
   // Fetch pet history documents from Firestore.
@@ -18,13 +23,29 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     if (userId == null) {
       throw Exception("User is not signed in.");
     }
-    final snapshot = await FirebaseFirestore.instance
+    
+    // Get the history collection reference
+    final historyCol = FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
-        .collection('History')
+        .collection('History');
+    
+    // Get the documents ordered by date
+    final snapshot = await historyCol
         .orderBy('date', descending: true)
         .get();
-    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    
+    // Map the documents to include their IDs
+    return snapshot.docs
+        .map((doc) {
+          // Add the document ID to each document data
+          final data = doc.data();
+          return {
+            ...data,
+            'id': doc.id, // Include the document ID for editing
+          };
+        })
+        .toList();
   }
 
   @override
@@ -48,7 +69,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
           IconButton(
             icon: Icon(Icons.search, color: Colors.white, size: 24.sp),
             onPressed: () {
-              // Add search functionality here if needed
+              // Add search functionality here if needed.
             },
           ),
         ],
@@ -84,11 +105,12 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                   SizedBox(height: 24.h),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {}); // Retry fetching data
+                      setState(() {}); // Retry fetching data.
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF52AAA4),
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 12.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
@@ -137,13 +159,14 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                     label: Text("Add Pet"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF52AAA4),
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 12.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
                     onPressed: () {
-                      // Add navigation to pet creation screen if needed
+                      // Add navigation to pet creation screen if needed.
                     },
                   ),
                 ],
@@ -170,7 +193,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                   Expanded(
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Two columns
+                        crossAxisCount: 2, // Two columns.
                         crossAxisSpacing: 16.w,
                         mainAxisSpacing: 16.h,
                         childAspectRatio: 0.75,
@@ -194,12 +217,13 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   /// Builds each pet card in the grid using the fetched data.
   Widget _buildPetCard(BuildContext context, Map<String, dynamic> petData) {
     final String petName = petData['petName'] ?? "Unknown";
-    final List<dynamic> details = petData['petDetails'] ?? [];
-    // Assume index 1 = Age, index 2 = Size, index 3 = Breed.
-    final String age = (details.length > 1) ? details[1]['value'] ?? "0 yrs" : "0 yrs";
-    final String breed = (details.length > 3) ? details[3]['value'] ?? "Unknown" : "Unknown";
+    final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
+    // Extract details with fallbacks.
+    final String age = details.length > 1 ? (details[1]['value']?.toString() ?? "0 yrs") : "0 yrs";
+    final String breed = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
+    // Removed Symptoms detail from the pet card display.
     final String imageUrl = petData['petImage'] ?? "assets/sampleimage.jpg";
-    
+
     return GestureDetector(
       onTap: () {
         _showPetDetails(context, petData);
@@ -226,7 +250,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Pet image at the top with overlay gradient
+            // Pet image at the top with overlay gradient.
             Stack(
               children: [
                 ClipRRect(
@@ -274,7 +298,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                           fit: BoxFit.cover,
                         ),
                 ),
-                // Gradient overlay on image
+                // Gradient overlay on image.
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -295,7 +319,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                 ),
               ],
             ),
-            // Pet details below image
+            // Pet details below the image.
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(12.w),
@@ -345,36 +369,31 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     );
   }
 
-  /// Displays a bottom sheet with pet details and shows all assessments.
-  /// For each assessment (each group of input symptoms) it computes the final illness based on diagnosisResults.
+  /// Displays a bottom sheet with pet details and health record assessments.
+  /// Each assessment's symptom input is merged (deep copy) into the pet's details
+  /// so that when you tap a health record, the correct symptom (e.g. "diarrhea" or "vomiting") is shown.
+  /// The bottom sheet height can be manually adjusted by the user by dragging the image area.
   void _showPetDetails(BuildContext context, Map<String, dynamic> petData) {
-    // Extract the assessments array saved in the history document.
-    final List<dynamic> assessments = petData['assessments'] ?? [];
-
-    // Retrieve the overall date from the petData document (fallback if individual assessments don't have one)
+    final List<dynamic> assessments = petData['assessments'] is List ? petData['assessments'] : [];
     final dynamic timestamp = petData['date'];
     final String defaultDateStr = (timestamp != null && timestamp is Timestamp)
         ? "${timestamp.toDate().day} ${_getMonthAbbr(timestamp.toDate().month)} ${timestamp.toDate().year}"
         : "N/A";
+    final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
+    final String age = details.length > 1 ? (details[1]['value']?.toString() ?? "Unknown") : "Unknown";
+    final String size = details.length > 2 ? (details[2]['value']?.toString() ?? "Unknown") : "Unknown";
+    final String breed = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
 
-    // Extract pet details.
-    final List<dynamic> details = petData['petDetails'] ?? [];
-    final String age = (details.length > 1) ? details[1]['value'] ?? "Unknown" : "Unknown";
-    final String size = (details.length > 2) ? details[2]['value'] ?? "Unknown" : "Unknown";
-    final String breed = (details.length > 3) ? details[3]['value'] ?? "Unknown" : "Unknown";
-
-    // Build a list of health record widgets.
     List<Widget> healthRecords = [];
     if (assessments.isNotEmpty) {
       for (var assessment in assessments) {
-        // Get the input symptoms (e.g. "vomiting + fever + diarrhea")
+        // Use the symptom input stored in this assessment.
         final String inputSymptoms = assessment['allSymptoms'] ?? "";
-        // Get the diagnosis results from this assessment.
+        // Get the diagnosis results from the assessment.
         final List<dynamic> diag = assessment['diagnosisResults'] ?? [];
         String finalIllness = "No Result";
         Timestamp? assessTimestamp;
         if (diag.isNotEmpty) {
-          // Sort the diagnosis results by confidence_ab descending and take the top one.
           List<dynamic> sortedDiag = List.from(diag);
           sortedDiag.sort((a, b) => (b['confidence_ab'] as num)
               .compareTo(a['confidence_ab'] as num));
@@ -387,6 +406,31 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ? "${assessTimestamp.toDate().day} ${_getMonthAbbr(assessTimestamp.toDate().month)} ${assessTimestamp.toDate().year}"
             : defaultDateStr;
 
+        // Create a deep copy of the petDetails list.
+        List<dynamic> updatedPetDetails = (petData['petDetails'] as List<dynamic>?)
+            ?.map((e) => Map<String, dynamic>.from(e))
+            .toList() ?? [];
+        // Update or add the Symptoms detail for this assessment.
+        if (updatedPetDetails.length >= 5) {
+          updatedPetDetails[4]['value'] = inputSymptoms;
+        } else {
+          updatedPetDetails.add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
+        }
+
+        // Merge the pet's basic data with the assessment-specific fields.
+        Map<String, dynamic> mergedData = {
+          'id': petData['id'], // Include document ID for editing
+          'petName': petData['petName'] ?? "Unknown",
+          'petDetails': updatedPetDetails,
+          'petImage': petData['petImage'] ?? "assets/sampleimage.jpg",
+          'petType': petData['petType'] ?? "",
+          // Overwrite/assign assessment-specific fields.
+          'date': assessment['date'] ?? defaultDateStr,
+          'diagnosisResults': assessment['diagnosisResults'] ?? [],
+          'allSymptoms': inputSymptoms,
+          'symptomDetails': assessment['symptomDetails'] ?? {},
+        };
+
         healthRecords.add(
           _buildHealthRecordItem(
             title: "$inputSymptoms\n→ $finalIllness",
@@ -394,11 +438,10 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             status: "Completed",
             isCompleted: true,
             onTap: () {
-              // When tapped, navigate to ViewhistoryScreen passing this specific assessment.
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ViewhistoryScreen(historyData: Map<String, dynamic>.from(assessment)),
+                  builder: (context) => ViewhistoryScreen(historyData: mergedData),
                 ),
               );
             },
@@ -417,181 +460,123 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       );
     }
 
+    // Create a key to access the modal sheet's state
+    final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey = GlobalKey<ImageDraggableBottomSheetState>();
+
+    // Store the current context's size
+    final Size screenSize = MediaQuery.of(context).size;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
-      ),
+      backgroundColor: Colors.transparent,
+      enableDrag: false, // Disable default dragging to use our custom implementation
+      isDismissible: true,
       builder: (context) {
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Top section with pet image and info.
-              Stack(
-                children: [
-                  Container(
-                    height: 350.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50.r),
-                        topRight: Radius.circular(50.r),
-                      ),
-                      image: DecorationImage(
-                        image: petData['petImage'] != null &&
-                                (petData['petImage'] as String).startsWith("http")
-                            ? NetworkImage(petData['petImage'])
-                            : AssetImage(petData['petImage'] ?? "assets/sampleimage.jpg") as ImageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 12.h,
-                    left: 12.w,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: EdgeInsets.all(8.sp),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20.sp,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 12.h,
-                    left: 16.w,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          petData['petName'] ?? "Unknown",
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 8.0,
-                                color: Colors.black.withOpacity(0.5),
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          breed,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 8.0,
-                                color: Colors.black.withOpacity(0.5),
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+        return ImageDraggableBottomSheet(
+          key: resizableSheetKey,
+          initialHeight: screenSize.height * 0.85, // Start at 85% of screen height
+          minHeight: screenSize.height * 0.4, // Minimum height (40%)
+          maxHeight: screenSize.height * 0.95, // Maximum height (95%)
+          petData: petData,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
+          petBreed: breed,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 1,
               ),
-              // Details section.
-              Padding(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ],
+          ),
+          onPetDetailsUpdated: () {
+            // Refresh the screen when pet details are updated
+            setState(() {});
+          },
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Details",
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                // Pet details in cards
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildDetailCard(
+                        icon: Icons.cake,
+                        iconColor: Colors.amber,
+                        label: "Age",
+                        value: age,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: _buildDetailCard(
+                        icon: Icons.pets,
+                        iconColor: Colors.brown,
+                        label: "Breed",
+                        value: breed,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: _buildDetailCard(
+                        icon: Icons.straighten,
+                        iconColor: Colors.blue,
+                        label: "Size",
+                        value: size,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                // Recent Health Records section.
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Details",
+                      "Recent Health Records",
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(height: 16.h),
-                    // Pet details in 3 cards.
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildDetailCard(
-                            icon: Icons.cake,
-                            iconColor: Colors.amber,
-                            label: "Age",
-                            value: age,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: _buildDetailCard(
-                            icon: Icons.pets,
-                            iconColor: Colors.brown,
-                            label: "Breed",
-                            value: breed,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: _buildDetailCard(
-                            icon: Icons.straighten,
-                            iconColor: Colors.blue,
-                            label: "Size",
-                            value: size,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      "See All",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.orange,
+                      ),
                     ),
-                    SizedBox(height: 24.h),
-                    // Recent Health Records section.
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Recent Health Records",
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        Text(
-                          "See All",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    // Display all assessments health records.
-                    Column(
-                      children: healthRecords,
-                    ),
-                    SizedBox(height: 24.h),
                   ],
                 ),
-              ),
-            ],
+                SizedBox(height: 16.h),
+                // Display all health record items.
+                Column(
+                  children: healthRecords,
+                ),
+                SizedBox(height: 24.h),
+              ],
+            ),
           ),
         );
       },
+      // Set barrier color and other modal properties
+      barrierColor: Colors.black.withOpacity(0.5),
     );
   }
 
@@ -604,7 +589,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     return months[month - 1];
   }
   
-  /// Builds a detail card for age, breed, size.
+  /// Builds a detail card for a pet detail.
   Widget _buildDetailCard({
     required IconData icon,
     required Color iconColor,
@@ -721,7 +706,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     );
   }
   
-  /// Builds an expandable card (unchanged UI).
+  /// Builds an expandable card (UI remains unchanged).
   Widget _buildExpandableCard({
     required String title,
     required IconData icon,
@@ -742,7 +727,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color.fromARGB(0, 0, 0, 0),
           leading: Icon(
             icon,
             color: const Color(0xFF52AAA4),
@@ -763,8 +748,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-
-  /// Builds a recommendation item (unchanged UI).
+  
+  /// Builds a recommendation item.
   Widget _buildRecommendationItem(ListItem item) {
     return Container(
       margin: EdgeInsets.only(bottom: 15.h),
@@ -842,12 +827,545 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-
+  
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
+  }
+}
+
+/// A bottom sheet that can be resized by dragging the image area.
+/// 
+/// This widget displays a bottom sheet with a pet image at the top that
+/// can be dragged to adjust the height of the sheet.
+class ImageDraggableBottomSheet extends StatefulWidget {
+  final Widget child;
+  final double initialHeight;
+  final double minHeight;
+  final double maxHeight;
+  final BoxDecoration decoration;
+  final BorderRadius borderRadius;
+  final Map<String, dynamic> petData;
+  final String petBreed;
+  final VoidCallback? onPetDetailsUpdated;
+
+  const ImageDraggableBottomSheet({
+    Key? key,
+    required this.child,
+    required this.initialHeight,
+    required this.minHeight,
+    required this.maxHeight,
+    required this.decoration,
+    required this.borderRadius,
+    required this.petData,
+    required this.petBreed,
+    this.onPetDetailsUpdated,
+  }) : super(key: key);
+
+  @override
+  State<ImageDraggableBottomSheet> createState() => ImageDraggableBottomSheetState();
+}
+
+class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> with SingleTickerProviderStateMixin {
+  late double _currentHeight;
+  bool _isDragging = false;
+  late AnimationController _snapController;
+  late Animation<double> _snapAnimation;
+  
+  // Add fixed bottom limit constant
+  final double _fixedBottomLimit = 500.0; // Adjust value as needed
+  
+  // Heights for magnetic snapping
+  double? _snapToHeight;
+  final List<double> _snapPoints = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentHeight = widget.initialHeight;
+    
+    // Setup animation controller for smooth snapping
+    _snapController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    
+    _snapController.addListener(() {
+      if (_snapToHeight != null) {
+        setState(() {
+          _currentHeight = _snapAnimation.value;
+        });
+      }
+    });
+    
+    // Calculate snap points - these are positions where the sheet will "snap" to
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final screenHeight = MediaQuery.of(context).size.height;
+      _snapPoints.addAll([
+        screenHeight * 0.45, // Small peek
+        screenHeight * 0.65, // Half view
+        screenHeight * 0.85, // Full view
+      ]);
+    });
+  }
+
+  @override
+  void dispose() {
+    _snapController.dispose();
+    super.dispose();
+  }
+
+  void setHeight(double newHeight) {
+    setState(() {
+      // Use fixed bottom limit instead of widget.minHeight
+      _currentHeight = newHeight.clamp(_fixedBottomLimit, widget.maxHeight);
+    });
+  }
+  
+  void _snapToNearestPoint(double velocity) {
+    // Find the nearest snap point that's above our fixed bottom limit
+    double? nearestPoint;
+    double minDistance = double.infinity;
+    
+    for (final point in _snapPoints) {
+      // Only consider snap points above our fixed limit
+      if (point >= _fixedBottomLimit) {
+        final distance = (_currentHeight - point).abs();
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = point;
+        }
+      }
+    }
+    
+    // If there are no valid snap points, default to the fixed bottom limit
+    nearestPoint ??= _fixedBottomLimit;
+    
+    // If the velocity is significant, snap in that direction
+    if (velocity.abs() > 800 && nearestPoint != _fixedBottomLimit) {
+      final direction = velocity < 0 ? 1 : -1;
+      final currentIndex = _snapPoints.indexOf(nearestPoint);
+      int targetIndex = (currentIndex + direction).clamp(0, _snapPoints.length - 1);
+      
+      // Ensure the target snap point is above our fixed limit
+      while (targetIndex >= 0 && targetIndex < _snapPoints.length && 
+             _snapPoints[targetIndex] < _fixedBottomLimit) {
+        targetIndex += direction > 0 ? 1 : -1;
+      }
+      
+      // If we found a valid target, use it
+      if (targetIndex >= 0 && targetIndex < _snapPoints.length) {
+        nearestPoint = _snapPoints[targetIndex];
+      }
+    }
+    
+    // Snap to the selected point if it differs from current height
+    if (nearestPoint != null && (nearestPoint - _currentHeight).abs() > 10) {
+      _snapToHeight = nearestPoint;
+      
+      // Create animation
+      _snapAnimation = Tween<double>(
+        begin: _currentHeight,
+        end: _snapToHeight,
+      ).animate(CurvedAnimation(
+        parent: _snapController,
+        curve: Curves.easeOutCubic,
+      ));
+      
+      // Start animation
+      _snapController.reset();
+      _snapController.forward().then((_) {
+        _snapToHeight = null;
+      });
+    }
+  }
+
+  // Add method to show edit dialog
+  void _showEditDialog(BuildContext context) {
+    // Controllers for the text fields
+    final TextEditingController ageController = TextEditingController();
+    final TextEditingController sizeController = TextEditingController();
+    
+    // Get current values from petData to prefill
+    final List<dynamic> details = widget.petData['petDetails'] is List ? widget.petData['petDetails'] : [];
+    final String currentAge = details.length > 1 ? (details[1]['value']?.toString() ?? "") : "";
+    final String currentSize = details.length > 2 ? (details[2]['value']?.toString() ?? "") : "";
+    
+    // Set initial values
+    ageController.text = currentAge;
+    sizeController.text = currentSize;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Edit Pet Details",
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF3D4A5C),
+            ),
+          ),
+          content: Container(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: ageController,
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    hintText: 'e.g. 2 yrs',
+                    prefixIcon: Icon(Icons.cake, color: Colors.amber),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: BorderSide(color: const Color(0xFF52AAA4), width: 2),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                TextField(
+                controller: sizeController,
+                inputFormatters: [
+                  FirstLetterUpperCaseTextFormatter(),
+                  FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'Size',
+                  hintText: 'e.g. Medium',
+                  prefixIcon: Icon(Icons.straighten, color: Colors.blue),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                    borderSide: BorderSide(color: const Color(0xFF52AAA4), width: 2),
+                  ),
+                ),
+              ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF52AAA4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                "Save",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () async {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: const Color(0xFF52AAA4),
+                      ),
+                    );
+                  },
+                );
+                
+                try {
+                  // Update Firestore with new values
+                  await _updatePetDetails(ageController.text, sizeController.text);
+                  
+                  // Close loading dialog
+                  Navigator.of(context).pop();
+                  
+                  // Close edit dialog
+                  Navigator.of(context).pop();
+                  
+                  // Show success snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Pet details updated successfully"),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                  );
+                  
+                  // Notify parent about the update
+                  if (widget.onPetDetailsUpdated != null) {
+                    widget.onPetDetailsUpdated!();
+                  }
+                } catch (e) {
+                  // Close loading dialog
+                  Navigator.of(context).pop();
+                  
+                  // Show error snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Error updating pet details: ${e.toString()}"),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      // Dispose controllers when dialog is closed
+      ageController.dispose();
+      sizeController.dispose();
+    });
+  }
+
+  // Add method to update Firestore
+  Future<void> _updatePetDetails(String newAge, String newSize) async {
+    try {
+      // Get user ID
+      final String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("User is not signed in.");
+      }
+      
+      // Get document ID from petData
+      final String documentId = widget.petData['id'] ?? "";
+      if (documentId.isEmpty) {
+        throw Exception("Document ID not found");
+      }
+      
+      // Create a copy of the pet details
+      List<dynamic> updatedDetails = [];
+      if (widget.petData['petDetails'] is List) {
+        updatedDetails = List.from(widget.petData['petDetails']);
+        
+        // Update age (index 1)
+        if (updatedDetails.length > 1) {
+          updatedDetails[1] = {
+            ...updatedDetails[1] as Map<String, dynamic>,
+            'value': newAge
+          };
+        }
+        
+        // Update size (index 2)
+        if (updatedDetails.length > 2) {
+          updatedDetails[2] = {
+            ...updatedDetails[2] as Map<String, dynamic>,
+            'value': newSize
+          };
+        }
+      }
+      
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('History')
+          .doc(documentId)
+          .update({
+            'petDetails': updatedDetails,
+          });
+      
+      // Update local state to reflect changes
+      setState(() {
+        widget.petData['petDetails'] = updatedDetails;
+      });
+      
+    } catch (e) {
+      print("Error updating pet details: $e");
+      throw e;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: _isDragging ? 0 : 200),
+      curve: Curves.easeInOut,
+      height: _currentHeight,
+      decoration: widget.decoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Pet image section that acts as the draggable area
+          GestureDetector(
+            onVerticalDragStart: (details) {
+              // Stop any running snap animation
+              _snapController.stop();
+              _snapToHeight = null;
+              
+              setState(() {
+                _isDragging = true;
+              });
+            },
+            onVerticalDragUpdate: (details) {
+              // Calculate new height when dragging
+              final newHeight = _currentHeight - details.delta.dy;
+              
+              // Apply the fixed bottom limit
+              final limitedHeight = newHeight.clamp(_fixedBottomLimit, widget.maxHeight);
+              
+              setState(() {
+                _currentHeight = limitedHeight;
+              });
+            },
+            onVerticalDragEnd: (details) {
+              setState(() {
+                _isDragging = false;
+              });
+              
+              // Snap to nearest point when user stops dragging
+              _snapToNearestPoint(details.velocity.pixelsPerSecond.dy);
+            },
+            child: Stack(
+              children: [
+                Container(
+                  height: 350.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: widget.borderRadius,
+                    image: DecorationImage(
+                      image: widget.petData['petImage'] != null &&
+                              (widget.petData['petImage'] as String).startsWith("http")
+                          ? NetworkImage(widget.petData['petImage'])
+                          : AssetImage(widget.petData['petImage'] ?? "assets/sampleimage.jpg") as ImageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Close button
+                Positioned(
+                  top: 12.h,
+                  left: 12.w,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: EdgeInsets.all(8.sp),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
+                    ),
+                  ),
+                ),
+                // Edit button
+                Positioned(
+                  top: 280.h,
+                  right: 12.w,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Show edit dialog for age and size
+                      _showEditDialog(context);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8.sp),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 22.sp,
+                      ),
+                    ),
+                  ),
+                ),
+                // Pet name and breed info at the bottom of the image
+                Positioned(
+                  bottom: 12.h,
+                  left: 16.w,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.petData['petName'] ?? "Unknown",
+                        style: TextStyle(
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 8.0,
+                              color: Colors.black.withOpacity(0.5),
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        widget.petBreed,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 8.0,
+                              color: Colors.black.withOpacity(0.5),
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Content section
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              // Prevent scroll actions when dragging the modal
+              onNotification: (notification) {
+                if (_isDragging) {
+                  return true; // Block scroll when dragging
+                }
+                return false; // Allow scroll normally
+              },
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: widget.child,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -858,10 +1376,6 @@ class ListItem {
   final String? url;
   final bool isExternal;
   final String imageUrl;
-  final int age;
-  final String breed;
-  final Color color;
-  final String size;
 
   const ListItem({
     required this.title,
@@ -870,23 +1384,34 @@ class ListItem {
     this.url,
     required this.isExternal,
     required this.imageUrl,
-    required this.age,
-    required this.breed,
-    required this.color,
-    required this.size,
   });
+
+
+  
+
 }
 
-// Extension method to darken colors.
-extension ColorExtension on Color {
-  Color darken([int percent = 10]) {
-    assert(1 <= percent && percent <= 100);
-    final value = 1 - percent / 100;
-    return Color.fromARGB(
-      alpha,
-      (red * value).round(),
-      (green * value).round(),
-      (blue * value).round(),
+class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue; // Return empty value
+    }
+    
+    // Capitalize the first letter and keep the rest as-is
+    final text = newValue.text;
+    final firstLetter = text[0].toUpperCase();
+    final restOfText = text.substring(1);
+    
+    return newValue.copyWith(
+      text: firstLetter + restOfText,
+      selection: newValue.selection,
     );
   }
 }
+
+
+

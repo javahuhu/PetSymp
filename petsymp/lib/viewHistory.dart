@@ -9,7 +9,6 @@ import 'userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'barchart/barfirebasegraph.dart';
 
-
 class ViewhistoryScreen extends StatefulWidget {
   final Map<String, dynamic> historyData; // Data passed from the history card
   const ViewhistoryScreen({Key? key, required this.historyData}) : super(key: key);
@@ -62,7 +61,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Use the passed historyData instead of reloading via StreamBuilder.
+    // Use the passed historyData.
     final Map<String, dynamic> historyData = widget.historyData;
     final String petName = historyData['petName'] ?? "Unknown";
     final List<Map<String, String>> petDetails =
@@ -84,8 +83,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
           ? diagnoses.sublist(0, 3)
           : List<Map<String, dynamic>>.from(diagnoses);
     }
-    final String allSymptoms = historyData['allSymptoms'] ?? "";
-    // Properly cast saved symptom details
+    // Properly cast saved symptom details.
     final rawDetails = historyData['symptomDetails'] ?? {};
     final Map<String, List<Map<String, dynamic>>> savedSymptomDetails = {};
     if (rawDetails is Map) {
@@ -97,7 +95,6 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
       });
     }
 
-    // Build the UI exactly as before, using the passed data
     return PopScope(
       canPop: true,
       child: Scaffold(
@@ -108,7 +105,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Date display
+                // Date display.
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
                   decoration: BoxDecoration(
@@ -138,7 +135,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   ),
                 ),
                 SizedBox(height: 20.h),
-                // Pet Card
+                // Pet Card.
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -303,8 +300,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   ),
                 ),
                 SizedBox(height: 25.h),
-                if (topDiagnoses.isNotEmpty)
-                  _buildDiagnosisSection(topDiagnoses),
+                if (topDiagnoses.isNotEmpty) _buildDiagnosisSection(topDiagnoses),
                 SizedBox(height: 25.h),
                 _buildExpandableCard(
                   title: "Statistics & Analysis",
@@ -354,6 +350,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                               final double chartWidth = totalRequiredWidth < screenWidth
                                   ? screenWidth
                                   : totalRequiredWidth;
+                              // Note: the variable 'savedSymptomDetails' is built from the passed historyData.
                               return SizedBox(
                                 width: chartWidth,
                                 child: BarChartRetrieve(
@@ -500,8 +497,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
 
   Widget _buildDiagnosisItem(Map<String, dynamic> diagnosis,
       {bool isPrimary = false, required String description}) {
-    final confidence =
-        (diagnosis['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+    final confidence = (diagnosis['confidence_ab'] as num?)?.toDouble() ?? 0.0;
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       padding: EdgeInsets.all(15.w),
@@ -541,9 +537,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         child: CircularProgressIndicator(
                           value: confidence,
                           backgroundColor: Colors.grey.withOpacity(0.2),
-                          color: isPrimary
-                              ? const Color(0xFF52AAA4)
-                              : const Color(0xFFFFA726),
+                          color: isPrimary ? const Color(0xFF52AAA4) : const Color(0xFFFFA726),
                           strokeWidth: 8.w,
                         ),
                       ),
@@ -552,9 +546,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: isPrimary
-                              ? const Color(0xFF52AAA4)
-                              : const Color(0xFF3D4A5C),
+                          color: isPrimary ? const Color(0xFF52AAA4) : const Color(0xFF3D4A5C),
                         ),
                       ),
                     ],
@@ -613,8 +605,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => IllnessdetailsScreen(
-                          illnessName: diagnosis['illness']),
+                      builder: (context) => IllnessdetailsScreen(illnessName: diagnosis['illness']),
                     ),
                   );
                 },
@@ -864,9 +855,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
   Widget _tableScoreCell(double value, bool isHighlighted) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
-      color: isHighlighted
-          ? const Color(0xFFEFF8F7).withOpacity(0.3)
-          : Colors.transparent,
+      color: isHighlighted ? const Color(0xFFEFF8F7).withOpacity(0.3) : Colors.transparent,
       child: Text(
         value.toStringAsFixed(2),
         textAlign: TextAlign.center,

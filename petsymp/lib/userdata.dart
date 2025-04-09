@@ -87,7 +87,6 @@ class UserData with ChangeNotifier {
     _petAge = 0;
     _breed = '';
     _petImage = null;
-    _selectedPetType = '';
     notifyListeners();
   }
 

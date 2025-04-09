@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:petsymp/petimage.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
-import 'package:petsymp/userpet.dart';
+import 'package:petsymp/userpet.dart'; // This screen is shown when a pet is selected
 
 class CardpetScreen extends StatefulWidget {
   const CardpetScreen({super.key});
@@ -34,14 +33,14 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
       'name': 'Dog',
       'description': 'Loyal companion for your family',
       'color': const Color(0xFF428682),
-      'page': UserPetScreen(),
+      'page': const UserPetScreen(),
     },
     {
       'image': 'assets/cardCat.png',
       'name': 'Cat',
       'description': 'Elegant and independent friend',
       'color': const Color(0xFF5DBFB0),
-      'page': UserPetScreen(),
+      'page': const UserPetScreen(),
     },
   ];
 
@@ -55,7 +54,7 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
       if (page != null) {
         setState(() {
           _currentPage = page.round();
-          _selectedPet = _pets[_currentPage]['name'];
+          _selectedPet = _pets[_currentPage]['name'] as String;
         });
       }
     });
@@ -70,16 +69,22 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
 
   void _navigateToPetPage(int index) {
     if (_isAnimating) return;
-    final selectedPet = _pets[index]['name'];
+    final selectedPet = _pets[index]['name'] as String;
+    // Set the pet type in the provider.
     Provider.of<UserData>(context, listen: false).setSelectedPetType(selectedPet);
-    setState(() { _isAnimating = true; _selectedPet = selectedPet; });
+    setState(() {
+      _isAnimating = true;
+      _selectedPet = selectedPet;
+    });
     _animationController.reverse().then((_) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => _pets[index]['page']),
       );
       _animationController.forward().then((_) {
-        setState(() { _isAnimating = false; });
+        setState(() {
+          _isAnimating = false;
+        });
       });
     });
   }
@@ -93,9 +98,9 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: screenHeight
-                - MediaQuery.of(context).padding.top
-                - MediaQuery.of(context).padding.bottom,
+              minHeight: screenHeight -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +146,7 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
                       onPageChanged: (int page) {
                         setState(() {
                           _currentPage = page;
-                          _selectedPet = _pets[page]['name'];
+                          _selectedPet = _pets[page]['name'] as String;
                         });
                       },
                       itemBuilder: (context, index) {
@@ -155,10 +160,10 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
                             return Transform.scale(scale: value, child: child);
                           },
                           child: _buildEnhancedPetCard(
-                            _pets[index]['image'],
-                            _pets[index]['name'],
-                            _pets[index]['description'],
-                            _pets[index]['color'],
+                            _pets[index]['image'] as String,
+                            _pets[index]['name'] as String,
+                            _pets[index]['description'] as String,
+                            _pets[index]['color'] as Color,
                             index,
                             isSelected,
                           ),
@@ -180,8 +185,8 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
                         width: _currentPage == index ? 24.w : 8.w,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                            ? _pets[index]['color']
-                            : Colors.grey[600],
+                              ? _pets[index]['color'] as Color
+                              : Colors.grey[600],
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                       );
@@ -193,7 +198,7 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
                   child: ElevatedButton(
                     onPressed: () => _navigateToPetPage(_currentPage),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _pets[_currentPage]['color'],
+                      backgroundColor: _pets[_currentPage]['color'] as Color,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.r),
@@ -252,8 +257,8 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                  ? accentColor.withOpacity(0.4)
-                  : Colors.black.withOpacity(0.2),
+                    ? accentColor.withOpacity(0.4)
+                    : Colors.black.withOpacity(0.2),
                 blurRadius: 15.r,
                 offset: Offset(0, 8.h),
               ),
@@ -350,15 +355,12 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  // Use _currentPage instead of pageController.page!
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     width: 60.w,
                     height: 6.h,
                     decoration: BoxDecoration(
-                      color: _currentPage == index
-                        ? accentColor
-                        : Colors.transparent,
+                      color: _currentPage == index ? accentColor : Colors.transparent,
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
