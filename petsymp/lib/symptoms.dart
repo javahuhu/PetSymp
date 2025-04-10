@@ -96,29 +96,21 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
   }
 
   void navigateToNextPage() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final userData = Provider.of<UserData>(context, listen: false);
-      final inputText = _symptomsController.text.trim().toLowerCase();
+  if (_formKey.currentState?.validate() ?? false) {
+    final userData = Provider.of<UserData>(context, listen: false);
+    final inputText = _symptomsController.text.trim().toLowerCase();
 
-      // 1. Add to pending temporarily
-      userData.addPendingSymptom(inputText);
-      userData.setAnotherSymptom(inputText);
+    // Do not add to pending at this stage.
+    userData.setAnotherSymptom(inputText);
 
-      // 2. Navigate and wait for return
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SearchsymptomsScreen(symptoms: [inputText]),
-        ),
-      );
-
-      // 3. Remove if not selected
-      if (userData.pendingSymptoms.contains(inputText)) {
-        userData.removePendingSymptom(inputText);
-        debugPrint("🗑️ Removed $inputText since user backed out without selecting");
-      }
-    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchsymptomsScreen(symptoms: [inputText]),
+      ),
+    );
   }
+}
 
   void _navigateToSymptomCatalog() {
     if (_isNavigating) return;

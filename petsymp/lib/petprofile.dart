@@ -472,7 +472,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       builder: (context) {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
-          initialHeight: screenSize.height * 0.8, // Start at 85% of screen height
+          initialHeight: screenSize.height * 0.95, // Start at 85% of screen height
           minHeight: screenSize.height * 0.7, // Minimum height (40%)
           maxHeight: screenSize.height * 1, // Maximum height (95%)
           petData: petData,

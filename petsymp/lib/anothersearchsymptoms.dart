@@ -8,47 +8,50 @@ import 'symptomscatalog.dart';
 import 'package:animate_do/animate_do.dart';
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
-  const AnothersearchsymptomsScreen({super.key});
+  /// Expected to be a single-element list with the input symptom.
+  final List<String> symptoms;
+
+  const AnothersearchsymptomsScreen({super.key, required this.symptoms});
 
   @override
   AnothersearchsymptomsScreenState createState() =>
       AnothersearchsymptomsScreenState();
 }
 
-class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen> with SingleTickerProviderStateMixin {
+class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen>
+    with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
   bool _isNavigating = false;
-  final List<bool> _buttonVisible = [false, false, false, false, false, false];
-  
-  // Animation controller for bubbles
   AnimationController? _bubbleAnimationController;
+
+  // Map for additional symptom descriptions.
+  final Map<String, String> _symptomDescriptions = {
+    'diarrhea': 'Loose, watery stools occurring more frequently than usual.',
+    'vomiting': 'Forceful expulsion of stomach contents through the mouth.',
+    'coughing': 'Sudden expulsion of air from the lungs to clear the passages.',
+    'fever': 'Abnormally high body temperature, often indicating infection.',
+    'lethargy': 'Unusual tiredness or decreased activity.',
+    'loss of appetite': 'Reduced desire to eat despite a normal feeding schedule.',
+    'frequent bowel movements': 'Loose, watery stools.',
+    'frequent episodes': 'Repeated vomiting over a short period',
+    // Add more as needed.
+  };
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize animation controller first
     _bubbleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
-    
+
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
       });
-      for (int i = 0; i < _buttonVisible.length; i++) {
-        final int index = i;
-        Future.delayed(Duration(milliseconds: 300 * index), () {
-          if (!mounted) return;
-          setState(() {
-            _buttonVisible[index] = true;
-          });
-        });
-      }
     });
   }
-  
+
   @override
   void dispose() {
     _bubbleAnimationController?.dispose();
@@ -57,7 +60,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
 
   void _navigateToSymptomCatalog() {
     if (_isNavigating) return;
-
     _isNavigating = true;
     Navigator.push(
       context,
@@ -69,25 +71,113 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
 
   @override
   Widget build(BuildContext context) {
+    // Screen dimensions.
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final userData = Provider.of<UserData>(context);
+    final UserData userData = Provider.of<UserData>(context, listen: false);
 
-    // Instead of checking the temporary anotherSymptom field,
-    // use the last element in pendingSymptoms.
-    String displayedSymptom = "";
+    // Get predefined symptoms from userData.
+    final List<String> predefinedSymptoms = userData.getPredefinedSymptoms();
+
+    // Define additional symptoms.
+    final List<String> additionalSymptoms = [
+      'Frequent Bowel Movements',
+      'Frequent Episodes',
+    ];
+
+    // Determine the input symptom (if any).
+    String inputSymptom = "";
+    if (widget.symptoms.isNotEmpty && widget.symptoms[0].trim().isNotEmpty) {
+      inputSymptom = widget.symptoms[0].toLowerCase();
+    }
+
+    // Determine the candidate symptom:
+    // Priority: pending > selected > input.
+    String candidateSymptom = "";
     if (userData.pendingSymptoms.isNotEmpty) {
-      displayedSymptom = userData.pendingSymptoms.last;
+      candidateSymptom = userData.pendingSymptoms.last;
     } else if (userData.selectedSymptom.isNotEmpty) {
-      displayedSymptom = userData.selectedSymptom;
-    } else {
-      displayedSymptom = "Select Another Symptoms";
+      candidateSymptom = userData.selectedSymptom;
+    } else if (inputSymptom.isNotEmpty) {
+      candidateSymptom = inputSymptom;
+    }
+
+    // Build a candidate list by combining input, predefined, and additional symptoms.
+    List<String> candidateList = [];
+    if (inputSymptom.isNotEmpty) candidateList.add(inputSymptom);
+    candidateList.addAll(predefinedSymptoms);
+    candidateList.addAll(additionalSymptoms);
+
+    // Remove duplicates (order preserving, case-insensitive).
+    List<String> uniqueList = [];
+    for (String s in candidateList) {
+      if (!uniqueList.any((u) => u.toLowerCase() == s.toLowerCase())) {
+        uniqueList.add(s);
+      }
+    }
+
+    // Filter out any already pending symptoms from the selectable list.
+    // (Assuming you do not want any symptom in userData.pendingSymptoms to be selectable.)
+    final Set<String> pendingSet =
+        userData.pendingSymptoms.map((s) => s.toLowerCase()).toSet();
+    uniqueList.removeWhere((s) => pendingSet.contains(s.toLowerCase()));
+
+    // Now, if candidateSymptom exists, ensure it appears at the top as a header (if needed)
+    // but not repeated in the selectable list.
+    if (candidateSymptom.isNotEmpty) {
+      uniqueList.removeWhere((s) =>
+          s.toLowerCase() == candidateSymptom.toLowerCase());
+    }
+
+    final List<String> symptomList = uniqueList;
+
+    // If no selectable symptoms exist, show an error page.
+    if (symptomList.isEmpty && candidateSymptom.isEmpty) {
+      return Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(225, 240, 243, 1.0),
+                Color.fromRGBO(201, 229, 231, 1.0),
+                Color(0xFFE8F2F5),
+              ],
+              stops: [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("No symptoms available.",
+                    style: TextStyle(fontSize: 20, color: Colors.black)),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text("Go Back"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Make scaffold transparent for gradient
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: Container(
-        // Enhanced background with gradient
+        width: screenWidth,
+        height: screenHeight,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -102,9 +192,8 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
         ),
         child: Stack(
           children: [
-            // Decorative background elements
+            // Animated background bubbles.
             if (_bubbleAnimationController != null) ...[
-              // Large wave-like shape at the top
               Positioned(
                 top: -screenHeight * 0.2,
                 left: -screenWidth * 0.25,
@@ -112,24 +201,20 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   animation: _bubbleAnimationController!,
                   builder: (context, child) {
                     return Transform.translate(
-                      offset: Offset(
-                        0,
-                        _bubbleAnimationController!.value * 10,
-                      ),
+                      offset: Offset(0, _bubbleAnimationController!.value * 10),
                       child: Container(
                         width: screenWidth * 1.5,
                         height: screenHeight * 0.5,
                         decoration: BoxDecoration(
                           color: const Color.fromRGBO(66, 134, 129, 0.07),
-                          borderRadius: BorderRadius.circular(screenHeight * 0.25),
+                          borderRadius:
+                              BorderRadius.circular(screenHeight * 0.25),
                         ),
                       ),
                     );
                   },
                 ),
               ),
-              
-              // Smaller wave-like shape in bottom-right
               Positioned(
                 bottom: -screenHeight * 0.1,
                 right: -screenWidth * 0.25,
@@ -137,24 +222,20 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   animation: _bubbleAnimationController!,
                   builder: (context, child) {
                     return Transform.translate(
-                      offset: Offset(
-                        0,
-                        -_bubbleAnimationController!.value * 10,
-                      ),
+                      offset: Offset(0, -_bubbleAnimationController!.value * 10),
                       child: Container(
                         width: screenWidth * 0.9,
                         height: screenHeight * 0.3,
                         decoration: BoxDecoration(
                           color: const Color.fromRGBO(66, 134, 129, 0.08),
-                          borderRadius: BorderRadius.circular(screenHeight * 0.15),
+                          borderRadius:
+                              BorderRadius.circular(screenHeight * 0.15),
                         ),
                       ),
                     );
                   },
                 ),
               ),
-              
-              // Middle-left floating bubble
               Positioned(
                 top: screenHeight * 0.45,
                 left: screenWidth * 0.05,
@@ -182,8 +263,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   },
                 ),
               ),
-              
-              // Middle-right small floating circle
               Positioned(
                 top: screenHeight * 0.6,
                 right: screenWidth * 0.1,
@@ -213,8 +292,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ),
               ),
             ],
-            
-            // Small dot pattern top-right
+            // Static background dots.
             Positioned(
               top: screenHeight * 0.25,
               right: screenWidth * 0.15,
@@ -239,143 +317,100 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ),
               ),
             ),
-            
-            // Main content
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Back Button
-                    SizedBox(
-                      height: screenHeight * 0.1,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: screenHeight * 0.03,
-                            left: -screenWidth * 0.05,
-                            child: ElevatedButton.icon(
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(
-                                Icons.arrow_back_sharp,
-                                color: Color.fromRGBO(61, 47, 40, 1),
-                                size: 40.0,
-                              ),
-                              label: const Text(''),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: Colors.transparent,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.03),
-                    // Animated Header
-                    AnimatedOpacity(
-                      duration: const Duration(seconds: 1),
-                      opacity: _isAnimated ? 1 : 0,
+            // Main content.
+            SafeArea(
+              child: Column(
+                children: [
+                  // Back button and header.
+                  SizedBox(
+                    height: 60.h,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.05, vertical: 10.h),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Container(
-                            width: screenWidth * 0.15,
-                            height: screenWidth * 0.15,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromRGBO(66, 134, 129, 0.2),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              'assets/paw.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.05),
-                          Expanded(
-                            child: SlideInLeft(
-                              duration: const Duration(milliseconds: 1000),
-                              delay: const Duration(milliseconds: 300),
-                              from: 50,
-                              child: AutoSizeText(
-                                "Select Another Symptoms",
-                                maxLines: 1,
-                                minFontSize: 12,
-                                style: TextStyle(
-                                  fontSize: screenWidth * 0.08,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromRGBO(29, 29, 44, 1.0),
-                                ),
-                              ),
+                          IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(
+                              Icons.arrow_back_sharp,
+                              color: Color.fromRGBO(61, 47, 40, 1),
+                              size: 32.0,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 70.h),
-                    
-                    // Container that shows the latest symptom (from pendingSymptoms)
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 600),
-                      delay: const Duration(milliseconds: 100),
-                      child: Column(
-                        children: [
-                          buildSymptomsContainer(
-                            screenWidth,
-                            displayedSymptom,
-                            ["Tap to select and answer questions for new symptoms"],
+                  ),
+                  SizedBox(height: 10.h),
+                  // Animated header title.
+                  AnimatedOpacity(
+                    duration: const Duration(seconds: 1),
+                    opacity: _isAnimated ? 1 : 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SlideInLeft(
+                          duration: const Duration(milliseconds: 1000),
+                          from: 50,
+                          child: AutoSizeText(
+                            "Select Another Symptoms",
+                            maxLines: 1,
+                            minFontSize: 12,
+                            style: TextStyle(
+                              fontSize: 30.sp,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Oswald',
+                              color: const Color.fromRGBO(29, 29, 44, 1.0),
+                            ),
                           ),
-                          SizedBox(height: 15.h),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  // If a candidate (pending or input) symptom exists, show it as a header.
+                  if (candidateSymptom.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Text(
+                          "Symptoms: ${candidateSymptom[0].toUpperCase()}${candidateSymptom.substring(1)}",
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
                       ),
                     ),
-                    
-                    // Additional hardcoded symptom containers (if needed)
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 600),
-                      delay: const Duration(milliseconds: 200),
-                      child: Column(
-                        children: [
-                          buildSymptomsContainer(
-                            screenWidth,
-                            "Frequent Bowel Movements",
-                            ["Loose, watery stools."],
+                  SizedBox(height: 10.h),
+                  // Selectable symptom list.
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.fromLTRB(screenWidth * 0.05, 5.h, screenWidth * 0.05, 80.h),
+                      itemCount: symptomList.length,
+                      itemBuilder: (context, index) {
+                        final symptom = symptomList[index];
+                        return FadeInUp(
+                          duration: const Duration(milliseconds: 600),
+                          delay: Duration(milliseconds: index * 100),
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 15.h),
+                            child: buildSymptomsContainer(screenWidth, symptom, context),
                           ),
-                          SizedBox(height: 15.h),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                    
-                    FadeInUp(
-                      duration: const Duration(milliseconds: 600),
-                      delay: const Duration(milliseconds: 300),
-                      child: Column(
-                        children: [
-                          buildSymptomsContainer(
-                            screenWidth,
-                            "Frequent Episodes",
-                            ["Repeated vomiting over a short period"],
-                          ),
-                          SizedBox(height: 15.h),
-                        ],
-                      ),
-                    ),
-                    
-                    SizedBox(height: 80.h),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            
-            // Floating action button
+            // Floating catalog button.
             Positioned(
               bottom: 15.h,
               right: 16.w,
@@ -385,7 +420,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 foregroundColor: const Color(0xFFE8F2F5),
                 elevation: 4,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.r),
+                  borderRadius: BorderRadius.circular(100.r)
                 ),
                 child: const Icon(Icons.menu_book_sharp),
               ),
@@ -396,8 +431,14 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     );
   }
 
-  Widget buildSymptomsContainer(
-      double screenWidth, String title, List<String> details) {
+  /// Builds a card for a given symptom.
+  /// The "Select" button sets the symptom as selected and updates the questions,
+  /// then navigates to QoneScreen. It does not add the symptom to pending immediately.
+  Widget buildSymptomsContainer(double screenWidth, String title, BuildContext context) {
+    final String symptomKey = title.toLowerCase();
+    final String description = _symptomDescriptions[symptomKey] ??
+        'A common symptom that may indicate health issues in your pet.';
+        
     return Container(
       padding: EdgeInsets.all(16.sp),
       width: double.infinity,
@@ -419,8 +460,9 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Symptom title.
           Text(
-            title,
+            title[0].toUpperCase() + title.substring(1),
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -428,69 +470,69 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             ),
           ),
           SizedBox(height: 8.h),
-          for (String detail in details)
-            Text(
-              detail,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: const Color.fromRGBO(210, 216, 216, 1),
-              ),
+          // Description.
+          Text(
+            description,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.white.withOpacity(0.85),
             ),
+          ),
           SizedBox(height: 16.h),
+          // Select button.
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final userData =
-                      Provider.of<UserData>(context, listen: false);
-                  // Add this symptom and set it as the selected symptom.
-                  userData.addNewPetSymptom(title);
+                  final UserData userData = Provider.of<UserData>(context, listen: false);
+                  // Set the selected symptom and update questions.
                   userData.setSelectedSymptom(title);
-                  // Update the questions for the selected symptom.
                   userData.updateQuestions();
+                  debugPrint("✅ Selected Symptom: $title");
+                  debugPrint("✅ Updated Questions: ${userData.questions}");
+                  // Navigate to QoneScreen.
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => QoneScreen(
                         symptom: title,
                         questions: List<String>.from(userData.questions),
-                        impactChoices:
-                            List<List<String>>.from(userData.impactChoices),
+                        impactChoices: List<List<String>>.from(userData.impactChoices),
                       ),
                     ),
                   );
                 });
               },
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.pressed)) {
+                backgroundColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.pressed)) {
                     return const Color.fromRGBO(66, 134, 130, 1.0);
                   }
                   return Colors.transparent;
                 }),
-                foregroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.pressed)) {
+                foregroundColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.pressed)) {
                     return Colors.white;
                   }
                   return Colors.white;
                 }),
-                shadowColor: WidgetStateProperty.all(Colors.transparent),
-                side: WidgetStateProperty.all(
+                shadowColor: MaterialStateProperty.all(Colors.transparent),
+                side: MaterialStateProperty.all(
                   const BorderSide(
                     color: Color.fromRGBO(82, 170, 164, 1),
                     width: 2.0,
                   ),
                 ),
-                shape: WidgetStateProperty.all(
+                shape: MaterialStateProperty.all(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(6.r)),
                   ),
                 ),
-                padding: WidgetStateProperty.all(
+                padding: MaterialStateProperty.all(
                   EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 ),
-                fixedSize: WidgetStateProperty.all(Size(120.w, 45.h)),
+                fixedSize: MaterialStateProperty.all(Size(120.w, 45.h)),
               ),
               child: const Text(
                 "Select",

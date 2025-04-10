@@ -3,7 +3,7 @@ import 'dart:io';
 
 class AppConfig {
   // Fallback IP (your development machine’s IP)
-  static const String fallbackIP = "192.168.1.101";
+  static const String fallbackIP = "192.168.0.100";
   // Port where your Flask server is running
   static const int serverPort = 8000;
   // This will be updated with the detected IP (or remain as fallback)

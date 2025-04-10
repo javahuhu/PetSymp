@@ -30,50 +30,48 @@ class MentionsympScreen extends StatefulWidget {
   MentionsympScreenState createState() => MentionsympScreenState();
 }
 
-class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerProviderStateMixin {
+class MentionsympScreenState extends State<MentionsympScreen>
+    with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
   bool _isNavigating = false;
   final TextEditingController _symptomController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  
+
   // For suggested symptoms
   List<String> _suggestedSymptoms = [];
   bool _showSuggestions = false;
   final FocusNode _focusNode = FocusNode();
-  
-  // Animation controller for bubbles
+
+  // Animation controller for decorative bubbles.
   AnimationController? _bubbleAnimationController;
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize animation controller first
+
     _bubbleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
-    
-    // Use a post-frame callback to safely update the state
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) { // Safety check to ensure widget is still in the tree
+      if (mounted) {
         Provider.of<UserData>(context, listen: false).clearNewSymptoms();
       }
     });
-    
+
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
       });
     });
-    
-    // Add listener to update suggested symptoms
+
     _symptomController.addListener(_updateSuggestedSymptoms);
-    
-    // Add focus listener to show/hide suggestions
     _focusNode.addListener(() {
       setState(() {
-        _showSuggestions = _focusNode.hasFocus && _symptomController.text.isNotEmpty && _suggestedSymptoms.isNotEmpty;
+        _showSuggestions = _focusNode.hasFocus &&
+            _symptomController.text.isNotEmpty &&
+            _suggestedSymptoms.isNotEmpty;
       });
     });
   }
@@ -86,7 +84,7 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
     _bubbleAnimationController?.dispose();
     super.dispose();
   }
-  
+
   void _updateSuggestedSymptoms() {
     final query = _symptomController.text.trim().toLowerCase();
     setState(() {
@@ -95,11 +93,13 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
         _suggestedSymptoms = [];
       } else {
         _suggestedSymptoms = symptomQuestions.keys
-            .where((symptom) => 
-              symptom.toLowerCase().replaceAll(RegExp(r'\s+'), '')
-              .contains(query.replaceAll(RegExp(r'\s+'), '')))
+            .where((symptom) => symptom
+                .toLowerCase()
+                .replaceAll(RegExp(r'\s+'), '')
+                .contains(query.replaceAll(RegExp(r'\s+'), '')))
             .toList();
-        _showSuggestions = _focusNode.hasFocus && _suggestedSymptoms.isNotEmpty;
+        _showSuggestions =
+            _focusNode.hasFocus && _suggestedSymptoms.isNotEmpty;
       }
     });
   }
@@ -109,17 +109,17 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
       final userData = Provider.of<UserData>(context, listen: false);
       final inputText = _symptomController.text.trim().toLowerCase();
 
-      // 1. Add to pending temporarily
-      userData.addPendingSymptom(inputText);
+      // Set the symptom temporarily.
       userData.setAnotherSymptom(inputText);
 
-      // 2. Navigate and wait for result
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const AnothersearchsymptomsScreen()),
+        MaterialPageRoute(
+          builder: (context) =>  AnothersearchsymptomsScreen(symptoms: [inputText]),
+        ),
       );
 
-      // 3. Cleanup if user backed out without selecting
+      // If the symptom still exists in pending (i.e. user backed out), remove it.
       if (userData.pendingSymptoms.contains(inputText)) {
         userData.removePendingSymptom(inputText);
         debugPrint("🗑️ Removed $inputText from pending (user backed out)");
@@ -129,7 +129,6 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
 
   void _navigateToSymptomCatalog() {
     if (_isNavigating) return;
-
     _isNavigating = true;
     Navigator.push(
       context,
@@ -144,12 +143,12 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final List<String> predefinedSymptoms =
-        Provider.of<UserData>(context, listen: false).getPredefinedSymptoms();
+        Provider.of<UserData>(context, listen: false)
+            .getPredefinedSymptoms();
 
-    return PopScope(
-      canPop: false,
+    return WillPopScope(
+      onWillPop: () async => false,
       child: GestureDetector(
-        // Add a GestureDetector to dismiss suggestions when tapping outside
         onTap: () {
           FocusScope.of(context).unfocus();
           setState(() {
@@ -157,9 +156,8 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
           });
         },
         child: Scaffold(
-          backgroundColor: Colors.transparent, // Make transparent to show gradient
+          backgroundColor: Colors.transparent,
           body: Container(
-            // Enhanced background with gradient
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -174,9 +172,8 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
             ),
             child: Stack(
               children: [
-                // Decorative background elements
+                // Decorative background elements (add as needed)
                 if (_bubbleAnimationController != null) ...[
-                  // Large wave-like shape at the top
                   Positioned(
                     top: -screenHeight * 0.2,
                     left: -screenWidth * 0.25,
@@ -193,15 +190,14 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                             height: screenHeight * 0.5,
                             decoration: BoxDecoration(
                               color: const Color.fromRGBO(66, 134, 129, 0.07),
-                              borderRadius: BorderRadius.circular(screenHeight * 0.25),
+                              borderRadius:
+                                  BorderRadius.circular(screenHeight * 0.25),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  
-                  // Smaller wave-like shape in bottom-right
                   Positioned(
                     bottom: -screenHeight * 0.1,
                     right: -screenWidth * 0.25,
@@ -218,15 +214,14 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                             height: screenHeight * 0.3,
                             decoration: BoxDecoration(
                               color: const Color.fromRGBO(66, 134, 129, 0.08),
-                              borderRadius: BorderRadius.circular(screenHeight * 0.15),
+                              borderRadius:
+                                  BorderRadius.circular(screenHeight * 0.15),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  
-                  // Middle-left floating bubble
                   Positioned(
                     top: screenHeight * 0.45,
                     left: screenWidth * 0.05,
@@ -254,8 +249,6 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                       },
                     ),
                   ),
-                  
-                  // Middle-right small floating circle
                   Positioned(
                     top: screenHeight * 0.6,
                     right: screenWidth * 0.1,
@@ -285,7 +278,6 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                     ),
                   ),
                 ],
-                
                 // Static background elements
                 Positioned(
                   top: screenHeight * 0.25,
@@ -311,13 +303,14 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                     ),
                   ),
                 ),
-
+                // Back Button.
                 Positioned(
                   top: screenHeight * 0.03,
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back_sharp,
+                    icon: const Icon(
+                      Icons.arrow_back_sharp,
                       color: Color.fromRGBO(61, 47, 40, 1),
                       size: 40.0,
                     ),
@@ -328,7 +321,7 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                     ),
                   ),
                 ),
-
+                // Animated Header.
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
@@ -349,13 +342,16 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                             ),
                           ],
                         ),
-                        child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                        child: Image.asset(
+                          'assets/paw.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                       SizedBox(width: screenWidth * 0.05),
                     ],
                   ),
                 ),
-                
+                // Form for symptom input.
                 Positioned(
                   top: screenHeight * 0.22,
                   left: screenWidth * 0.12,
@@ -426,32 +422,27 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                                     if (value.contains(',') || value.contains('+')) {
                                       return 'Please enter only one symptom at a time';
                                     }
-
                                     final inputLower = value.trim().toLowerCase();
-                                    final userData = Provider.of<UserData>(context, listen: false);
-
-                                    // Check if it's in the list of predefined symptoms
+                                    final userData =
+                                        Provider.of<UserData>(context, listen: false);
                                     final List<String> predefinedLower =
-                                        userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
+                                        userData
+                                            .getPredefinedSymptoms()
+                                            .map((s) => s.toLowerCase())
+                                            .toList();
                                     if (!predefinedLower.contains(inputLower)) {
                                       return 'No such symptom found';
                                     }
-
-                                    // Prevent duplicates (already inputted but not finalized)
                                     if (userData.pendingSymptoms.contains(inputLower)) {
                                       return 'This symptom is already pending';
                                     }
-
-                                    // Already finalized check
                                     if (userData.finalizedSymptoms.contains(inputLower)) {
                                       return 'This symptom is already added/finalized';
                                     }
-
                                     return null;
-                                  }
+                                  },
                                 ),
                               ),
-                              // Suggested Symptoms List - Only show when _showSuggestions is true
                               if (_showSuggestions)
                                 Container(
                                   width: screenWidth * 0.8,
@@ -474,17 +465,16 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                                       return ListTile(
                                         title: Text(_suggestedSymptoms[index]),
                                         onTap: () {
-                                          // Set the selected symptom in the text field
-                                          _symptomController.text = _suggestedSymptoms[index];
-                                          // Move cursor to the end
-                                          _symptomController.selection = TextSelection.fromPosition(
-                                            TextPosition(offset: _symptomController.text.length),
+                                          _symptomController.text =
+                                              _suggestedSymptoms[index];
+                                          _symptomController.selection =
+                                              TextSelection.fromPosition(
+                                            TextPosition(
+                                                offset: _symptomController.text.length),
                                           );
-                                          // Hide suggestions after selection
                                           setState(() {
                                             _showSuggestions = false;
                                           });
-                                          // Unfocus to hide keyboard
                                           FocusScope.of(context).unfocus();
                                         },
                                       );
@@ -498,7 +488,6 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                     ],
                   ),
                 ),
-                
                 Positioned(
                   top: screenHeight * 0.9,
                   right: screenWidth * 0.02,
@@ -511,31 +500,31 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                       child: ElevatedButton(
                         onPressed: navigateToNextPage,
                         style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.pressed)) {
+                          backgroundColor: MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.pressed)) {
                               return const Color.fromARGB(255, 0, 0, 0);
                             }
                             return Colors.transparent;
                           }),
-                          foregroundColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.pressed)) {
+                          foregroundColor: MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.pressed)) {
                               return const Color.fromARGB(255, 255, 255, 255);
                             }
                             return const Color.fromRGBO(29, 29, 44, 1.0);
                           }),
-                          shadowColor: WidgetStateProperty.all(Colors.transparent),
-                          side: WidgetStateProperty.all(
+                          shadowColor: MaterialStateProperty.all(Colors.transparent),
+                          side: MaterialStateProperty.all(
                             const BorderSide(
                               color: Color.fromRGBO(82, 170, 164, 1),
                               width: 2.0,
                             ),
                           ),
-                          shape: WidgetStateProperty.all(
+                          shape: MaterialStateProperty.all(
                             const RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(Radius.circular(100)),
                             ),
                           ),
-                          fixedSize: WidgetStateProperty.all(const Size(100, 55)),
+                          fixedSize: MaterialStateProperty.all(const Size(100, 55)),
                         ),
                         child: const Text(
                           "Next",
@@ -548,17 +537,15 @@ class MentionsympScreenState extends State<MentionsympScreen> with SingleTickerP
                     ),
                   ),
                 ),
-
                 Positioned(
                   bottom: 100.h,
                   right: 16.w,
                   child: AnimatedContainer(
-                    duration: Duration.zero, // disables the slide-in animation
+                    duration: Duration.zero,
                     child: FloatingActionButton(
                       onPressed: _navigateToSymptomCatalog,
                       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
                       foregroundColor: const Color(0xFFE8F2F5),
-                      elevation: 4,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100.r),
                       ),
