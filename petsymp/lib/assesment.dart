@@ -94,7 +94,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
               child: Container(
                 width: screenWidth * 0.5,
                 height: screenWidth * 0.5,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(66, 134, 129, 0.1),
                 ),
@@ -108,7 +108,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
               child: Container(
                 width: screenWidth * 0.4,
                 height: screenWidth * 0.4,
-                decoration: BoxDecoration(
+                decoration:const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(66, 134, 129, 0.1),
                 ),
@@ -125,7 +125,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Color.fromRGBO(66, 134, 129, 0.6),
+                    color: const Color.fromRGBO(66, 134, 129, 0.6),
                     width: 2,
                   ),
                   color: Colors.transparent,
@@ -142,9 +142,9 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 height: screenWidth * 0.3,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color.fromRGBO(66, 134, 129, 0.1),
+                  color: const Color.fromRGBO(66, 134, 129, 0.1),
                   border: Border.all(
-                    color: Color.fromRGBO(66, 134, 129, 0.3),
+                    color: const Color.fromRGBO(66, 134, 129, 0.3),
                     width: 1.5,
                   ),
                 ),
@@ -158,7 +158,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
               child: Container(
                 width: 12,
                 height: 12,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(72, 38, 163, 0.4),
                 ),
@@ -172,7 +172,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
               child: Container(
                 width: 15,
                 height: 15,
-                decoration: BoxDecoration(
+                decoration:const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color.fromRGBO(72, 38, 163, 0.3),
                 ),

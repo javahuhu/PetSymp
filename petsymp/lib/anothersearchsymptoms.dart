@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
+import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
+import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
+import 'package:petsymp/SymptomQuestions/symptomsquestions.dart';
 import 'package:provider/provider.dart';
 import 'userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -75,9 +78,16 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final UserData userData = Provider.of<UserData>(context, listen: false);
+    final petType = userData.selectedPetType;
+
+    final Map<String, dynamic> petSymptoms = {
+      ...symptomQuestions,
+      if(petType == 'Dog') ...symptomQuestionsDog,
+      if(petType == 'Cat') ...symptomQuestionsCat,
+    };
 
     // Get predefined symptoms from userData.
-    final List<String> predefinedSymptoms = userData.getPredefinedSymptoms();
+    final List<String> predefinedSymptoms = petSymptoms.keys.toList();
 
     // Define additional symptoms.
     final List<String> additionalSymptoms = [
@@ -445,7 +455,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       decoration: BoxDecoration(
         color: const Color.fromRGBO(29, 29, 44, 1.0),
         borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,

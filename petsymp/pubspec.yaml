@@ -142,8 +142,11 @@ flutter:
       - assets/cardCat.png
       - assets/smallpet.png
       - assets/mediumpet.png
+      - assets/scanner.png
+      - assets/petwithowner.png
       - assets/largepet.png
       - assets/extralargepet.png
+      - assets/catcat.json
       - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
       - assets/imgsymptomcatalog/abdominalpain.jpg
       - assets/imgsymptomcatalog/abdominalenlargment.jpg

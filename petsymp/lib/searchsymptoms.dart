@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
+import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
+import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
+import 'package:petsymp/SymptomQuestions/symptomsquestions.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -73,9 +76,15 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context, listen: false);
+    final petType = userData.selectedPetType;
 
-    // Get predefined symptoms from UserData.
-    final List<String> predefinedSymptoms = userData.getPredefinedSymptoms();
+    final Map<String,dynamic> petSymptoms = {
+      ...symptomQuestions,
+      if(petType == 'Dog') ...symptomQuestionsDog,
+      if(petType == 'Cat') ...symptomQuestionsCat,
+    };
+
+    final List<String> predefinedSymptoms = petSymptoms.keys.toList();
 
     // Determine the input symptom.
     String inputSymptom = "";

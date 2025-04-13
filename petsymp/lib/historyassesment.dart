@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:petsymp/viewHistory.dart';
 
 class HistoryassesmentScreen extends StatefulWidget {
   const HistoryassesmentScreen({super.key});
@@ -13,582 +12,580 @@ class HistoryassesmentScreen extends StatefulWidget {
 }
 
 class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
-  // This static map remains for legacy reference.
-  final Map<String, Map<String, String>> profilelist = {
-    "img1": {
-      "profile": "assets/profile.jpg",
-      "image": "assets/security.png",
-    },
-    "img2": {
-      "image": "assets/support.png",
-    },
-    "img3": {
-      "image": "assets/condition.png",
-    },
-    "img4": {
-      "image": "assets/editprofile.png",
-    },
-    "img5": {
-      "image": "assets/restore.png",
-    },
-  };
-
   @override
   Widget build(BuildContext context) {
     final String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 219, 230, 233),
-      body: Column(
-        children: [
-          // Fixed App Bar
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-            decoration: const BoxDecoration(
-              color: Color(0xFF52AAA4),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.1),
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+      backgroundColor: const Color(0xFFF5F8FA), // Lighter, more modern background
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Enhanced App Bar
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF52AAA4), Color(0xFF3D8F8A)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-              ],
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(0, 0, 0, 0.15),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_rounded,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "Pet Health History",
+                        style: TextStyle(
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.filter_list_rounded,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      // Filter functionality
+                    },
+                  ),
+                ],
+              ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 94.w),
+            
+            // Simplified heading with swipe instruction
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDF7F7),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF52AAA4).withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.swipe_left_alt_rounded, 
+                    color: const Color(0xFF52AAA4),
+                    size: 24.sp,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
                     child: Text(
-                      "Pet Health History",
+                      "Swipe left to delete a pet profile",
                       style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
+                        fontSize: 14.sp,
+                        color: const Color(0xFF52AAA4),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                ),
-                // Balance the layout with an invisible icon
-                const IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.transparent,
-                  ),
-                  onPressed: null,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          // History list using StreamBuilder from Firestore.
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('Users')
-                .doc(userId)
-                .collection('History')
-                .orderBy('date', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) return _buildErrorState();
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF52AAA4),
+            
+            // History list
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              child: Row(
+                children: [
+                  Text(
+                    "History Records",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF4A4A4A),
                     ),
                   ),
-                );
-              }
-              final docs = snapshot.data?.docs;
-              if (docs == null || docs.isEmpty) return _buildEmptyState();
-
-              // Group records by month.
-              Map<String, List<QueryDocumentSnapshot>> groupedRecords = {};
-              for (var doc in docs) {
-                final data = doc.data() as Map<String, dynamic>;
-                final timestamp = data['date'] as Timestamp?;
-                if (timestamp != null) {
-                  final date = timestamp.toDate();
-                  final monthYear = DateFormat('MMMM yyyy').format(date);
-                  if (!groupedRecords.containsKey(monthYear)) {
-                    groupedRecords[monthYear] = [];
-                  }
-                  groupedRecords[monthYear]!.add(doc);
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.sort, size: 16.sp, color: const Color(0xFF52AAA4)),
+                        SizedBox(width: 4.w),
+                        Text(
+                          "Date",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: const Color(0xFF52AAA4),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Enhanced history list
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(userId)
+                  .collection('History')
+                  .orderBy('date', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) return _buildErrorState();
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF52AAA4),
+                      ),
+                    ),
+                  );
                 }
-              }
+                final docs = snapshot.data?.docs;
+                if (docs == null || docs.isEmpty) return _buildEmptyState();
 
-              return Expanded(
-                child: groupedRecords.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-                        itemCount: groupedRecords.length,
-                        itemBuilder: (context, index) {
-                          final monthYear = groupedRecords.keys.elementAt(index);
-                          final monthDocs = groupedRecords[monthYear]!;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 12.h),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      monthYear,
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF52AAA4),
-                                      ),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Expanded(
-                                      child: Container(
-                                        height: 1.5,
-                                        color: const Color(0xFF52AAA4)
-                                            .withOpacity(0.3),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ...monthDocs
-                                  .map((doc) => _buildHistoryCard(doc))
-                                  .toList(),
-                            ],
-                          );
-                        },
-                      ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
+                // Group by month
+                Map<String, List<QueryDocumentSnapshot>> groupedRecords = {};
+                for (var doc in docs) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final timestamp = data['date'] as Timestamp?;
+                  if (timestamp != null) {
+                    final date = timestamp.toDate();
+                    final monthYear = DateFormat('MMMM yyyy').format(date);
+                    if (!groupedRecords.containsKey(monthYear)) {
+                      groupedRecords[monthYear] = [];
+                    }
+                    groupedRecords[monthYear]!.add(doc);
+                  }
+                }
 
-  // Modified _buildHistoryCard with merge logic on tap.
-  Widget _buildHistoryCard(QueryDocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    final String docId = doc.id;
-
-    // Format date.
-    String formattedDate = "";
-    if (data['date'] != null) {
-      final timestamp = data['date'] as Timestamp;
-      final date = timestamp.toDate();
-      formattedDate = DateFormat('MMM d, yyyy').format(date);
-    }
-
-    // Extract basic pet data.
-    final String petName = data['petName'] as String? ?? "Pet";
-    final List<dynamic> petDetails = data['petDetails'] is List ? data['petDetails'] : [];
-    final String breed = (petDetails.length > 2 && petDetails[2]['value'] != null)
-        ? petDetails[2]['value'] as String
-        : "";
-    final String symptoms = (petDetails.length > 3 && petDetails.last['value'] != null)
-        ? petDetails.last['value'] as String
-        : "";
-    final diagnoses = data['diagnosisResults'] as List<dynamic>? ?? [];
-    String illness = "";
-    double confidence = 0.0;
-    if (diagnoses.isNotEmpty) {
-      final first = diagnoses[0] as Map<String, dynamic>;
-      illness = first['illness'] ?? "";
-      confidence = (first['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-    }
-    final String petImage = data['petImage'] as String? ?? "";
-
-    // Wrap the Dismissible card with InkWell to add an onTap event.
-    return InkWell(
-      onTap: () {
-        // Create a deep copy of petDetails and update the Symptoms field
-        List<dynamic> updatedPetDetails = (data['petDetails'] as List<dynamic>?)
-                ?.map((e) => Map<String, dynamic>.from(e))
-                .toList() ??
-            [];
-        if (updatedPetDetails.length >= 5) {
-          updatedPetDetails[4]['value'] = symptoms;
-        } else {
-          updatedPetDetails.add({"icon": "☣️", "label": "Symptoms", "value": symptoms});
-        }
-
-        // Merge document data with updated details.
-        final mergedData = {
-          ...data,
-          'id': docId,
-          'petDetails': updatedPetDetails,
-          'allSymptoms': symptoms,
-        };
-
-        // Navigate to the detail view.
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ViewhistoryScreen(historyData: mergedData)),
-        );
-      },
-      child: Dismissible(
-        key: Key(docId),
-        background: Container(
-          margin: EdgeInsets.only(bottom: 16.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        secondaryBackground: Container(
-          margin: EdgeInsets.only(bottom: 16.h),
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          alignment: Alignment.centerRight,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                "Delete",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16.sp,
-                ),
-              ),
-              SizedBox(width: 8.w),
-              const Icon(
-                Icons.delete_outline,
-                color: Colors.white,
-              ),
-            ],
-          ),
-        ),
-        direction: DismissDirection.endToStart,
-        confirmDismiss: (direction) async {
-          return await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: const Text("Confirm Deletion"),
-              content:
-                  const Text("Are you sure you want to delete this record?"),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text(
-                    "Delete",
-                    style: TextStyle(color: Color(0xFF52AAA4)),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-        onDismissed: (direction) async {
-          final String? userId = FirebaseAuth.instance.currentUser?.uid;
-          if (userId != null) {
-            await FirebaseFirestore.instance
-                .collection('Users')
-                .doc(userId)
-                .collection('History')
-                .doc(docId)
-                .delete();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Record deleted"),
-                backgroundColor: const Color(0xFF52AAA4),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                action: SnackBarAction(
-                  label: "UNDO",
-                  textColor: Colors.white,
-                  onPressed: () {
-                    // Implement undo functionality if needed
-                  },
-                ),
-              ),
-            );
-          }
-        },
-        child: Card(
-          elevation: 5,
-          shadowColor: Colors.black.withOpacity(0.1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          color: const Color.fromARGB(255, 236, 236, 236),
-          margin: EdgeInsets.only(bottom: 16.h),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Column(
-              children: [
-                // Card Header
-                Container(
-                  padding: EdgeInsets.all(14.w),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF52AAA4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 55.w,
-                        height: 55.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          backgroundImage: petImage.isNotEmpty &&
-                                  petImage.startsWith("http")
-                              ? NetworkImage(petImage)
-                              : const AssetImage("assets/goldenpet.png")
-                                  as ImageProvider,
-                          backgroundColor: Colors.grey[300],
-                        ),
-                      ),
-                      SizedBox(width: 14.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              petName,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              breed,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            formattedDate,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6.w,
-                              vertical: 3.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              "${confidence.toStringAsFixed(1)}%",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Symptoms section
-                Padding(
-                  padding: EdgeInsets.only(top: 12.w, left: 16.w, right: 16.w),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(6.w),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF52AAA4).withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.medical_services_outlined,
-                          color: Color(0xFF52AAA4),
-                          size: 15,
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Column(
+                return Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: groupedRecords.length,
+                    itemBuilder: (context, index) {
+                      final monthYear = groupedRecords.keys.elementAt(index);
+                      final monthDocs = groupedRecords[monthYear]!;
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Symptoms",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF52AAA4),
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            symptoms,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Card Content with Diagnosis section.
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(8.w),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF52AAA4).withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.medical_information_outlined,
-                              color: Color(0xFF52AAA4),
-                              size: 16,
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                            child: Row(
                               children: [
-                                Text(
-                                  "Diagnosis",
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF52AAA4),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF52AAA4).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    monthYear,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF52AAA4),
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 4.h),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: const Color(0xFF52AAA4).withOpacity(0.2),
+                                  ),
+                                ),
+                                SizedBox(width: 12.w),
                                 Text(
-                                  illness.isEmpty
-                                      ? "No diagnosis available"
-                                      : illness,
+                                  "${monthDocs.length} entries",
                                   style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.black87,
+                                    fontSize: 12.sp,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          ...monthDocs.map((doc) => _buildHistoryCard(doc)).toList(),
                         ],
-                      ),
-                      SizedBox(height: 16.h),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Here you may reuse the merged data in case you want to show a report view.
-                            // For example, if you want to push ViewhistoryScreen with the merged data:
-                            List<dynamic> updatedPetDetails = (data['petDetails'] as List<dynamic>?)
-                                    ?.map((e) => Map<String, dynamic>.from(e))
-                                    .toList() ??
-                                [];
-                            if (updatedPetDetails.length >= 5) {
-                              updatedPetDetails[4]['value'] = symptoms;
-                            } else {
-                              updatedPetDetails.add({
-                                "icon": "☣️",
-                                "label": "Symptoms",
-                                "value": symptoms
-                              });
-                            }
-                            final mergedData = {
-                              ...data,
-                              'id': docId,
-                              'petDetails': updatedPetDetails,
-                              'allSymptoms': symptoms,
-                            };
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      // No floating action button
+    );
+  }
 
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ViewhistoryScreen(historyData: mergedData),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: const Color.fromARGB(255, 131, 81, 185),
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            surfaceTintColor: Colors.transparent,
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(width: 8.w),
-                              const Text("Report"),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+  Widget _buildHistoryCard(QueryDocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    final String petName = data['petName'] as String? ?? "Pet";
+    final List<dynamic> petDetails = data['petDetails'] is List ? data['petDetails'] : [];
+
+    final String breed = petDetails.length > 2 && petDetails[2]['value'] != null
+        ? petDetails[2]['value'] as String
+        : "Unknown";
+    final String size = petDetails.length > 1 && petDetails[1]['value'] != null
+        ? petDetails[1]['value'] as String
+        : "Medium";
+    final String age = petDetails.length > 0 && petDetails[0]['value'] != null
+        ? petDetails[0]['value'].toString()
+        : "Unknown";
+
+    String accountCreated = "";
+    String formattedTime = "";
+    if (data['date'] != null) {
+      final timestamp = data['date'] as Timestamp;
+      final date = timestamp.toDate();
+      accountCreated = DateFormat('MMM d, yyyy').format(date);
+      formattedTime = DateFormat('h:mm a').format(date);
+    }
+
+    final String petImage = data['petImage'] as String? ?? "";
+
+    // For swipe-to-delete functionality
+    return Dismissible(
+      key: Key(doc.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        // Show confirmation dialog
+        bool? result = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                "Delete Pet Profile",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF4A4A4A),
+                ),
+              ),
+              content: Text(
+                "Are you sure you want to delete $petName's profile?",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                    ),
                   ),
                 ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red[700],
+                  ),
+                  child: const Text("Delete"),
+                ),
               ],
+            );
+          },
+        );
+        
+        // If user confirmed, delete from Firestore
+        if (result == true) {
+          try {
+            final String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
+            // Delete the pet profile from Firebase
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(userId)
+                .collection('History')
+                .doc(doc.id)
+                .delete();
+                
+            // You may want to show a success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("$petName's profile has been deleted"),
+                backgroundColor: Colors.green[700],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                margin: EdgeInsets.all(16),
+              ),
+            );
+            
+            return true;
+          } catch (e) {
+            // Handle error
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Error deleting profile: ${e.toString()}"),
+                backgroundColor: Colors.red[700],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                margin: EdgeInsets.all(16),
+              ),
+            );
+            return false;
+          }
+        }
+        
+        return result ?? false;
+      },
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20.w),
+        margin: EdgeInsets.symmetric(vertical: 8.h),
+        decoration: BoxDecoration(
+          color: Colors.red[400],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.delete_forever_rounded,
+              color: Colors.white,
+              size: 26.sp,
             ),
+            SizedBox(height: 4.h),
+            Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12.sp,
+              ),
+            ),
+          ],
+        ),
+      ),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              // Simple tap action if needed
+            },
+          child: Column(
+            children: [
+              // Enhanced header with gradient
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF52AAA4), Color(0xFF489E98)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Hero(
+                      tag: "pet_${doc.id}",
+                      child: Container(
+                        width: 60.w,
+                        height: 60.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage: petImage.isNotEmpty && petImage.startsWith("http")
+                              ? NetworkImage(petImage)
+                              : const AssetImage("assets/goldenpet.png") as ImageProvider,
+                          backgroundColor: Colors.grey[300],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            petName,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.pets_rounded,
+                                color: Colors.white70,
+                                size: 14,
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                breed,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            accountCreated,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          formattedTime,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 11.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Simplified pet details section
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildDetailItem(Icons.cake_rounded, "Age", age),
+                    _buildDetailItem(Icons.straighten_rounded, "Size", size),
+                    _buildDetailItem(Icons.pets_rounded, "Breed", breed.isNotEmpty ? breed : "Unknown"),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
+   ));
+  }
+  
+  Widget _buildDetailItem(IconData icon, String label, String value) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+              color: const Color(0xFF52AAA4).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF52AAA4),
+              size: 20.sp,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
+            ),
+          ),
+        ],
+      ),
     );
   }
+  
+  // Removed _buildActionButton method as it's no longer needed
 
   Widget _buildEmptyState() {
     return Expanded(
@@ -596,27 +593,53 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.history,
-              size: 80.sp,
-              color: Colors.grey[400],
+            Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFF52AAA4).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.pets_rounded,
+                size: 80.sp,
+                color: const Color(0xFF52AAA4),
+              ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 24.h),
             Text(
-              "No History Records",
+              "No Health Records Yet",
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                color: const Color(0xFF4A4A4A),
               ),
             ),
-            SizedBox(height: 8.h),
-            Text(
-              "Your pet health records will appear here",
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.grey[600],
+            SizedBox(height: 12.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              child: Text(
+                "Track your pet's health journey by adding their first health record",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.grey[600],
+                ),
               ),
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton.icon(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFF52AAA4),
+                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              icon: const Icon(Icons.add),
+              label: const Text("Add First Record"),
             ),
           ],
         ),
@@ -630,45 +653,55 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 80.sp,
-              color: Colors.red[300],
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              "Something went wrong",
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+            Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                shape: BoxShape.circle,
               ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Please try again later",
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.grey[600],
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 80.sp,
+                color: Colors.red[400],
               ),
             ),
             SizedBox(height: 24.h),
-            ElevatedButton(
+            Text(
+              "Oops! Something went wrong",
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF4A4A4A),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              child: Text(
+                "We're having trouble loading your pet's health records",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton.icon(
               onPressed: () {
                 setState(() {});
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: const Color(0xFF52AAA4),
+                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
+                elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24.w,
-                  vertical: 12.h,
-                ),
               ),
-              child: const Text("Retry"),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text("Try Again"),
             ),
           ],
         ),

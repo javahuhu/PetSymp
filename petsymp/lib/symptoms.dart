@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
+import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
+import 'package:petsymp/SymptomQuestions/NLPSymptom.dart';
 import 'package:petsymp/searchsymptoms.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/symptomscatalog.dart';
 import 'userdata.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'symptomsquestions.dart';
+import 'SymptomQuestions/symptomsquestions.dart';
 import 'package:animate_do/animate_do.dart';
 
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
@@ -78,37 +81,77 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
     super.dispose();
   }
 
+  String resolveNlpSymptom(String input) {
+  final lower = input.toLowerCase();
+  for (final entry in symptomNLPMap.entries) {
+    if (lower.contains(entry.key)) {
+      return entry.value;
+    }
+  }
+  return lower;
+}
+
+
   void _updateSuggestedSymptoms() {
     final query = _symptomsController.text.trim().toLowerCase();
-    setState(() {
-      if (query.isEmpty) {
-        _showSuggestions = false;
-        _suggestedSymptoms = [];
-      } else {
-        _suggestedSymptoms = symptomQuestions.keys
-            .where((symptom) => 
-              symptom.toLowerCase().replaceAll(RegExp(r'\s+'), '')
-              .contains(query.replaceAll(RegExp(r'\s+'), '')))
-            .toList();
-        _showSuggestions = _focusNode.hasFocus && _suggestedSymptoms.isNotEmpty;
+    final userData = Provider.of<UserData>(context, listen: false);
+    final petType = userData.selectedPetType;
+    final Set<String> smartInput = {};
+
+    symptomNLPMap.forEach((phrase, symptom) {
+      if(query.contains(phrase)) {
+        smartInput.add(symptom);
       }
     });
+
+
+
+    final Map<String, dynamic> petSymptoms = {
+      ...symptomQuestions,
+      if(petType == 'Dog') ...symptomQuestionsDog,
+      if(petType == 'Cat') ...symptomQuestionsCat
+    };
+
+    setState(() {
+        if (query.isEmpty) {
+          _showSuggestions = false;
+          _suggestedSymptoms = [];
+        } else {
+          // This only includes direct matches
+          final symptomMatches = petSymptoms.keys
+              .where((symptom) =>
+                  symptom.toLowerCase().replaceAll(RegExp(r'\s+'), '').contains(
+                      query.replaceAll(RegExp(r'\s+'), '')))
+              .toList();
+
+          // 👇 Combine NLP-based smartInput and direct matches
+          _suggestedSymptoms = [
+            ...smartInput.where((s) => petSymptoms.containsKey(s)),
+            ...symptomMatches.where((s) => !smartInput.contains(s))
+          ];
+
+          _showSuggestions =
+              _focusNode.hasFocus && _suggestedSymptoms.isNotEmpty;
+        }
+      });
+
   }
 
   void navigateToNextPage() async {
   if (_formKey.currentState?.validate() ?? false) {
     final userData = Provider.of<UserData>(context, listen: false);
     final inputText = _symptomsController.text.trim().toLowerCase();
-
-    // Do not add to pending at this stage.
-    userData.setAnotherSymptom(inputText);
+    
+    final resolvedSymptom = resolveNlpSymptom(inputText);
+    userData.setAnotherSymptom(resolvedSymptom);
 
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SearchsymptomsScreen(symptoms: [inputText]),
+        builder: (context) => SearchsymptomsScreen(symptoms: [resolvedSymptom]),
       ),
     );
+
   }
 }
 
@@ -421,20 +464,22 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                                   }
 
                                   final userData = Provider.of<UserData>(context, listen: false);
+                                  
                                   final inputLower = value.trim().toLowerCase();
 
                                   // Check if it's in the list of predefined symptoms
-                                  final List<String> predefinedLower =
-                                      userData.getPredefinedSymptoms().map((s) => s.toLowerCase()).toList();
-                                  if (!predefinedLower.contains(inputLower)) {
-                                    return 'No such symptom found';
-                                  }
+                                  final petType = userData.selectedPetType;
+                                  final Map<String, dynamic> petSymptoms = {
+                                    ...symptomQuestions,
+                                    if (petType == "Cat") ...symptomQuestionsCat,
+                                    if (petType == "Dog") ...symptomQuestionsDog,
+                                  };
 
-                                  // Prevent duplicates (already inputted but not finalized)
-                                  if (userData.finalizedSymptoms.contains(inputLower)) {
-                                    return 'This symptom is already finalized';
-                                  }
+                                  final resolvedSymptom = resolveNlpSymptom(inputLower);
 
+                                  if (!petSymptoms.containsKey(resolvedSymptom)) {
+                                    return 'This symptom is not available for ${petType.toLowerCase()}';
+                                  }
                                   return null;
                                 },
                               ),

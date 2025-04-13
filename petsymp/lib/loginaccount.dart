@@ -90,7 +90,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
             bottom: 0,
             child: Container(
               width: 1.0.sw,
-              height: 0.56.sh,
+              height: 0.5.sh,
 
               decoration: const BoxDecoration(
                 color: Color.fromRGBO(29, 29, 44, 1.0),
@@ -301,113 +301,113 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
 
                   SizedBox(height: 0.01.sh),
 
-                   Row(
-                children: [
-                  Expanded(
-                    child: Divider(
-                      color: const Color.fromRGBO(82, 170, 164, 1),
-                      thickness: 2,
-                      indent: 0.05.w,
-                      endIndent:  0.02.w,
-                    ),
-                  ),
-                   Text(
-                    "OR",
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color:  const Color.fromRGBO(82, 170, 164, 1),
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: const Color.fromRGBO(82, 170, 164, 1),
-                      thickness: 2,
-                      indent: 0.02.w,
-                      endIndent: 0.05.w,
-                    ),
-                  ),
-                ],
-              ),
+            //        Row(
+            //     children: [
+            //       Expanded(
+            //         child: Divider(
+            //           color: const Color.fromRGBO(82, 170, 164, 1),
+            //           thickness: 2,
+            //           indent: 0.05.w,
+            //           endIndent:  0.02.w,
+            //         ),
+            //       ),
+            //        Text(
+            //         "OR",
+            //         style: TextStyle(
+            //           fontSize: 18.sp,
+            //           fontWeight: FontWeight.bold,
+            //           color:  const Color.fromRGBO(82, 170, 164, 1),
+            //           letterSpacing: 1.0,
+            //         ),
+            //       ),
+            //       Expanded(
+            //         child: Divider(
+            //           color: const Color.fromRGBO(82, 170, 164, 1),
+            //           thickness: 2,
+            //           indent: 0.02.w,
+            //           endIndent: 0.05.w,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
 
-                         Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 50.h, // ✅ Adjusted for safe area
-              left: 0,
-              right: 0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // ✅ Prevents unnecessary space usage
-                children: [
-                  SizedBox(height: 12.h), // ✅ Adds space before icons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 🔹 Google Logo
-                      InkWell(
-                        onTap: () async {
-                          await gotoPage("https://accounts.google.com/");
-                        },
-                        child: Container(
-                          width: 40.w,  // ✅ Auto-scaled width
-                          height: 40.w, // ✅ Keep it square
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/googlelogo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20.w), // ✅ Scaled spacing between icons
+            //              Positioned(
+            //   bottom: MediaQuery.of(context).padding.bottom + 50.h, // ✅ Adjusted for safe area
+            //   left: 0,
+            //   right: 0,
+            //   child: Column(
+            //     mainAxisSize: MainAxisSize.min, // ✅ Prevents unnecessary space usage
+            //     children: [
+            //       SizedBox(height: 12.h), // ✅ Adds space before icons
+            //       Row(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           // 🔹 Google Logo
+            //           InkWell(
+            //             onTap: () async {
+            //               await gotoPage("https://accounts.google.com/");
+            //             },
+            //             child: Container(
+            //               width: 40.w,  // ✅ Auto-scaled width
+            //               height: 40.w, // ✅ Keep it square
+            //               decoration: const BoxDecoration(
+            //                 shape: BoxShape.circle,
+            //               ),
+            //               child: ClipOval(
+            //                 child: Image.asset(
+            //                   'assets/googlelogo.png',
+            //                   fit: BoxFit.cover,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(width: 20.w), // ✅ Scaled spacing between icons
                       
-                      // 🔹 Facebook Logo
-                      InkWell(
-                        onTap: () async {
-                          await gotoPage("https://www.facebook.com/");
-                        },
-                        child: Container(
-                          width: 50.w, // ✅ Slightly bigger than Google for proportion
-                          height: 50.w,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/facebooklogo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20.w), // ✅ Scaled spacing between icons
+            //           // 🔹 Facebook Logo
+            //           InkWell(
+            //             onTap: () async {
+            //               await gotoPage("https://www.facebook.com/");
+            //             },
+            //             child: Container(
+            //               width: 50.w, // ✅ Slightly bigger than Google for proportion
+            //               height: 50.w,
+            //               decoration: const BoxDecoration(
+            //                 shape: BoxShape.circle,
+            //               ),
+            //               child: ClipOval(
+            //                 child: Image.asset(
+            //                   'assets/facebooklogo.png',
+            //                   fit: BoxFit.cover,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(width: 20.w), // ✅ Scaled spacing between icons
                       
-                      // 🔹 Instagram Logo
-                      InkWell(
-                        onTap: () async {
-                          await gotoPage("https://www.instagram.com/");
-                        },
-                        child: Container(
-                          width: 40.w,  // ✅ Same as Google size
-                          height: 40.w,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/instagramlogo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            //           // 🔹 Instagram Logo
+            //           InkWell(
+            //             onTap: () async {
+            //               await gotoPage("https://www.instagram.com/");
+            //             },
+            //             child: Container(
+            //               width: 40.w,  // ✅ Same as Google size
+            //               height: 40.w,
+            //               decoration: const BoxDecoration(
+            //                 shape: BoxShape.circle,
+            //               ),
+            //               child: ClipOval(
+            //                 child: Image.asset(
+            //                   'assets/instagramlogo.png',
+            //                   fit: BoxFit.cover,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             
        
@@ -420,10 +420,10 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
           ),
 
            Positioned(
-             top: lerpDouble(114.5.h, -700.h, keyboardHeight / screenHeight) ?? 114.5.h,// Move up when keyboard is open // Move it higher to ensure visibility
+             top: lerpDouble(122.h, -700.h, keyboardHeight / screenHeight) ?? 122.h,// Move up when keyboard is open // Move it higher to ensure visibility
             left: 0.17.sw, // Adjusts for centering
             child: Container(
-              height: 0.3.sh, // Increase size slightly for better visibility
+              height: 0.35.sh, // Increase size slightly for better visibility
               width: 0.7.sw,
               decoration: const BoxDecoration(
                 image: DecorationImage(

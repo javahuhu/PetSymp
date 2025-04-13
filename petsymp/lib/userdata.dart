@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'symptomsquestions.dart';
+import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
+import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
+import 'SymptomQuestions/symptomsquestions.dart';
 import 'dynamicconnections.dart'; // Import our connection config
 
 class UserData with ChangeNotifier {
@@ -16,6 +18,7 @@ class UserData with ChangeNotifier {
   String _anotherSymptom = '';
   String? _petImage;
   String _selectedPetType = '';
+  String _otpCode = '';
 
   // History of past assessments (no petType filter)
   List<Map<String, dynamic>> _history = [];
@@ -55,14 +58,12 @@ class UserData with ChangeNotifier {
   List<List<String>> get impactChoices => _impactChoices;
   List<String> get questionSymptoms => _questionSymptoms;
   Map<String, List<Map<String, dynamic>>> get symptomDetails => _symptomDetails;
+  String get otpCode => _otpCode;
 
   /// Getter used by NewSummaryScreen
   List<String> get petSymptoms => [..._finalizedSymptoms, ..._pendingSymptoms];
 
-  // -------------------------------------------------------------
-  // Firestore History Subscription (no petType filter)
-  // -------------------------------------------------------------
-  /// Call once you know userId
+  
   void subscribeToHistory(String userId) {
     FirebaseFirestore.instance
       .collection('Users')
@@ -179,6 +180,11 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
+  void setOtpCode(String code) {
+  _otpCode = code;
+  notifyListeners();
+}
+
   final Map<String, dynamic> _symptomQuestions = symptomQuestions;
   List<String> getPredefinedSymptoms() => _symptomQuestions.keys.toList();
   void setSymptomDetails(Map<String, List<Map<String, dynamic>>> details) {
@@ -188,8 +194,15 @@ class UserData with ChangeNotifier {
 
   void updateQuestions() {
     final key = _selectedSymptom.toLowerCase();
-    if (key.isNotEmpty && _symptomQuestions.containsKey(key)) {
-      final newQuestions = List<String>.from(_symptomQuestions[key]["questions"]);
+    final petType = selectedPetType;
+    final Map<String,dynamic> petSymptoms = {
+      ...symptomQuestions,
+      if(petType =='Dog') ...symptomQuestionsDog,
+      if(petType =='Cat') ...symptomQuestionsCat,
+    };
+
+    if (key.isNotEmpty && petSymptoms.containsKey(key)) {
+      final newQuestions = List<String>.from(petSymptoms[key]["questions"]);
       _questions.clear();
       _impactChoices.clear();
       _questionSymptoms.clear();
@@ -197,14 +210,14 @@ class UserData with ChangeNotifier {
       _questionSymptoms.addAll(List.filled(newQuestions.length, key));
       List<String> impactDaysChoices = [];
       List<String> impactSymptomChoices = [];
-      if (_symptomQuestions[key].containsKey("impactDays")) {
-        var v = _symptomQuestions[key]["impactDays"];
+      if (petSymptoms[key].containsKey("impactDays")) {
+       var v = petSymptoms[key]["impactDays"];
         impactDaysChoices = v is List
           ? List<String>.from(v)
           : List<String>.from((v as Map).keys);
       }
-      if (_symptomQuestions[key].containsKey("impactSymptom")) {
-        var v = _symptomQuestions[key]["impactSymptom"];
+      if (petSymptoms[key].containsKey("impactSymptom")) {
+        var v = petSymptoms[key]["impactSymptom"];
         impactSymptomChoices = v is List
           ? List<String>.from(v)
           : List<String>.from((v as Map).keys);
@@ -242,6 +255,32 @@ class UserData with ChangeNotifier {
       }
     } catch (_) {}
   }
+
+
+
+  Future<bool> sendOtpToEmail(String email, String otp) async {
+  final Uri url = Uri.parse(AppConfig.oTPURL); // 🔁 Replace with your actual URL
+  
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email, "otp": otp}),
+    );
+
+    if (response.statusCode == 200) {
+      setOtpCode(otp); // Save the OTP locally
+      return true;
+    } else {
+      debugPrint("❌ OTP send failed: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    debugPrint("❌ Error sending OTP: $e");
+    return false;
+  }
+}
+
 
   void clearData() {
     _userName = '';

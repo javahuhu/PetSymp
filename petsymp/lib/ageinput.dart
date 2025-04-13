@@ -329,7 +329,7 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                       color: const Color.fromRGBO(66, 134, 129, 1.0),
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(),
                           offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),
@@ -439,7 +439,7 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                                 });
                               },
                               onHorizontalDragUpdate: (details) {
-                                final double localPosition = details.localPosition.dx;
+                                
                                 final double percentage = ((details.globalPosition.dx - sliderStartX) / sliderWidth).clamp(0.0, 1.0);
                                 
                                 setState(() {
@@ -515,10 +515,10 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                               width: 60,
                               height: 60,
                               margin: const EdgeInsets.symmetric(horizontal: 15),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color.fromRGBO(29, 29, 44, 1.0),
-                                boxShadow: const [
+                                color:  Color.fromRGBO(29, 29, 44, 1.0),
+                                boxShadow:  [
                                   BoxShadow(
                                     color: Color.fromRGBO(0, 0, 0, 0.2),
                                     blurRadius: 8,
@@ -548,10 +548,10 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                               width: 60,
                               height: 60,
                               margin: const EdgeInsets.symmetric(horizontal: 15),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color.fromRGBO(29, 29, 44, 1.0),
-                                boxShadow: const [
+                                color:  Color.fromRGBO(29, 29, 44, 1.0),
+                                boxShadow: [
                                   BoxShadow(
                                     color: Color.fromRGBO(0, 0, 0, 0.2),
                                     blurRadius: 8,
