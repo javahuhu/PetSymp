@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
 import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
 import 'SymptomQuestions/symptomsquestions.dart';
-import 'dynamicconnections.dart'; // Import our connection config
+import 'Connection/dynamicconnections.dart'; // Import our connection config
 
 class UserData with ChangeNotifier {
   // Basic user info

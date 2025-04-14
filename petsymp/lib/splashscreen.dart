@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'login.dart'; // For Timer and Future
+import 'LogIn/login.dart'; // For Timer and Future
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

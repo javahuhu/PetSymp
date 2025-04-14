@@ -5,7 +5,7 @@ import 'userdata.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'firebase_options.dart';
-import 'dynamicconnections.dart';
+import 'Connection/dynamicconnections.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

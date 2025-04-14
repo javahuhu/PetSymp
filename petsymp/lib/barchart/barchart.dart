@@ -9,7 +9,7 @@ import 'barcolorextension.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'dart:io';
-import 'package:petsymp/dynamicconnections.dart';
+import 'package:petsymp/Connection/dynamicconnections.dart';
 
 class BarChartSample2 extends StatefulWidget {
   final List<String> illnessLabels;

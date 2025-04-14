@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:petsymp/homepage.dart';
-import 'package:petsymp/profile.dart';
+import 'package:petsymp/HomePage/homepage.dart';
+import 'package:petsymp/HomePage/profile.dart';
 import 'package:petsymp/Not%20Used%20file/recommendationtwo.dart';
 import 'package:url_launcher/url_launcher.dart';
 
