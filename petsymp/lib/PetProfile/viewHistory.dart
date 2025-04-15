@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '';
 import 'package:petsymp/HomePage/homepage.dart';
 import 'package:petsymp/HomePage/profile.dart';
 import 'package:provider/provider.dart';

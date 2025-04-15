@@ -182,49 +182,57 @@ class RecoveryScreenState extends State<RecoveryScreen> with TickerProviderState
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          child: const Text(
+                          child:  Text(
                             "Confirm",
-                            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 22.0.sp, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      Row(
+                      
+                
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(width: 57.w),
                           Text(
                             "Did not receive the code?",
                             style: TextStyle(fontSize: 17.sp, color: Colors.white),
                           ),
-                          ElevatedButton(
+                          TextButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const RecoveryScreen()),
                               );
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                              padding: EdgeInsets.zero,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(horizontal: 4.w),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            child: const Text(
+                            child: Text(
                               "Resend",
-                              style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold, color: Color.fromRGBO(82, 170, 164, 1)),
+                              style: TextStyle(
+                                fontSize: 17.0.sp, 
+                                fontWeight: FontWeight.bold, 
+                                color: Color.fromRGBO(82, 170, 164, 1)
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 10.h),
+                    ),             
                     ],
                   ),
                 ),
               ),
               Positioned(
-                top: 0.081.sh,
-                left: (0.85.sw - 0.82.sw) / 2,
+                top: 0.112.sh,
+                left: (0.85.sw - 0.87.sw) / 2,
                 child: Container(
-                  height: 0.4.sh,
-                  width: 0.9.sw, 
+                  height: 0.37.sh,
+                  width: 0.95.sw, 
                   decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/petwithowner.png'),

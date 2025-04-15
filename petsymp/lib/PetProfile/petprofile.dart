@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,330 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/PetProfile/viewHistory.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
-import 'dart:math' show max;
+
+/// Different shape types for the animations
+enum ShapeType {
+  circle,
+  square,
+  triangle,
+  star,
+  heart,
+  rectangle,
+  diamond,
+
+}
+
+/// ShapeWidget that draws different shapes based on the type
+class ShapeWidget extends StatelessWidget {
+  final ShapeType type;
+  final Color color;
+  final double size;
+  
+  const ShapeWidget({
+    Key? key,
+    required this.type,
+    required this.color,
+    required this.size,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: ShapePainter(
+        type: type,
+        color: color,
+      ),
+    );
+  }
+}
+
+/// Custom painter for drawing various shapes
+class ShapePainter extends CustomPainter {
+  final ShapeType type;
+  final Color color;
+  
+  ShapePainter({
+    required this.type,
+    required this.color,
+  });
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = color.withOpacity(0.4)
+      ..style = PaintingStyle.fill;
+    
+    switch (type) {
+      case ShapeType.circle:
+        canvas.drawCircle(
+          Offset(size.width / 2, size.height / 2),
+          size.width / 2,
+          paint,
+        );
+        break;
+      
+      case ShapeType.square:
+        canvas.drawRect(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          paint,
+        );
+        break;
+      
+      case ShapeType.triangle:
+        final Path path = Path();
+        path.moveTo(size.width / 2, 0);
+        path.lineTo(0, size.height);
+        path.lineTo(size.width, size.height);
+        path.close();
+        canvas.drawPath(path, paint);
+        break;
+      
+      case ShapeType.star:
+        final Path path = _drawStar(size);
+        canvas.drawPath(path, paint);
+        break;
+      
+      case ShapeType.heart:
+        final Path path = _drawHeart(size);
+        canvas.drawPath(path, paint);
+        break;
+
+      case ShapeType.diamond:
+        final Path path = _drawDiamond(size);
+        canvas.drawPath(path, paint);
+        break;
+
+      case ShapeType.rectangle:
+        final Path path = _drawRegularPolygon(size, 4);
+        canvas.drawPath(path, paint);
+        break;
+    
+
+    }
+  }
+
+  Path _drawStar(Size size) {
+    final Path path = Path();
+    final double centerX = size.width / 2;
+    final double centerY = size.height / 2;
+    final double radius = size.width / 2;
+    final double innerRadius = radius * 0.4;
+    
+    const int numPoints = 5;
+    final double angle = (2 * pi) / (2 * numPoints);
+    
+    path.moveTo(centerX + radius * cos(0), centerY + radius * sin(0));
+    
+    for (int i = 1; i < 2 * numPoints; i++) {
+      final double r = i.isOdd ? innerRadius : radius;
+      final double currAngle = i * angle;
+      path.lineTo(
+        centerX + r * cos(currAngle),
+        centerY + r * sin(currAngle),
+      );
+    }
+    
+    path.close();
+    return path;
+  }
+
+  
+Path _drawDiamond(Size size) {
+  final Path path = Path();
+  final double width = size.width;
+  final double height = size.height;
+  
+  // Draw a diamond (rotated square)
+  path.moveTo(width / 2, 0); // Top point
+  path.lineTo(width, height / 2); // Right point
+  path.lineTo(width / 2, height); // Bottom point
+  path.lineTo(0, height / 2); // Left point
+  path.close();
+  
+  return path;
+}
+
+Path _drawRegularPolygon(Size size, int sides) {
+  final Path path = Path();
+  final double centerX = size.width / 2;
+  final double centerY = size.height / 2;
+  final double radius = size.width / 2;
+  
+  // Calculate the angle between each point
+  final double angle = (2 * pi) / sides;
+  
+  // Start at the top point (0 degrees)
+  path.moveTo(
+    centerX + radius * cos(-pi / 2),
+    centerY + radius * sin(-pi / 2),
+  );
+  
+  // Draw lines to each point
+  for (int i = 1; i < sides; i++) {
+    final double currAngle = (-pi / 2) + (i * angle);
+    path.lineTo(
+      centerX + radius * cos(currAngle),
+      centerY + radius * sin(currAngle),
+    );
+  }
+  
+  path.close();
+  return path;
+}
+
+
+
+  Path _drawHeart(Size size) {
+    final Path path = Path();
+    final double width = size.width;
+    final double height = size.height;
+    
+    path.moveTo(0.5 * width, height * 0.25);
+    path.cubicTo(
+      0.2 * width, 0.1 * height,
+      0, 0.4 * height,
+      0.5 * width, height,
+    );
+    path.cubicTo(
+      width, 0.4 * height,
+      0.8 * width, 0.1 * height,
+      0.5 * width, height * 0.25,
+    );
+
+
+    
+    
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+
+class AnimatedShapesBackground extends StatefulWidget {
+  final Color baseColor;
+  final ShapeType shapeType;
+  
+  const AnimatedShapesBackground({
+    Key? key,
+    required this.baseColor,
+    required this.shapeType,
+  }) : super(key: key);
+
+  @override
+  _AnimatedShapesBackgroundState createState() => _AnimatedShapesBackgroundState();
+}
+
+class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground> with TickerProviderStateMixin {
+  late List<AnimatedShape> _shapes;
+  final Random _random = Random();
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializeShapes();
+  }
+
+  void _initializeShapes() {
+    // Create 4-6 random animated shapes
+    final int numShapes = 15 + _random.nextInt(10);
+    _shapes = List.generate(numShapes, (_) => _generateRandomShape());
+  }
+
+  AnimatedShape _generateRandomShape() {
+    // Random position
+    final double left = _random.nextDouble() * 250;
+    final double top = _random.nextDouble() * 150;
+    
+    // Random size between 15 and 30
+    final double size = 15 + _random.nextDouble() * 15;
+    
+    // Animation duration between 5 and 10 seconds
+    final int duration = 5000 + _random.nextInt(5000);
+    
+    // Random color variation based on the base color
+    final HSLColor hslColor = HSLColor.fromColor(widget.baseColor);
+    final double hue = (hslColor.hue + _random.nextDouble() * 30 - 15) % 360;
+    final double saturation = 0.5 + _random.nextDouble() * 0.3;
+    final double lightness = 0.7 + _random.nextDouble() * 0.2;
+    final Color color = HSLColor.fromAHSL(0.6, hue, saturation, lightness).toColor();
+    
+    // Create an AnimationController for this shape
+    final AnimationController controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: duration),
+    );
+    
+    // Make the animation loop
+    controller.repeat(reverse: true);
+    
+    return AnimatedShape(
+      left: left,
+      top: top,
+      size: size,
+      color: color,
+      controller: controller,
+      shapeType: widget.shapeType,
+    );
+  }
+
+  @override
+  void dispose() {
+    // Dispose all animation controllers
+    for (final shape in _shapes) {
+      shape.controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: _shapes.map((shape) {
+        return AnimatedBuilder(
+          animation: shape.controller,
+          builder: (context, child) {
+            // Move the shape in a floating pattern
+            final double offset = sin(shape.controller.value * pi * 2) * 10;
+            
+            return Positioned(
+              left: shape.left + offset,
+              top: shape.top + (cos(shape.controller.value * pi * 2) * 10),
+              child: ShapeWidget(
+                type: shape.shapeType,
+                color: shape.color,
+                size: shape.size + (offset * 0.3),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+}
+
+/// Model class for an animated shape
+class AnimatedShape {
+  final double left;
+  final double top;
+  final double size;
+  final Color color;
+  final AnimationController controller;
+  final ShapeType shapeType;
+  
+  AnimatedShape({
+    required this.left,
+    required this.top,
+    required this.size,
+    required this.color,
+    required this.controller,
+    required this.shapeType,
+  });
+}
 
 class PetProfileScreen extends StatefulWidget {
   const PetProfileScreen({Key? key}) : super(key: key);
@@ -14,17 +338,39 @@ class PetProfileScreen extends StatefulWidget {
   _PetProfileScreenState createState() => _PetProfileScreenState();
 }
 
-
-
 class _PetProfileScreenState extends State<PetProfileScreen> {
-  // Fetch pet history documents from Firestore.
+  final Random _random = Random();
+  
+  @override
+  void initState() {
+    super.initState();
+    
+  }
+  
+  
+  Color generatePastelColor() {
+  // Generate a darker pastel color
+  final int red = 75 + _random.nextInt(75);   
+  final int green = 75 + _random.nextInt(75); 
+  final int blue = 75 + _random.nextInt(75);  
+
+  return Color.fromRGBO(red, green, blue, 1.0);
+}
+
+
+  ShapeType getRandomShapeType() {
+    final types = ShapeType.values;
+    return types[_random.nextInt(types.length)];
+  }
+  
+  
   Future<List<Map<String, dynamic>>> fetchPetHistory() async {
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       throw Exception("User is not signed in.");
     }
     
-    // Get the history collection reference
+    
     final historyCol = FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
@@ -35,14 +381,14 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         .orderBy('date', descending: true)
         .get();
     
-    // Map the documents to include their IDs
+    
     return snapshot.docs
         .map((doc) {
-          // Add the document ID to each document data
+          
           final data = doc.data();
           return {
             ...data,
-            'id': doc.id, // Include the document ID for editing
+            'id': doc.id, 
           };
         })
         .toList();
@@ -52,33 +398,12 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Pets Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 22.sp,
-            letterSpacing: 0.5,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.white, size: 24.sp),
-            onPressed: () {
-              // Add search functionality here if needed.
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: 
+      FutureBuilder<List<Map<String, dynamic>>>(
         future: fetchPetHistory(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(
                 color: const Color(0xFF52AAA4),
               ),
@@ -160,18 +485,20 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             );
           } else {
             final petHistory = snapshot.data!;
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            return 
+            
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 50.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 4.w, bottom: 16.h),
                     child: Text(
-                      'Your Pets',
+                      'Pets Profile',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18.sp,
+                        fontSize: 27.sp,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -200,7 +527,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     );
   }
 
-  /// Builds each pet card in the grid using the fetched data.
+  
   Widget _buildPetCard(BuildContext context, Map<String, dynamic> petData) {
     final String petName = petData['petName'] ?? "Unknown";
     final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
@@ -210,21 +537,24 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     // Removed Symptoms detail from the pet card display.
     final String imageUrl = petData['petImage'] ?? "assets/sampleimage.jpg";
 
+ 
+    final Color cardColor = petData.containsKey('cardColor')
+        ? Color(petData['cardColor'] as int)
+        : generatePastelColor();
+
+ 
+    final ShapeType shapeType = petData.containsKey('shapeType')
+        ? ShapeType.values[petData['shapeType'] as int]
+        : getRandomShapeType();
+
     return GestureDetector(
       onTap: () {
         _showPetDetails(context, petData);
       },
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF52AAA4).withOpacity(0.1),
-              const Color(0xFF3D4A5C).withOpacity(0.2),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20.r),
+          color: cardColor, // Use the pastel color as background
+          borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
@@ -233,126 +563,201 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Pet image at the top with overlay gradient.
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-                  child: imageUrl.startsWith("http")
-                      ? Image.network(
-                          imageUrl,
-                          height: 140.h,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 140.h,
-                              color: Colors.grey[800],
-                              child: Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white70,
-                                  size: 40.sp,
-                                ),
-                              ),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              height: 140.h,
-                              color: Colors.grey[800],
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: const Color(0xFF52AAA4),
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : Image.asset(
-                          imageUrl,
-                          height: 140.h,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.r),
+          child: Stack(
+            children: [
+       
+              Positioned.fill(
+                child: AnimatedShapesBackground(
+                  baseColor: cardColor,
+                  shapeType: shapeType,
                 ),
-                // Gradient overlay on image.
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 40.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.5),
-                        ],
+              ),
+              // Original content remains unchanged
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Pet image at the top with overlay gradient.
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                        child: imageUrl.startsWith("http")
+                            ? Image.network(
+                                imageUrl,
+                                height: 140.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 140.h,
+                                    color: Colors.grey[800],
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Colors.white70,
+                                        size: 40.sp,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    height: 140.h,
+                                    color: Colors.grey[800],
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: const Color(0xFF52AAA4),
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                imageUrl,
+                                height: 140.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                    ),
+                      // Gradient overlay on image.
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.5),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            // Pet details below the image.
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(12.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      petName,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 6.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.pets,
-                          size: 14.sp,
-                          color: const Color(0xFF52AAA4),
-                        ),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: Text(
-                            '$age • $breed',
+                  // Pet details below the image.
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            petName,
                             style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.grey[300],
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 6.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.pets,
+                                size: 14.sp,
+                                color: const Color(0xFF52AAA4),
+                              ),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: Text(
+                                  '$age • $breed',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.grey[300],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// Add this method to create/update pets with a random color and shape type
+  Future<void> createNewPet(Map<String, dynamic> petData) async {
+    try {
+      final String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("User is not signed in.");
+      }
+
+      // Generate a random color for this pet
+      final Color cardColor = generatePastelColor();
+      
+      // Generate a random shape type
+      final ShapeType shapeType = getRandomShapeType();
+      
+      // Add the color and shape type to the pet data
+      petData['cardColor'] = cardColor.value;
+      petData['shapeType'] = shapeType.index; // Store the enum index
+      
+      // Add the pet to Firestore
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('History')
+          .add(petData);
+      
+    } catch (e) {
+      print("Error creating new pet: $e");
+      rethrow;
+    }
+  }
+
+  /// If you need to update existing pets to add the animation properties,
+  /// call this method once from initState()
+  Future<void> updateExistingPetsWithAnimationProperties() async {
+    try {
+      final String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return;
+      
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('History')
+          .get();
+      
+      for (final doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        
+        // Only update if the pet doesn't already have animation properties
+        if (!data.containsKey('cardColor') || !data.containsKey('shapeType')) {
+          await doc.reference.update({
+            'cardColor': generatePastelColor().value,
+            'shapeType': getRandomShapeType().index,
+          });
+        }
+      }
+    } catch (e) {
+      print("Error updating pets with animation properties: $e");
+    }
   }
 
   /// Displays a bottom sheet with pet details and health record assessments.
@@ -472,9 +877,9 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       builder: (context) {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
-          initialHeight: screenSize.height * 1, // Start at 85% of screen height
-          minHeight: screenSize.height * 0.8, // Minimum height (40%)
-          maxHeight: screenSize.height * 1, // Maximum height (95%)
+          initialHeight: screenSize.height * 0.85, // Start at 85% of screen height
+          minHeight: screenSize.height * 0.4, // Minimum height (40%)
+          maxHeight: screenSize.height * 0.95, // Maximum height (95%)
           petData: petData,
           borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
           petBreed: breed,
@@ -526,7 +931,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         label: "Breed",
                         value: breed,
                       ),
-                    ),
+
+                      ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: _buildDetailCard(
@@ -1520,7 +1926,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                 ),
                 // Edit button
                 Positioned(
-                  top: 280.h,
+                  top: 340.h,
                   right: 12.w,
                   child: GestureDetector(
                     onTap: () {

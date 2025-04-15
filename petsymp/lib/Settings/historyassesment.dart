@@ -17,8 +17,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
     final String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     return Scaffold(
       backgroundColor: const Color(0xFFF5F8FA), // Lighter, more modern background
-      body: SafeArea(
-        child: Column(
+      body:  Column(
           children: [
             // Enhanced App Bar
             Container(
@@ -43,13 +42,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
               ),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
+                  
                   Expanded(
                     child: Center(
                       child: Text(
@@ -63,15 +56,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.filter_list_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      // Filter functionality
-                    },
-                  ),
+                 
                 ],
               ),
             ),
@@ -137,20 +122,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                         ),
                       ],
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.sort, size: 16.sp, color: const Color(0xFF52AAA4)),
-                        SizedBox(width: 4.w),
-                        Text(
-                          "Date",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: const Color(0xFF52AAA4),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                   
                   ),
                 ],
               ),
@@ -251,7 +223,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
             ),
           ],
         ),
-      ),
+      
       // No floating action button
     );
   }

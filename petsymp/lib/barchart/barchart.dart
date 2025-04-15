@@ -5,10 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:http/http.dart' as http;
 import 'barresources.dart';
-import 'barcolorextension.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
-import 'dart:io';
 import 'package:petsymp/Connection/dynamicconnections.dart';
 
 class BarChartSample2 extends StatefulWidget {
@@ -108,26 +106,24 @@ class _BarChartSample2State extends State<BarChartSample2> {
   }
 
 
-    Map<String, double> _computeFinalScores(List<SymptomDetail> symptoms) {
-    double fc = 0.0;
-    double gb = 0.0;
-    double ab = 0.0;
+  Map<String, double> _computeFinalScores(List<SymptomDetail> symptoms, String illnessName) {
+  final userData = Provider.of<UserData>(context, listen: false);
+  final match = userData.diagnosisResults.firstWhere(
+    (element) => element['illness'] == illnessName,
+    orElse: () => {
+      'confidence_fc': 0.0,
+      'confidence_gb': 0.0,
+      'confidence_ab': 0.0,
+    },
+  );
 
-    for (var s in symptoms) {
-      final fcWeight = s.baseWeight * s.priority;
-      final gbWeight = fcWeight + s.gbAdjustment;
-      final abWeight = gbWeight * s.abFactor;
-      fc += fcWeight;
-      gb += gbWeight;
-      ab += abWeight;
-    }
+  return {
+    "confidence_fc": (match['confidence_fc'] ),
+    "confidence_gb": (match['confidence_gb'] ),
+    "confidence_ab": (match['confidence_ab'] ),
+  };
+}
 
-    return {
-      "confidence_fc": fc,
-      "confidence_gb": gb,
-      "confidence_ab": ab,
-    };
-  }
 
   @override
   void initState() {
@@ -222,14 +218,29 @@ class _BarChartSample2State extends State<BarChartSample2> {
                             content: Text(snapshot.error.toString()),
                           );
                         } else {
+
+                      
                           final details = snapshot.data!;
                           // Get user input symptoms from the provider.
                           final userData = Provider.of<UserData>(context, listen: false);
                           final userSymptoms = userData.petSymptoms.map((s) => s.toLowerCase()).toList();
+                           
+                          final illnessName = widget.illnessLabels[index];
+                          final result = userData.diagnosisResults.firstWhere(
+                            (illness) => illness['illness'] == illnessName,
+                            orElse: () => {
+                              'confidence_fc': 0.0,
+                              'confidence_gb': 0.0,
+                              'confidence_ab': 0.0,
+                            },
+                          );
+                          
    
                           // Filter the fetched details to only include symptoms that match the user input.
                           final filteredDetails = details.where((d) => userSymptoms.contains(d.name.toLowerCase())).toList();
-                          final scores = _computeFinalScores(filteredDetails);
+                          final scores = _computeFinalScores(filteredDetails, illnessName);
+
+                          
                           // If no matching symptoms, you can show a message.
                           if (filteredDetails.isEmpty) {
                             return AlertDialog(
@@ -325,8 +336,10 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                       ),
                                     ),
                                     SizedBox(height: 10.h),
-                                     Table(
-                                        defaultColumnWidth:  FixedColumnWidth(149.w),
+                                     SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Table(
+                                        defaultColumnWidth:  FixedColumnWidth(155.w),
                                         textDirection: TextDirection.ltr,
                                         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                                         border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
@@ -341,13 +354,13 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                             return TableRow(
                                               children: [
                                                 Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.name, style:  TextStyle(fontFamily: 'Inter', fontSize: 15.sp)))),
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.baseWeight.toString(), style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp)))),
+                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.fcWeight.toStringAsFixed(2), style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp)))),
                                                 
                                               ],
                                             );
                                           }).toList(),
                                         ],
-                                      ),
+                                     )),
                                     
 
                                     SizedBox(height: 15.h),
@@ -423,8 +436,11 @@ class _BarChartSample2State extends State<BarChartSample2> {
 
 
                                     SizedBox(height: 10.h,),
-                                Table(
-                  defaultColumnWidth: FixedColumnWidth(149.w),
+
+                   SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child:Table(
+                  defaultColumnWidth:  FixedColumnWidth(155.w),
                   textDirection: TextDirection.ltr,
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
@@ -466,7 +482,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                       );
                     }).toList(),
                   ],
-                ),
+                )),
 
 
                 SizedBox(height: 15.h,),
@@ -547,8 +563,10 @@ class _BarChartSample2State extends State<BarChartSample2> {
 
 
                     SizedBox(height: 10.h,),
-                                  Table(
-                    defaultColumnWidth: FixedColumnWidth(149.w),
+                     SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Table(
+                    defaultColumnWidth:  FixedColumnWidth(155.w),
                     textDirection: TextDirection.ltr,
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
@@ -600,7 +618,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         );
                       }).toList(),
                     ],
-                  ),
+                  )),
 
 
 
@@ -621,10 +639,6 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
                       ),
                     ),
-
-
-
-                    
                            SizedBox(height: 60.h),
                             Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -671,60 +685,107 @@ class _BarChartSample2State extends State<BarChartSample2> {
 
 
 
-                          
-                                       SizedBox(height: 50.h,),
-                  Center(
-                      child: Text(
-                            "Total Result for each Algorithm",
-                            style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
+                          SizedBox(height: 30.h),
+                          Center(
+                            child: Text(
+                              "Complete Symptom Breakdown",
+                              style: TextStyle(fontSize: 20.sp, fontFamily: 'Oswald'),
+                            ),
                           ),
-                           ),
-                            SizedBox(height: 20.h),
-                            Table(
-                              defaultColumnWidth: FixedColumnWidth(160.w),
+                          SizedBox(height: 10.h),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Table(
+                              defaultColumnWidth: FixedColumnWidth(140.w),
+                              textDirection: TextDirection.ltr,
+                              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                               border: TableBorder.all(width: 1, color: Colors.grey),
                               children: [
                                 const TableRow(
+                                  decoration: BoxDecoration(color: Color.fromARGB(255, 239, 239, 239)),
                                   children: [
-                                    Center(child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("Algorithm", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                                    )),
-                                    Center(child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("Final Score", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                                    )),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("Symptom", style: TextStyle(fontWeight: FontWeight.bold)))),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("FC Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("GB Adj.", style: TextStyle(fontWeight: FontWeight.bold)))),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("GB Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("AB Factor", style: TextStyle(fontWeight: FontWeight.bold)))),
+                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("AB Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
                                   ],
                                 ),
-                                TableRow(
-                                  children: [
-                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Forward Chaining", style: TextStyle(fontFamily: 'Inter')))),
-                                    Center(child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("${scores["confidence_fc"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                    )),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Gradient Boosting", style: TextStyle(fontFamily: 'Inter')))),
-                                    Center(child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("${scores["confidence_gb"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                    )),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("AdaBoost", style: TextStyle(fontFamily: 'Inter')))),
-                                    Center(child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text("${scores["confidence_ab"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                    )),
-                                  ],
-                                ),
+                                ...filteredDetails.map((d) {
+                                  return TableRow(
+                                    children: [
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.name))),
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.fcWeight.toStringAsFixed(2)))),
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.gbAdjustment.toStringAsFixed(2)))),
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.gbWeight.toStringAsFixed(2)))),
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.abFactor.toStringAsFixed(2)))),
+                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.abWeight.toStringAsFixed(2)))),
+                                    ],
+                                  );
+                                }).toList(),
                               ],
                             ),
+                          ),
+
+
+
+
+
+
+                          
+                                       SizedBox(height: 50.h,),
+                                
+
+                                 SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Table(
+                                  defaultColumnWidth: FixedColumnWidth(160.w),
+                                  border: TableBorder.all(width: 1, color: Colors.grey),
+                                  children: [
+                                    const TableRow(
+                                      children: [
+                                        Center(child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("Algorithm", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                                        )),
+                                        Center(child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("Final Score", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                                        )),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: [
+                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Forward Chaining", style: TextStyle(fontFamily: 'Inter')))),
+                                        Center(child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("${scores["confidence_fc"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                        )),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: [
+                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Gradient Boosting", style: TextStyle(fontFamily: 'Inter')))),
+                                        Center(child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("${scores["confidence_gb"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                        )),
+                                      ],
+                                    ),
+                                    TableRow(
+                                       decoration: BoxDecoration(color: Color.fromARGB(255, 121, 216, 104)),
+                                      children: [
+                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("AdaBoost", style: TextStyle(fontFamily: 'Inter')))),
+                                        Center(child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("${scores["confidence_ab"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
+                                        )),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+
 
                             SizedBox(height: 15.h,),
                             Center(

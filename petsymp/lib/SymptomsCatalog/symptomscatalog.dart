@@ -189,9 +189,9 @@ class SymptomscatalogScreenState extends State<SymptomscatalogScreen> {
                                       child: Text(
                                         symptomDescription,
                                         style: TextStyle(
-                                          fontSize: 16.sp,
+                                          fontSize: 18.sp,
                                           fontWeight: FontWeight.w500,
-                                          color: const Color.fromRGBO(66, 134, 130, 1.0),
+                                          color: const Color.fromARGB(255, 119, 218, 211),
                                           height: 1.5,
                                         ),
                                         textAlign: TextAlign.justify,

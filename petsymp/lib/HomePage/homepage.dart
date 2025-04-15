@@ -26,6 +26,15 @@ class HomePageScreenState extends State<HomePageScreen> {
     Settingscreen(),
   ];
 
+  Future<bool?> _showTermsDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const TermsDialogContent(),
+  );
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -46,10 +55,14 @@ class HomePageScreenState extends State<HomePageScreen> {
 
     // Navigate first, delay heavy loading AFTER the page transition begins
     Future.delayed(Duration.zero, () async {
+      
+
+     
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const SymptomscatalogScreen()),
-      );
+      ); 
+     
 
       setState(() {
         _isNavigating = false;
@@ -129,11 +142,15 @@ class HomePageScreenState extends State<HomePageScreen> {
                     SizedBox(height: 55.h), // Adjusted spacing
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          bool? accepted = await _showTermsDialog(context);
+
+                          if(accepted == true) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const CardpetScreen()),
-                          );
+                          ); }
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF428682),
@@ -285,6 +302,173 @@ class HomePageScreenState extends State<HomePageScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+
+class TermsDialogContent extends StatefulWidget {
+  const TermsDialogContent({Key? key}) : super(key: key);
+  @override
+  _TermsDialogContentState createState() => _TermsDialogContentState();
+}
+
+class _TermsDialogContentState extends State<TermsDialogContent> {
+  bool accepted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Terms and Agreement"),
+      content: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(0),
+          child: Column(
+            children: [
+
+         Padding(
+  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h), // responsive left/right padding
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
+    children: [
+      Text(
+        "Welcome!",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 35.sp, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 25.h),
+      Text(
+        "These Terms and Conditions ('Terms') govern your use of the PetSymp mobile application and services. By accessing or using PetSymp, you agree to these Terms. If you do not agree, please do not use the app.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+    ],
+  ),
+),
+ Padding(
+  padding: EdgeInsets.only(left: 50.w, right: 20.w), // responsive left/right padding
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
+    children: [
+      Text(
+        "Acceptance of Terms",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 5.h),
+      Text(
+        "By using PetSymp, you confirm that you have read, understood, and agree to comply with these Terms.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+       SizedBox(height: 25.h),
+      Text(
+        "Description of Service",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 5.h),
+      Text(
+        "PetSymp provides symptom analysis for pets based on user input. The app generates possible conditions and follow-up questions to refine the assessment. PetSymp does not provide medical diagnoses and should not replace professional veterinary advice.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+       SizedBox(height: 25.h),
+      Text(
+        "User Responsibilities",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 5.h),
+      Text(
+        "By using PetSymp, you agree to:",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+
+       SizedBox(height: 20.h),
+      Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Icon(
+      Icons.arrow_forward,
+      size: 20.sp,
+      color: Colors.black,
+    ),
+    SizedBox(width: 8.w), // spacing between icon and text
+    Flexible(
+      child: Text(
+        "Provide accurate and truthful symptom information.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+    ),
+  ],
+),
+ SizedBox(height: 15.h),
+ Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+
+    Icon(
+      Icons.arrow_forward,
+      size: 20.sp,
+      color: Colors.black,
+    ),
+    SizedBox(width: 8.w), // spacing between icon and text
+    Flexible(
+      child: Text(
+        "Use the app only for personal, non-commercial purposes.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+    ),
+  ],
+),
+ SizedBox(height: 15.h),
+ Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Icon(
+      Icons.arrow_forward,
+      size: 20.sp,
+      color: Colors.black,
+    ),
+    SizedBox(width: 8.w), // spacing between icon and text
+    Flexible(
+      child: Text(
+        "Acknowledge that results are for informational purposes only and consult a veterinarian for medical concerns.",
+        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+      ),
+    ),
+  ],
+),
+ SizedBox(height: 30.h),
+  ],
+  ),
+),
+              
+              CheckboxListTile(
+                value: accepted,
+                onChanged: (bool? value) {
+                  setState(() {
+                    accepted = value ?? false;
+                  });
+                },
+                title: const Text("I agree to the Terms and Conditions"),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: accepted
+              ? () {
+                  Navigator.of(context).pop(true);
+                }
+              : null,
+          child: const Text("Proceed"),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: const Text("Cancel"),
+        ),
+      ],
     );
   }
 }
