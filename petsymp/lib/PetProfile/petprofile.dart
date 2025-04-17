@@ -6,8 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/PetProfile/viewHistory.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
-/// Different shape types for the animations
 enum ShapeType {
   circle,
   square,
@@ -19,7 +20,7 @@ enum ShapeType {
 
 }
 
-/// ShapeWidget that draws different shapes based on the type
+
 class ShapeWidget extends StatelessWidget {
   final ShapeType type;
   final Color color;
@@ -44,7 +45,7 @@ class ShapeWidget extends StatelessWidget {
   }
 }
 
-/// Custom painter for drawing various shapes
+
 class ShapePainter extends CustomPainter {
   final ShapeType type;
   final Color color;
@@ -339,20 +340,29 @@ class PetProfileScreen extends StatefulWidget {
 }
 
 class _PetProfileScreenState extends State<PetProfileScreen> {
+  late final ScrollController _scrollController;
   final Random _random = Random();
+  
   
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     
+  }
+
+   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
   
   
   Color generatePastelColor() {
   // Generate a darker pastel color
-  final int red = 75 + _random.nextInt(75);   
-  final int green = 75 + _random.nextInt(75); 
-  final int blue = 75 + _random.nextInt(75);  
+  final int red = 65 + _random.nextInt(75);   
+  final int green = 65 + _random.nextInt(75); 
+  final int blue = 65 + _random.nextInt(75);  
 
   return Color.fromRGBO(red, green, blue, 1.0);
 }
@@ -396,6 +406,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       body: 
@@ -484,40 +495,216 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               ),
             );
           } else {
+
             final petHistory = snapshot.data!;
+            final DateTime now       = DateTime.now();
+            final String todayDate   = DateFormat('d').format(now);
+            final String todayWeekday  = DateFormat('E').format(now);  
+            final int todayIndex     = now.weekday - 1;
             return 
             
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 50.h),
+              padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 4.w, bottom: 16.h),
+
+                 Row(
+                crossAxisAlignment: CrossAxisAlignment.start, 
+                children: [
+                SizedBox(width: 50.w),
+
+                
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                    padding: EdgeInsets.only(top: 110.h,),
                     child: Text(
-                      'Pets Profile',
+                      "Pets Profile",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 27.sp,
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Two columns.
-                        crossAxisSpacing: 16.w,
-                        mainAxisSpacing: 16.h,
-                        childAspectRatio: 0.75,
+                  
+                  
+                  ],
+                ),
+
+              
+              Padding(padding: EdgeInsets.only( top: 40.h, left: 5.w),
+              child: Container(
+                width: 200.w,
+                height: 150.h,
+                
+                child: Lottie.asset(
+                  'assets/dogsitanimation.json',
+                  fit: BoxFit.contain,  
+                  repeat: true,
+                  animate: true,
+                ),
+              )),
+
+              ],
+            ),
+
+
+
+                Expanded(
+                  child: Stack(
+                    children: [
+                     
+                      Positioned(
+                        bottom: 0.h,
+                        left: 0.w,
+                        right: 0.w,
+                        child: Container(
+                          height: 540.h,
+                          decoration: const BoxDecoration(
+                            color: Color.fromRGBO(225, 240, 243, 0.884),
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(50)),
+                            border: Border(
+                              top: BorderSide(
+                                color: Color.fromRGBO(82, 170, 164, 1),
+                                width: 10,
+                              ),
+                            ),
+                          ),
+                          child: Stack(  
+                            children: [
+                              Padding(padding: EdgeInsets.only(top: 15.h, left: 15.w),
+                              child: Container(
+                                width: 70.w,
+                                height: 70.h,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(82, 170, 164, 1),
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  border: Border.all(
+                                  color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                  width: 1.w,
+                                  ),
+                                ),
+
+                                child:  Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                  padding: EdgeInsets.only(top: 5.h),
+                                  child: Text(
+                                    petHistory.length.toString(),
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(255, 231, 231, 231),
+                                      fontSize: 25.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                
+                                  Text(
+                                    'Pets',
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(255, 231, 231, 231),
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                                
+                              )),
+
+
+
+
+                               Padding(padding: EdgeInsets.only(top: 15.h, left: 100.w),
+                               
+                              child: Container(
+                                width: 70.w,
+                                height: 70.h,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(82, 170, 164, 1),
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  border: Border.all(
+                                    color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                    width: 1.w,
+                                  ),
+                                ),
+
+                                child:  Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                  padding: EdgeInsets.only(top: 5.h),
+                                  child: Text(
+                                    todayDate,
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(255, 231, 231, 231),
+                                      fontSize: 25.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                
+                                  Text(
+                                    todayWeekday,
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(255, 231, 231, 231),
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                                
+                              )),
+
+                              
+                              
+                              Padding(
+                                padding: EdgeInsets.only(top: 95.h),
+                                child: ListView.builder(
+                                  controller: _scrollController,
+                                  primary: false,
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: EdgeInsets.zero,
+                                  itemCount: petHistory.length,
+                                  itemBuilder: (context, index) {
+                                    final petData = petHistory[index];
+                                    return _buildPetCard(context, petData);
+                                  },
+                                ),
+                              ),
+
+                              
+                              Positioned(
+                                top: 110.h,   
+                                bottom: 0,   
+                                left: MediaQuery.of(context).size.width
+                                      - (80.w + 20.w ),
+                                child: Container(
+                                  width: 2.w,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 63, 62, 62),
+                                    borderRadius: BorderRadius.circular(50.r),
+                                  ),
+                                  
+                                ),
+
+                              ),
+
+                            
+                            ],
+                          ),
+                        ),
                       ),
-                      itemCount: petHistory.length,
-                      itemBuilder: (context, index) {
-                        final petData = petHistory[index];
-                        return _buildPetCard(context, petData);
-                      },
-                    ),
+                    ],
                   ),
+                ),
+
+
                 ],
               ),
             );
@@ -529,176 +716,150 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 
   
   Widget _buildPetCard(BuildContext context, Map<String, dynamic> petData) {
-    final String petName = petData['petName'] ?? "Unknown";
-    final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
-    // Extract details with fallbacks.
-    final String age = details.length > 1 ? (details[1]['value']?.toString() ?? "0 yrs") : "0 yrs";
-    final String breed = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
-    // Removed Symptoms detail from the pet card display.
-    final String imageUrl = petData['petImage'] ?? "assets/sampleimage.jpg";
-
- 
-    final Color cardColor = petData.containsKey('cardColor')
-        ? Color(petData['cardColor'] as int)
-        : generatePastelColor();
-
- 
-    final ShapeType shapeType = petData.containsKey('shapeType')
-        ? ShapeType.values[petData['shapeType'] as int]
-        : getRandomShapeType();
-
-    return GestureDetector(
-      onTap: () {
-        _showPetDetails(context, petData);
-      },
+  final String petType = petData['petType'] ?? 'Unknown';
+  final String petName   = petData['petName']   ?? 'Unknown';
+  final List details     = petData['petDetails'] is List ? petData['petDetails'] : [];
+  final String age       = details.length > 1 ? '${details[1]['value']} yrs' : '–';
+  final String breed     = details.length > 3 ? details[3]['value'] : 'Unknown';
+  final String imageUrl  = petData['petImage']  ?? 'assets/sampleimage.jpg';
+  final Timestamp? ts = petData['date'] as Timestamp?;
+                                final String dateStr = ts != null
+                                  ? DateFormat('MMM d, yyyy').format(ts.toDate())
+                                  : '';
+  return Padding(
+    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 23.h),
+    child: GestureDetector(
+      onTap: () => _showPetDetails(context, petData),
       child: Container(
-        decoration: BoxDecoration(
-          color: cardColor, // Use the pastel color as background
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+        child: Row(
+          children: [
+          SizedBox(
+          width: 24.w,          
+          child: RotatedBox(
+            quarterTurns: 3,     
+            child: Text(
+              petType,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.r),
-          child: Stack(
-            children: [
-       
-              Positioned.fill(
-                child: AnimatedShapesBackground(
-                  baseColor: cardColor,
-                  shapeType: shapeType,
-                ),
-              ),
-              // Original content remains unchanged
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Pet image at the top with overlay gradient.
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                        child: imageUrl.startsWith("http")
-                            ? Image.network(
-                                imageUrl,
-                                height: 140.h,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    height: 140.h,
-                                    color: Colors.grey[800],
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.broken_image,
-                                        color: Colors.white70,
-                                        size: 40.sp,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Container(
-                                    height: 140.h,
-                                    color: Colors.grey[800],
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: const Color(0xFF52AAA4),
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )
-                            : Image.asset(
-                                imageUrl,
-                                height: 140.h,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-                      // Gradient overlay on image.
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          height: 40.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.5),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Pet details below the image.
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(12.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            petName,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 6.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.pets,
-                                size: 14.sp,
-                                color: const Color(0xFF52AAA4),
-                              ),
-                              SizedBox(width: 4.w),
-                              Expanded(
-                                child: Text(
-                                  '$age • $breed',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    color: Colors.grey[300],
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
         ),
+            SizedBox(width: 12.w),
+            
+            Container(
+            height: 70.h,
+            width: 215.w,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 235, 233, 233),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50.r),
+                bottomLeft: Radius.circular(50.r),
+                topRight: Radius.circular(10.r),
+                bottomRight: Radius.circular(10.r),
+              ),
+                boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.25),  
+                  offset: const Offset(-5, 10),                   
+                  blurRadius: 10,                          
+                  spreadRadius: 1,                        
+                ),
+              ],
+            ),
+            child: 
+              Padding(padding: EdgeInsets.only(left: 12.w),
+              child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container( 
+                  decoration: BoxDecoration(  
+                    borderRadius: BorderRadius.circular(50.r), 
+                    border: Border.all(
+                    color: const Color.fromRGBO(82, 170, 164, 1),  // border color
+                    width: 3.w,           // border thickness
+                  ),),
+                            child: ClipOval(
+                  child: imageUrl.startsWith('http')
+                      ? Image.network(
+                          imageUrl,
+                          width: 48.w,
+                          height: 48.w,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          imageUrl,
+                          width: 48.w,
+                          height: 48.w,
+                          fit: BoxFit.cover,
+                        ),
+                )),
+
+                SizedBox(width: 12.w),
+
+                Padding(padding: EdgeInsets.only(top: 10.w),
+              child:
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      petName,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color.fromARGB(255, 0, 0, 0),   // white on dark grey
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '$age • $breed',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: const Color.fromARGB(179, 0, 0, 0),
+                            ),
+
+                              maxLines: 1,                   
+                              overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      )),
+                    
+                    ],
+                  ),
+                )),
+
+                
+                            
+
+                  SizedBox(width: 0.w),
+
+            // 3) The horizontal connector rail
+            Container(
+                height: 2.w,         
+                width: 14.w,         // thickness of the rail
+                color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
+              ),
+            
+
+            SizedBox(width: 20.w),
+
+            // 4) Date
+            Text(
+              dateStr,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: const Color.fromARGB(255, 63, 62, 62),
+              )),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   /// Add this method to create/update pets with a random color and shape type
   Future<void> createNewPet(Map<String, dynamic> petData) async {
@@ -731,8 +892,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     }
   }
 
-  /// If you need to update existing pets to add the animation properties,
-  /// call this method once from initState()
+
   Future<void> updateExistingPetsWithAnimationProperties() async {
     try {
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
@@ -760,10 +920,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     }
   }
 
-  /// Displays a bottom sheet with pet details and health record assessments.
-  /// Each assessment's symptom input is merged (deep copy) into the pet's details
-  /// so that when you tap a health record, the correct symptom (e.g. "diarrhea" or "vomiting") is shown.
-  /// The bottom sheet height can be manually adjusted by the user by dragging the image area.
   void _showPetDetails(BuildContext context, Map<String, dynamic> petData) {
     final List<dynamic> assessments = petData['assessments'] is List ? petData['assessments'] : [];
     final dynamic timestamp = petData['date'];
@@ -925,6 +1081,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
+                      flex: 1,
                       child: _buildDetailCard(
                         icon: Icons.pets,
                         iconColor: Colors.brown,
@@ -1014,12 +1171,13 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     required String value,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 0.w),
       decoration: BoxDecoration(
         color: Colors.amber.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
@@ -1028,6 +1186,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             size: 24.sp,
           ),
           SizedBox(height: 8.h),
+          
           Text(
             label,
             style: TextStyle(
@@ -1036,14 +1195,19 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ),
           ),
           SizedBox(height: 4.h),
+          
           Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          value,
+          textAlign: TextAlign.center,
+          softWrap: false, 
+          overflow: TextOverflow.ellipsis,  
+          maxLines: 1,  
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
+        ),
         ],
       ),
     );

@@ -274,6 +274,14 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                               MaterialPageRoute(builder: (context) => const SignupScreen()),
                             );
                           },
+
+                           style: const ButtonStyle(
+                             overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                             shadowColor: WidgetStatePropertyAll(Colors.transparent),
+                             elevation: WidgetStatePropertyAll(0),
+
+                          ),
+                          
                           child:  Text(
                             "Sign Up",
                             style: TextStyle(fontSize: 16.0.sp, color: const Color.fromRGBO(82, 170, 164, 1)),
@@ -282,12 +290,21 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
 
                         // ✅ Recovery Password Button (properly positioned)
                         TextButton(
+                         
                           onPressed: () {
                               Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => const EmailScreen()),
                             );
                           },
+                          
+                           style: const ButtonStyle(
+                             overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                             shadowColor: WidgetStatePropertyAll(Colors.transparent),
+                             elevation: WidgetStatePropertyAll(0),
+
+                          ),
+
                           child:  Text(
                             "Recovery Password",
                             style: TextStyle(fontSize: 16.0.sp, color:const Color.fromRGBO(82, 170, 164, 1)),
@@ -420,7 +437,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
           ),
 
            Positioned(
-             top: lerpDouble(122.h, -700.h, keyboardHeight / screenHeight) ?? 122.h,// Move up when keyboard is open // Move it higher to ensure visibility
+             top: lerpDouble(122.h, -690.h, keyboardHeight / screenHeight) ?? 124.h,// Move up when keyboard is open // Move it higher to ensure visibility
             left: 0.17.sw, // Adjusts for centering
             child: Container(
               height: 0.35.sh, // Increase size slightly for better visibility

@@ -1,0 +1,2 @@
+C:/PetSymp/petsymp/android/app/.cxx/RelWithDebInfo/2lg722o5/x86/CMakeFiles/edit_cache.dir
+C:/PetSymp/petsymp/android/app/.cxx/RelWithDebInfo/2lg722o5/x86/CMakeFiles/rebuild_cache.dir

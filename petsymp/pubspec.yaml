@@ -61,6 +61,9 @@ dependencies:
   animated_bottom_navigation_bar: ^1.4.0
   convex_bottom_bar: ^3.2.0
   animate_do: ^4.2.0
+  shared_preferences: ^2.5.3
+  intl: ^0.20.2
+  card_swiper: ^3.0.1
   
 
 dev_dependencies:
@@ -147,6 +150,9 @@ flutter:
       - assets/largepet.png
       - assets/extralargepet.png
       - assets/catcat.json
+      - assets/dogsitanimation.json
+      - assets/cardCatss.png
+      - assets/cardDogss.png
       - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
       - assets/imgsymptomcatalog/abdominalpain.jpg
       - assets/imgsymptomcatalog/abdominalenlargment.jpg

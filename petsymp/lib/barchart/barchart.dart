@@ -156,12 +156,12 @@ class _BarChartSample2State extends State<BarChartSample2> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 makeTransactionsIcon(),
-                const SizedBox(width: 38),
+                 SizedBox(width: 20.w),
                 Text(
                   'Confidence Comparison',
                   style: TextStyle(
                     color: const Color.fromARGB(255, 0, 0, 0),
-                    fontSize: 22.sp,
+                    fontSize: 19.sp,
                     fontFamily: 'Oswald',
                   ),
                 ),
@@ -995,18 +995,19 @@ class _BarChartSample2State extends State<BarChartSample2> {
 
   Widget _buildLegend() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       decoration: BoxDecoration(
         color: const Color.fromARGB(0, 29, 29, 44),
         borderRadius: BorderRadius.circular(100),
       ),
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+           SizedBox(height: 5.h),
           _legendItem(widget.fcColor, "Forward Chaining"),
-          const SizedBox(width: 12),
+          SizedBox(height: 5.h),
           _legendItem(widget.gbColor, "Gradient Boosting"),
-          const SizedBox(width: 12),
+          SizedBox(height: 5.h),
           _legendItem(widget.abColor, "Ada Boost"),
         ],
       ),

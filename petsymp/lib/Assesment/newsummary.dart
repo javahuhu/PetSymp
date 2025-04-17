@@ -14,6 +14,7 @@ import 'package:petsymp/SymptomsCatalog/symptomscatalog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:petsymp/Connection/dynamicconnections.dart';
+import 'package:card_swiper/card_swiper.dart';
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
 
@@ -426,7 +427,112 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               ),
             ),
 
+Padding(
+  padding: EdgeInsets.symmetric(vertical: 15.h),
+  child: Center(
+    child: SizedBox(
+      width: 1.sw,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
+        child: SizedBox(
+          height: 350.h,
+           // card height
+          child: Consumer<UserData>(
+            builder: (_, userData, __) {
+              final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
+                ..sort((a, b) => (b['confidence_ab'] as num)
+                                  .compareTo(a['confidence_ab'] as num));
+              final top10 = diagnoses.take(10).toList();
+              while (top10.length < 10) {
+                top10.add({
+                  'illness': '',
+                  'confidence_fc': 0.0,
+                  'confidence_gb': 0.0,
+                  'confidence_ab': 0.0,
+                  'subtype_coverage': 0.0,
+                });
+              }
 
+              return Swiper(
+                itemCount: top10.length,
+                viewportFraction: 0.8,  // each card takes 80% of width
+                scale: 0.9,             // cards behind are 90% size
+                 pagination: SwiperPagination(
+                    alignment: Alignment.bottomCenter,
+                    builder: DotSwiperPaginationBuilder(
+                      color: const Color.fromARGB(255, 69, 19, 78).withOpacity(0.2), // inactive dots
+                      activeColor: Colors.purple,             // the “filled” dot
+                      size: 8.0,        // diameter of inactive dots
+                      activeSize: 10.0, // diameter of active dot
+                      space: 4.0,       // space between dots
+                    ),
+                  ),
+  
+                control: SwiperControl(),        
+                itemBuilder: (context, index) {
+                  final d    = top10[index];
+                  final name = d['illness'] as String;
+                  final fc   = (d['confidence_fc'] as num).toDouble();
+                  final gb   = (d['confidence_gb'] as num).toDouble();
+                  final ab   = (d['confidence_ab'] as num).toDouble();
+
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.r),
+                    ),
+                    elevation: 4,
+                    child: Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Illness name
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8.h),
+
+                          // One-item bar chart
+                          Expanded(
+                            child: BarChartSample2(
+                              illnessLabels: [name],
+                              fcScores:        [fc],
+                              gbScores:        [gb],
+                              abScores:        [ab],
+                            ),
+                          ),
+
+                          SizedBox(height: 8.h),
+                          // Top N label
+                          Text(
+                            "Top ${index + 1}",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    ),
+  ),
+),
+
+
+         
              Padding(
               padding: EdgeInsets.symmetric(vertical: 15.h),
               child: Center( child: 
@@ -435,83 +541,17 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               child: Card(
                   margin: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(10.0), 
+                     borderRadius: BorderRadius.circular(25.0), 
                     side: BorderSide.none,
                   ),
                   elevation: 3,
-                  child: Theme(
-                    data: Theme.of(context)
-                        .copyWith(dividerColor: Colors.transparent),
-                    child: ExpansionTile(
-                title: const Text(
-                  'Statistic Results',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Inter'),
-                ),
-                children: [
-                  
-                  
-             Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 25.h),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(0, 19, 19, 44),
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  height: 300.h,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Consumer<UserData>(
-                      builder: (_, userData, __) {
-                        final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
-                          ..sort((a, b) => (b['confidence_ab'] as num).compareTo((a['confidence_ab'] as num)));
-                        final top10 = diagnoses.take(10).toList();
-                        while (top10.length < 10) {
-                          top10.add({
-                            'illness': '',
-                            'confidence_fc': 0.0,
-                            'confidence_gb': 0.0,
-                            'confidence_ab': 0.0,
-                            'subtype_coverage': 0.0
-                          });
-                        }
- 
-                        final labels = top10.map((d) => d['illness'] as String).toList();
-                        final fc = top10.map((d) => (d['confidence_fc'] as num).toDouble()).toList();
-                        final gb = top10.map((d) => (d['confidence_gb'] as num).toDouble()).toList();
-                        final ab = top10.map((d) => (d['confidence_ab'] as num).toDouble()).toList();
- 
-                        final double groupWidth = 20.w;
-                        final double gapWidth = 90.w;
-                        final double totalRequiredWidth =
-                            (groupWidth * labels.length) + (gapWidth * (labels.length - 1));
-                        final double screenWidth = MediaQuery.of(context).size.width - 20.w;
-                        final double chartWidth =
-                            totalRequiredWidth < screenWidth ? screenWidth : totalRequiredWidth;
- 
-                        return SizedBox(
-                          width: chartWidth,
-                          child: BarChartSample2(
-                            illnessLabels: labels,
-                            fcScores: fc,
-                            gbScores: gb,
-                            abScores: ab,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
- 
-
-
-
+                  child: 
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
                 child: Center(
                   child: Container(
                     color: const Color.fromARGB(0, 19, 19, 44),
-                    height: 300.h,
+                    height: 325.h,
                     width: 355.w,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -633,14 +673,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                 ),
               ),
 
-              SizedBox(height: 25.h,)
-                ],
-              ),
-            ))))),
-
-            
-
-           // ===== Top 1–5 =====
+              )))),
 
 
     SizedBox(height: 0.h,),
@@ -650,29 +683,23 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               child: Center( child: 
               SizedBox(
               width: 350.w, 
+              height: 0.68.sh,
               child: Card(
                   margin: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(10.0), 
+                     borderRadius: BorderRadius.circular(25.0), 
                     side: BorderSide.none,
                   ),
                   elevation: 3,
-                  child: Theme(
-                    data: Theme.of(context)
-                        .copyWith(dividerColor: Colors.transparent),
-                    child:  ExpansionTile(
-                title: const Text(
-                  'Illness Pet Results',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
-                ),
-                children: [
+                  child:  Column(
+                  children: [
                                         //progress indicator 1
                         if (topDiagnoses.isNotEmpty)         
-                           Padding(
-                          padding: EdgeInsets.only(left: 0.w, right: 60.w,top: 20.h),
+                          Padding(
+                          padding: EdgeInsets.only(top: 20.h,left: 5.w),
                           child: SizedBox(
-                            width: 250.w, // Keep fixed width for alignment
-                            child: Column(
+                            width: 350.w,
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Progress Indicator
@@ -683,19 +710,19 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     alignment: Alignment.center,
                                     children: [
                                       SizedBox(
-                                      width: 110.w,
-                                      height: 110.w,
-                                      child: CircularProgressIndicator(
-                                        value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
-                                        backgroundColor: Colors.grey,
-                                        color: const Color.fromARGB(255, 255, 0, 0),
-                                        strokeWidth: 10.w,
+                                        width: 90.w,
+                                        height: 90.w,
+                                        child: CircularProgressIndicator(
+                                          value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
+                                          backgroundColor: Colors.grey,
+                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          strokeWidth: 8.w,
+                                        ),
                                       ),
-                                    ),
                                       Text(
                                         "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
                                         style: TextStyle(
-                                          fontSize: 20.sp,
+                                          fontSize: 15.sp,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
@@ -703,318 +730,330 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     ],
                                   ),
                                 ),
-
-                        Transform.translate(
-                          offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: 250.w,
-                            ),
-                            child: Text(
-                              topDiagnoses[0]['illness'] ?? "",
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                              maxLines: 4,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                              ],
-                            ),
-                          ),
-                        ),
-
-              
-                                      
-
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.h, left: 200.w),
-                    child: ElevatedButton(
-                        onPressed: () {
-                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[0]['illness']),
-                          ),
-                        );
-                                                },
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,                       // Removes shadow
-                          backgroundColor: Colors.transparent, // Makes background transparent
-                          shadowColor: const Color.fromARGB(0, 0, 0, 0),     // Ensures no shadow color
-                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)         // Optional: remove extra padding
-                        ),
-                        child: Text(
-                          'See More',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      )
-
-                  ),
-
-                  
-
-
-                   if (topDiagnoses.length > 1)  
-                                  
-                     Padding(
-                    padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
-                    child: SizedBox(
-                      width: 250.w, // Keep fixed width for alignment
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Progress Indicator
-                          SizedBox(
-                            width: 110.w,
-                            height: 110.w,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                width: 110.w,
-                                height: 110.w,
-                                child: CircularProgressIndicator(
-                                  value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
-                                  backgroundColor: Colors.grey,
-                                  color: const Color.fromARGB(255, 255, 0, 0),
-                                  strokeWidth: 10.w,
-                                ),
-                              ),
-                                Text(
-                                  "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                                  style: TextStyle(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                // Text content - now properly aligned
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
+                                    children: [
+                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      child: // Padding for left alignment
+                                      Text(
+                                        topDiagnoses[0]['illness'] ?? "",
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                        maxLines: 4,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontSize: 22.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      )),
+                                      SizedBox(height: 0.h),
+                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      child: // Proper spacing between items
+                                      Text(
+                                        "Top 1",
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: const Color.fromARGB(255, 169, 169, 169),
+                                          fontWeight: FontWeight.normal,
+                                          fontFamily: 'Inter',
+                                        )),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-
-                  Transform.translate(
-                    offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: 250.w,
-                      ),
-                      child: Text(
-                        topDiagnoses[1]['illness'] ?? "",
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                        maxLines: 4,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
-                      ),
-                    ),
-                  ),
 
-                        ],
-                      ),
-                    ),
-                  ),
+                                
+                                Padding(
+                                  padding: EdgeInsets.only(top: 0.h, left: 190.w), 
+                                  child: TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => IllnessdetailsScreen(
+                                                  illnessName: topDiagnoses[0]['illness']),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          backgroundColor: Colors.transparent,
+                                        ).copyWith(
+                                          // remove splash / highlight
+                                          overlayColor: WidgetStateProperty.all(Colors.transparent),
+                                          // remove any shadow (TextButton normally has none, but just in case)
+                                          shadowColor:  WidgetStateProperty.all(Colors.transparent),
+                                          elevation:  WidgetStateProperty.all(0),
+                                        ),
+                                        child: Text(
+                                          'See More',
+                                          style: TextStyle(
+                                            color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
 
-              
-                  
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
-                  ),
+                                ),
 
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.h, left: 200.w),
-                    child: ElevatedButton(
-                        onPressed: () {
-                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[1]['illness']),
+                                Divider(
+                                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
+                                  thickness: 2,
+                                  indent: 20.w,
+                                  endIndent: 20.w,
+                                ),
+                                                  
+
+                   if (topDiagnoses.length > 1)  
+                                  
+                     Padding(
+                          padding: EdgeInsets.only(top: 15.h,left: 5.w),
+                          child: SizedBox(
+                            width: 350.w,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Progress Indicator
+                                SizedBox(
+                                  width: 110.w,
+                                  height: 110.w,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 90.w,
+                                        height: 90.w,
+                                        child: CircularProgressIndicator(
+                                          value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
+                                          backgroundColor: Colors.grey,
+                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          strokeWidth: 8.w,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Text content - now properly aligned
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
+                                    children: [
+                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      child: // Padding for left alignment
+                                      Text(
+                                        topDiagnoses[1]['illness'] ?? "",
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                        maxLines: 4,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontSize: 22.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      )),
+                                      SizedBox(height: 0.h),
+                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      child: // Proper spacing between items
+                                      Text(
+                                        "Top 2",
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: const Color.fromARGB(255, 169, 169, 169),
+                                          fontWeight: FontWeight.normal,
+                                          fontFamily: 'Inter',
+                                        )),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,                       // Removes shadow
-                          backgroundColor: Colors.transparent, // Makes background transparent
-                          shadowColor: Colors.transparent,     // Ensures no shadow color
-                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)        // Optional: remove extra padding
                         ),
-                        child: Text(
-                          'See More',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      )
 
-                  ),
+                                
+                                Padding(
+                                  padding: EdgeInsets.only(top: 0.h, left: 190.w), 
+                                  child: TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => IllnessdetailsScreen(
+                                                illnessName: topDiagnoses[0]['illness']),
+                                          ),
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        backgroundColor: Colors.transparent,
+                                      ).copyWith(
+                                        // remove splash / highlight
+                                        overlayColor:  WidgetStateProperty.all(Colors.transparent),
+                                        // remove any shadow (TextButton normally has none, but just in case)
+                                        shadowColor:  WidgetStateProperty.all(Colors.transparent),
+                                        elevation:  WidgetStateProperty.all(0),
+                                      ),
+                                      child: Text(
+                                        'See More',
+                                        style: TextStyle(
+                                          color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    )
 
-                  
+                                ), 
+
+                                 Divider(
+                                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
+                                  thickness: 2,
+                                  indent: 20.w,
+                                  endIndent: 20.w,
+                                ), 
 
                   //progress indicator 3
                                   
                 if (topDiagnoses.length > 2)                   
-              Padding(
-              padding: EdgeInsets.only(left: 0.w, right: 60.w, top: 50.h),
-              child: SizedBox(
-                width: 250.w, // Keep fixed width for alignment
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Progress Indicator
-                    SizedBox(
-                      width: 110.w,
-                      height: 110.w,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                          width: 110.w,
-                          height: 110.w,
-                          child: CircularProgressIndicator(
-                            value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
-                            backgroundColor: Colors.grey,
-                            color: const Color.fromARGB(255, 255, 0, 0),
-                            strokeWidth: 10.w,
-                          ),
-                        ),
-                          Text(
-                            "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          Padding(
+                          padding: EdgeInsets.only(top: 15.h,left: 5.w),
+                          child: SizedBox(
+                            width: 350.w,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Progress Indicator
+                                SizedBox(
+                                  width: 110.w,
+                                  height: 110.w,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 90.w,
+                                        height: 90.w,
+                                        child: CircularProgressIndicator(
+                                          value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
+                                          backgroundColor: Colors.grey,
+                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          strokeWidth: 8.w,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Text content - now properly aligned
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
+                                    children: [
+                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      child: // Padding for left alignment
+                                      Text(
+                                        topDiagnoses[2]['illness'] ?? "",
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                        maxLines: 4,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontSize: 22.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      )),
+                                      SizedBox(height: 0.h),
+                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      child: // Proper spacing between items
+                                      Text(
+                                        "Top 3",
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: const Color.fromARGB(255, 169, 169, 169),
+                                          fontWeight: FontWeight.normal,
+                                          fontFamily: 'Inter',
+                                        )),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-
-            Transform.translate(
-              offset: Offset(-10.w, 10.h), // ✅ Moves the text to the left
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 250.w,
-                ),
-                child: Text(
-                  topDiagnoses[2]['illness'] ?? "",
-                  softWrap: true,
-                  overflow: TextOverflow.visible,
-                  maxLines: 4,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-
-                  ],
-                ),
-              ),
-            ),
-
-                          
-
-                 
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: SizedBox(
-                      width: 340.w,
-                      child: Text(
-                        "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inter',
                         ),
-                      ),
-                    ),
-                  ),
 
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.h, left: 200.w),
-                    child: ElevatedButton(
-                        onPressed: () {
-                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => IllnessdetailsScreen(illnessName: topDiagnoses[2]['illness']),
-                          ),
-                        );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,                       // Removes shadow
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          surfaceTintColor: Colors.transparent, // for Material3// disables splash/tap color   // Ensures no shadow color
-                          side: const BorderSide(color: Color.fromRGBO(29, 29, 44, 1.0), width: 2)          // Optional: remove extra padding
-                        ),
-                        child: Text(
-                          'See More',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(29, 29, 44, 1.0), // Set text color as needed
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      )
+                                Padding(
+                                  padding: EdgeInsets.only(top: 0.h, left: 190.w), 
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => IllnessdetailsScreen(
+                                              illnessName: topDiagnoses[2]['illness']),
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      backgroundColor: Colors.transparent,
+                                    ).copyWith(
+                                      // remove splash / highlight
+                                      overlayColor:  WidgetStateProperty.all(Colors.transparent),
+                                      // remove any shadow (TextButton normally has none, but just in case)
+                                      shadowColor:  WidgetStateProperty.all(Colors.transparent),
+                                      elevation:  WidgetStateProperty.all(0),
+                                    ),
+                                    child: Text(
+                                      'See More',
+                                      style: TextStyle(
+                                        color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  )
 
-                  ),
+                                ),  
 
                   
-                  SizedBox(height: 50.h),
+                  
                 ],
-              )))))),
+              ))))),
             
 
             ///Recommendation//////////

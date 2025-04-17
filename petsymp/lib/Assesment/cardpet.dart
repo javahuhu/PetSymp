@@ -29,14 +29,14 @@ class CardpetScreenState extends State<CardpetScreen> with SingleTickerProviderS
 
   final List<Map<String, dynamic>> _pets = [
     {
-      'image': 'assets/cardDog.png',
+      'image': 'assets/cardDogss.png',
       'name': 'Dog',
       'description': 'Loyal companion for your family',
       'color': const Color(0xFF428682),
       'page': const UserPetScreen(),
     },
     {
-      'image': 'assets/cardCat.png',
+      'image': 'assets/cardCatss.png',
       'name': 'Cat',
       'description': 'Elegant and independent friend',
       'color': const Color(0xFF5DBFB0),

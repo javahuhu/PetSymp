@@ -5,6 +5,7 @@ import 'profile.dart';
 import 'package:petsymp/Assesment/cardpet.dart';
 import '../PetProfile/petprofile.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -43,7 +44,14 @@ class HomePageScreenState extends State<HomePageScreen> {
         _isAnimated = true;
       });
     });
+
+ 
   }
+
+  
+
+  
+
 
   // Method for symptom catalog navigation
   void _navigateToSymptomCatalog() async {
@@ -315,160 +323,198 @@ class TermsDialogContent extends StatefulWidget {
 }
 
 class _TermsDialogContentState extends State<TermsDialogContent> {
-  bool accepted = false;
-
+  bool accepted1 = false;
+ 
+  
   @override
+  void initState() {
+    super.initState();
+    _CheckDontShowAgain();
+  }
+
+    @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Terms and Agreement"),
-      content: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(0),
-          child: Column(
-            children: [
+    return const SizedBox(); 
+  }
 
-         Padding(
-  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h), // responsive left/right padding
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
-    children: [
-      Text(
-        "Welcome!",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 35.sp, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 25.h),
-      Text(
-        "These Terms and Conditions ('Terms') govern your use of the PetSymp mobile application and services. By accessing or using PetSymp, you agree to these Terms. If you do not agree, please do not use the app.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-    ],
-  ),
-),
- Padding(
-  padding: EdgeInsets.only(left: 50.w, right: 20.w), // responsive left/right padding
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
-    children: [
-      Text(
-        "Acceptance of Terms",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 5.h),
-      Text(
-        "By using PetSymp, you confirm that you have read, understood, and agree to comply with these Terms.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-       SizedBox(height: 25.h),
-      Text(
-        "Description of Service",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 5.h),
-      Text(
-        "PetSymp provides symptom analysis for pets based on user input. The app generates possible conditions and follow-up questions to refine the assessment. PetSymp does not provide medical diagnoses and should not replace professional veterinary advice.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-       SizedBox(height: 25.h),
-      Text(
-        "User Responsibilities",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 5.h),
-      Text(
-        "By using PetSymp, you agree to:",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
 
-       SizedBox(height: 20.h),
-      Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Icon(
-      Icons.arrow_forward,
-      size: 20.sp,
-      color: Colors.black,
-    ),
-    SizedBox(width: 8.w), // spacing between icon and text
-    Flexible(
-      child: Text(
-        "Provide accurate and truthful symptom information.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-    ),
-  ],
-),
- SizedBox(height: 15.h),
- Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
+ Future<void> _CheckDontShowAgain() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? dontShowAgain = prefs.getBool('dontShowAgain') ?? false;
 
-    Icon(
-      Icons.arrow_forward,
-      size: 20.sp,
-      color: Colors.black,
-    ),
-    SizedBox(width: 8.w), // spacing between icon and text
-    Flexible(
-      child: Text(
-        "Use the app only for personal, non-commercial purposes.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-    ),
-  ],
-),
- SizedBox(height: 15.h),
- Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Icon(
-      Icons.arrow_forward,
-      size: 20.sp,
-      color: Colors.black,
-    ),
-    SizedBox(width: 8.w), // spacing between icon and text
-    Flexible(
-      child: Text(
-        "Acknowledge that results are for informational purposes only and consult a veterinarian for medical concerns.",
-        style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
-      ),
-    ),
-  ],
-),
- SizedBox(height: 30.h),
-  ],
-  ),
-),
-              
-              CheckboxListTile(
-                value: accepted,
-                onChanged: (bool? value) {
-                  setState(() {
-                    accepted = value ?? false;
-                  });
-                },
-                title: const Text("I agree to the Terms and Conditions"),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: accepted
-              ? () {
-                  Navigator.of(context).pop(true);
-                }
-              : null,
-          child: const Text("Proceed"),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-          child: const Text("Cancel"),
-        ),
-      ],
-    );
+  if (dontShowAgain != true) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      bool? accepted = await _showTermsAgain(context);
+      Navigator.of(context).pop(accepted); // ✅ send result back to HomePageScreen
+    });
+  } else {
+    Navigator.of(context).pop(true); // ✅ Auto-accept if don'tShowAgain is true
   }
 }
+    
+
+  Future<bool?> _showTermsAgain(BuildContext context) async {
+  bool localAccepted = false;
+  bool localDontShowAgain = false;
+
+  return await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text("Terms and Agreement"),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                   Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h), // responsive left/right padding
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
+                        children: [
+                          Text(
+                            "Welcome!",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 35.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 25.h),
+                          Text(
+                            "These Terms and Conditions ('Terms') govern your use of the PetSymp mobile application and services. By accessing or using PetSymp, you agree to these Terms. If you do not agree, please do not use the app.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 50.w, right: 20.w), // responsive left/right padding
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, // ⬅️ aligns text to the left
+                        children: [
+                          Text(
+                            "Acceptance of Terms",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5.h),
+                          Text(
+                            "By using PetSymp, you confirm that you have read, understood, and agree to comply with these Terms.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                          SizedBox(height: 25.h),
+                          Text(
+                            "Description of Service",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5.h),
+                          Text(
+                            "PetSymp provides symptom analysis for pets based on user input. The app generates possible conditions and follow-up questions to refine the assessment. PetSymp does not provide medical diagnoses and should not replace professional veterinary advice.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                          SizedBox(height: 25.h),
+                          Text(
+                            "User Responsibilities",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5.h),
+                          Text(
+                            "By using PetSymp, you agree to:",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+
+                          SizedBox(height: 20.h),
+                          Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 20.sp,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 8.w), // spacing between icon and text
+                        Flexible(
+                          child: Text(
+                            "Provide accurate and truthful symptom information.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 15.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 20.sp,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 8.w), // spacing between icon and text
+                        Flexible(
+                          child: Text(
+                            "Use the app only for personal, non-commercial purposes.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 15.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 20.sp,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 8.w), // spacing between icon and text
+                        Flexible(
+                          child: Text(
+                            "Acknowledge that results are for informational purposes only and consult a veterinarian for medical concerns.",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30.h),
+                      ],
+                      ),
+                    ),
+
+                  CheckboxListTile(
+                    value: localAccepted,
+                    onChanged: (val) => setState(() => localAccepted = val ?? false),
+                    title: const Text("I agree to the Terms and Conditions"),
+                  ),
+                  CheckboxListTile(
+                    value: localDontShowAgain,
+                    onChanged: (val) => setState(() => localDontShowAgain = val ?? false),
+                    title: const Text("Don't Show This Again"),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  if (localAccepted) {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('dontShowAgain', localDontShowAgain);
+                    Navigator.of(context).pop(true); // ✅ Returns true!
+                  }
+                },
+                child: const Text("Proceed"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+}
+
