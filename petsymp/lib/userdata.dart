@@ -230,31 +230,40 @@ class UserData with ChangeNotifier {
   }
 
   Future<void> fetchDiagnosis() async {
-    final Uri url = Uri.parse(AppConfig.diagnoseURL);
-    final uniqueSymptoms = _finalizedSymptoms.toSet().toList();
-    final requestData = {
-      "owner": _userName,
-      "symptoms": uniqueSymptoms,
-      "pet_info": {
-        "age": _petAge.toString(),
-        "breed": _breed,
-        "size": _petSize,
-      },
-      "user_answers": _symptomDurations,
-    };
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestData),
-      ).timeout(const Duration(minutes: 2));
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final illnesses = List<Map<String, dynamic>>.from(jsonResponse["diagnoses"]);
-        setDiagnosisResults(illnesses);
-      }
-    } catch (_) {}
+  final Uri url = Uri.parse(AppConfig.diagnoseURL);
+  final uniqueSymptoms = _finalizedSymptoms.toSet().toList();
+  final requestData = {
+    "owner": _userName,
+    "symptoms": uniqueSymptoms,
+    "pet_info": {
+      "age":  _petAge.toString(),
+      "breed": _breed,
+      "size":  _petSize,
+    },
+    "user_answers": _symptomDurations,
+  };
+
+  try {
+    final response = await http.post(url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestData),
+    ).timeout(const Duration(minutes: 2));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      // ← use top_diagnoses now, not diagnoses
+      final illnesses = List<Map<String, dynamic>>.from(
+        (jsonResponse["top_diagnoses"] as List)
+      );
+      setDiagnosisResults(illnesses);
+    } else {
+      print("❌ API Error: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("🚨 Failed to connect: $e");
   }
+}
+
 
 
 
