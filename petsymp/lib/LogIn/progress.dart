@@ -148,7 +148,10 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    return 
+    PopScope(
+      canPop: false, 
+      child: Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
@@ -175,7 +178,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
           ),
         ],
       ),
-    );
+    ));
   }
 
   @override
