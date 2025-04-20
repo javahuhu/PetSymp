@@ -370,6 +370,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                   gbScores: gb,
                                   abScores: ab,
                                   symptomDetails: savedSymptomDetails,
+                                  petName: historyData['petName']  as String,  
+                                  petType: historyData['petType']  as String,  
                                 ),
                               );
                             },
