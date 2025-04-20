@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/Assesment/newsummary.dart';
 import '../userdata.dart';
 import 'package:provider/provider.dart';
+
+
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
 
@@ -42,36 +44,16 @@ class ReportScreenState extends State<ReportScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final userName = Provider.of<UserData>(context).userName;
 
-    return Scaffold(
+    return 
+    PopScope(
+      canPop: false,
+      child: Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
           
             Stack(
               children: [
-                // Back Button
-                Positioned(
-                  top: screenHeight * 0.03,
-                  left: screenWidth * 0.01,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context); // ✅ Only pops if there's a previous route
-                    } 
-                  },
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      color: Color.fromRGBO(61, 47, 40, 1),
-                      size: 40.0,
-                    ),
-                    label: const Text(''),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                ),
-                // Animated Header
                 AnimatedPositioned(
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
@@ -131,7 +113,7 @@ class ReportScreenState extends State<ReportScreen> {
         ],
       ),
       
-    );
+    ));
   }
 
   // Method to create an animated button
