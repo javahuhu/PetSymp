@@ -8,7 +8,7 @@ import 'barresources.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:petsymp/Connection/dynamicconnections.dart';
-
+import 'metrics.dart';
 class BarChartSample2 extends StatefulWidget {
   final List<String> illnessLabels;
   final List<double> fcScores;
@@ -156,7 +156,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 makeTransactionsIcon(),
-                 SizedBox(width: 20.w),
+                 SizedBox(width: 10.w),
                 Text(
                   'Confidence Comparison',
                   style: TextStyle(
@@ -172,7 +172,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
             Expanded(
               child: BarChart(
                 BarChartData(
-                  maxY: 100,
+                  maxY: 100.h,
                   groupsSpace: 20,
                   barGroups: showingBarGroups,
                   barTouchData: BarTouchData(
@@ -379,53 +379,6 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                       ),
                                     ),
 
-                                    
-                           SizedBox(height: 60.h),
-                            Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.blueAccent,
-                                size: 24.sp,
-                              ),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                child: Text.rich(
-                                  TextSpan(
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 127, 127, 127),
-                                      fontSize: 12.sp,
-                                    ),
-                                    children: const [
-                                      const TextSpan(
-                                          text:
-                                              "Note: The graph above illustrates the results of different algorithms used in illness analysis. "),
-                                      const TextSpan(
-                                          text: "Forward Chaining (FC)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " provides the initial diagnosis, "),
-                                      const TextSpan(
-                                          text: "Gradient Boosting (GB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " refines the ranking, and "),
-                                      const TextSpan(
-                                          text: "AdaBoost (AB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " delivers the final result."),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-
-
-                                    
-
-
                                        SizedBox(height: 50.h,),
                   Center(
                       child: Text(
@@ -505,49 +458,6 @@ class _BarChartSample2State extends State<BarChartSample2> {
 
 
                     
-                           SizedBox(height: 60.h),
-                            Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.blueAccent,
-                                size: 24.sp,
-                              ),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                child: Text.rich(
-                                  TextSpan(
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 127, 127, 127),
-                                      fontSize: 12.sp,
-                                    ),
-                                    children: const [
-                                      const TextSpan(
-                                          text:
-                                              "Note: The graph above illustrates the results of different algorithms used in illness analysis. "),
-                                      const TextSpan(
-                                          text: "Forward Chaining (FC)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " provides the initial diagnosis, "),
-                                      const TextSpan(
-                                          text: "Gradient Boosting (GB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " refines the ranking, and "),
-                                      const TextSpan(
-                                          text: "AdaBoost (AB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " delivers the final result."),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-
-
 
 
 
@@ -639,48 +549,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
                       ),
                     ),
-                           SizedBox(height: 60.h),
-                            Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.blueAccent,
-                                size: 24.sp,
-                              ),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                child: Text.rich(
-                                  TextSpan(
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 127, 127, 127),
-                                      fontSize: 12.sp,
-                                    ),
-                                    children: const [
-                                      const TextSpan(
-                                          text:
-                                              "Note: The graph above illustrates the results of different algorithms used in illness analysis. "),
-                                      const TextSpan(
-                                          text: "Forward Chaining (FC)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " provides the initial diagnosis, "),
-                                      const TextSpan(
-                                          text: "Gradient Boosting (GB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " refines the ranking, and "),
-                                      const TextSpan(
-                                          text: "AdaBoost (AB)",
-                                          style: TextStyle(fontWeight: FontWeight.bold)),
-                                      const TextSpan(text: " delivers the final result."),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ],
-                          ),
-
+                          
 
 
 
@@ -759,7 +628,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                       children: [
                                         const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Forward Chaining", style: TextStyle(fontFamily: 'Inter')))),
                                         Center(child: Padding(
-                                          padding: EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(8.0),
                                           child: Text("${scores["confidence_fc"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
                                         )),
                                       ],
@@ -768,7 +637,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                       children: [
                                         const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Gradient Boosting", style: TextStyle(fontFamily: 'Inter')))),
                                         Center(child: Padding(
-                                          padding: EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(8.0),
                                           child: Text("${scores["confidence_gb"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
                                         )),
                                       ],
@@ -794,6 +663,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                 style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
                               ),
                             ),
+
                             SizedBox(height: 60.h,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -835,13 +705,87 @@ class _BarChartSample2State extends State<BarChartSample2> {
                               ],
                             ),
 
-                            const SizedBox(height: 30),
+
+                            
+                           
+                            SizedBox(height: 10.h,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blueAccent,
+                                  size: 24.sp,
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Text.rich(
+                                    TextSpan(
+                                      style: TextStyle(
+                                        color: const Color.fromARGB(255, 127, 127, 127),
+                                        fontSize: 12.sp,
+                                      ),
+                                      children:  [
+                                       const TextSpan(
+                                            text: "Insight:",
+                                            style: const TextStyle(fontWeight: FontWeight.normal)),
+                                        TextSpan(
+                                            text: " Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,",  style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        TextSpan(
+                                            text: " AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%",
+                                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                                       const TextSpan(text: ", "),
+                                       const TextSpan(
+                                            text: ("by reweighting the symptoms and resolving the overlaps")),
+                                       
+                                       const TextSpan (
+                                            text: (" Making the result more accurate."),),
+                                   
+                                      ],
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            Align(
+                            alignment: Alignment.bottomRight,
+                            child: TextButton(
+                             style: ButtonStyle(
+                              overlayColor: WidgetStateProperty.all(Colors.transparent),
+                              splashFactory: NoSplash.splashFactory,
+                              padding: WidgetStateProperty.all(EdgeInsets.zero),
+                              minimumSize: WidgetStateProperty.all(Size(0,0)),
+                            ),
 
 
-              
+                              onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MetricsScreen(
+                                    illnessName: widget.illnessLabels[index],
+                                  ),
+                                ),
+                              );
+                            },
 
+                          
+                
+                              child: const Text(
+                                'Metrics',
+                                style: TextStyle(
+                                   color: Colors.blueAccent,
+                                  fontSize: 16,
+                                  fontFamily: 'Oswald',
+                               
+                                ),
+                              ),
+                            )),
 
-                                    // ... (keep the Gradient Boosting and Ada Boost sections unchanged)
+                             SizedBox(height: 5.h),
                                   ],
                                 ),
                               ),
