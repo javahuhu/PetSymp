@@ -2,22 +2,37 @@
 import 'dart:io';
 
 class AppConfig {
-  // Fallback IP (your development machine’s IP)
   static const String fallbackIP = "192.168.1.101";
-  // Port where your Flask server is running
   static const int serverPort = 8000;
-  // This will be updated with the detected IP (or remain as fallback)
   static String serverIP = fallbackIP;
 
-  // API URL builders
-  static String get diagnoseURL => "http://$serverIP:$serverPort/diagnose";
-  static String get allSymptomsURL => "http://$serverIP:$serverPort/debug/all-symptoms";
-  static String get oTPURL => "http://$serverIP:$serverPort/send-otp";
-  static String get resetpass => "http://$serverIP:$serverPort/reset-password";
+  static String get diagnoseURL =>
+      "http://$serverIP:$serverPort/diagnose";
+
+  static String get allSymptomsURL =>
+      "http://$serverIP:$serverPort/debug/all-symptoms";
+
+  static String get oTPURL =>
+      "http://$serverIP:$serverPort/send-otp";
+
+  static String get resetpass =>
+      "http://$serverIP:$serverPort/reset-password";
+
+  /// Existing endpoint (metrics without confusion‑matrix)
+  static String getMetricsURL(String illness) {
+    final encoded = Uri.encodeComponent(illness);
+    return "http://$serverIP:$serverPort/metrics/$encoded";
+  }
+
+  /// **New** endpoint: returns both confusion matrix + metrics
+  static String getMetricsWithCmURL(String illness) {
+    final encoded = Uri.encodeComponent(illness);
+    return "http://$serverIP:$serverPort/metrics-with-cm/$encoded";
+  }
+
   static String getKnowledgeDetailsURL(String illness) =>
       "http://$serverIP:$serverPort/debug/knowledge-details?illness=${Uri.encodeComponent(illness)}";
 
-  // Detect the correct server IP by scanning available interfaces
   static Future<void> detectServerIP() async {
     try {
       for (var interface in await NetworkInterface.list()) {
@@ -33,7 +48,6 @@ class AppConfig {
     } catch (e) {
       print("⚠️ Error detecting IP: $e");
     }
-    // If auto-detection fails, use the fallback
     serverIP = fallbackIP;
     print("⚠️ Using fallback IP: $serverIP");
   }
