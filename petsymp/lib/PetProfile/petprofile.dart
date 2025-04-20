@@ -562,14 +562,14 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         left: 0.w,
                         right: 0.w,
                         child: Container(
-                          height: 540.h,
+                          height: 0.665.sh,
                           decoration: const BoxDecoration(
                             color: Color.fromRGBO(225, 240, 243, 0.884),
                             borderRadius: BorderRadius.only(topLeft: Radius.circular(50)),
                             border: Border(
                               top: BorderSide(
                                 color: Color.fromRGBO(82, 170, 164, 1),
-                                width: 10,
+                                width: 15,
                               ),
                             ),
                           ),
@@ -577,8 +577,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                             children: [
                               Padding(padding: EdgeInsets.only(top: 15.h, left: 15.w),
                               child: Container(
-                                width: 70.w,
-                                height: 70.h,
+                                width: 0.187.sw,
+                                height: 0.086.sh,
                                 decoration: BoxDecoration(
                                   color: const Color.fromRGBO(82, 170, 164, 1),
                                   borderRadius: BorderRadius.circular(20.r),
@@ -622,8 +622,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                                Padding(padding: EdgeInsets.only(top: 15.h, left: 100.w),
                                
                               child: Container(
-                                width: 70.w,
-                                height: 70.h,
+                                width: 0.187.sw,
+                                height: 0.086.sh,
                                 decoration: BoxDecoration(
                                   color: const Color.fromRGBO(82, 170, 164, 1),
                                   borderRadius: BorderRadius.circular(20.r),
@@ -680,7 +680,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 
                               
                               Positioned(
-                                top: 110.h,   
+                                top: 100.h,   
                                 bottom: 0,   
                                 left: MediaQuery.of(context).size.width
                                       - (80.w + 20.w ),
@@ -719,15 +719,15 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   final String petType = petData['petType'] ?? 'Unknown';
   final String petName   = petData['petName']   ?? 'Unknown';
   final List details     = petData['petDetails'] is List ? petData['petDetails'] : [];
-  final String age       = details.length > 1 ? '${details[1]['value']} yrs' : '–';
-  final String breed     = details.length > 3 ? details[3]['value'] : 'Unknown';
+  final String age       = details.length > 2 ? '${details[2]['value']} yrs' : '–';
+  final String breed     = details.length > 4 ? details[4]['value'] : 'Unknown';
   final String imageUrl  = petData['petImage']  ?? 'assets/sampleimage.jpg';
   final Timestamp? ts = petData['date'] as Timestamp?;
                                 final String dateStr = ts != null
                                   ? DateFormat('MMM d, yyyy').format(ts.toDate())
                                   : '';
   return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 23.h),
+    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 23.h),
     child: GestureDetector(
       onTap: () => _showPetDetails(context, petData),
       child: Container(
@@ -755,6 +755,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             width: 215.w,
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 235, 233, 233),
+              
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(50.r),
                 bottomLeft: Radius.circular(50.r),
@@ -834,17 +835,17 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                 
                             
 
-                  SizedBox(width: 0.w),
+            //       SizedBox(width: 0.w),
 
-            // 3) The horizontal connector rail
-            Container(
-                height: 2.w,         
-                width: 14.w,         // thickness of the rail
-                color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
-              ),
+            // // 3) The horizontal connector rail
+            // Container(
+            //     height: 2.w,         
+            //     width: 20.w,         // thickness of the rail
+            //     color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
+            //   ),
             
 
-            SizedBox(width: 20.w),
+            SizedBox(width: 35.w),
 
             // 4) Date
             Text(
@@ -927,14 +928,13 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         ? "${timestamp.toDate().day} ${_getMonthAbbr(timestamp.toDate().month)} ${timestamp.toDate().year}"
         : "N/A";
     final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
-    final String age = details.length > 1 ? (details[1]['value']?.toString() ?? "Unknown") : "Unknown";
-    final String size = details.length > 2 ? (details[2]['value']?.toString() ?? "Unknown") : "Unknown";
-    final String breed = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
+    final String age = details.length > 2 ? (details[2]['value']?.toString() ?? "Unknown") : "Unknown";
+    final String size = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
+    final String breed = details.length > 4 ? (details[4]['value']?.toString() ?? "Unknown") : "Unknown";
 
     List<Widget> healthRecords = [];
     if (assessments.isNotEmpty) {
       for (var assessment in assessments) {
-        // Generate a unique ID for each assessment
         String assessmentId = assessment['assessmentId'] ?? 
                         assessment['date']?.toString() ?? 
                         DateTime.now().millisecondsSinceEpoch.toString();
@@ -967,8 +967,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             .toList() ?? [];
             
         // Update or add the Symptoms detail for this assessment
-        if (updatedPetDetails.length >= 5) {
-          updatedPetDetails[4]['value'] = inputSymptoms;
+        if (updatedPetDetails.length >= 6) {
+          updatedPetDetails[5]['value'] = inputSymptoms;
         } else {
           updatedPetDetails.add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
         }
@@ -987,7 +987,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
           'symptomDetails': assessment['symptomDetails'] ?? {},
         };
 
-        healthRecords.add(
+        healthRecords.insert(
+          0,
           _buildHealthRecordItem(
             title: "$inputSymptoms\n→ $finalIllness",
             date: assessDate,
@@ -1018,12 +1019,11 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       );
     }
 
-    // Create a key to access the modal sheet's state
+    
     final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey = GlobalKey<ImageDraggableBottomSheetState>();
 
-    // Store the current context's size
+    
     final Size screenSize = MediaQuery.of(context).size;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1034,7 +1034,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
           initialHeight: screenSize.height * 0.85, // Start at 85% of screen height
-          minHeight: screenSize.height * 0.4, // Minimum height (40%)
+          minHeight: screenSize.height * 0.5, // Minimum height (40%)
           maxHeight: screenSize.height * 0.95, // Maximum height (95%)
           petData: petData,
           borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
