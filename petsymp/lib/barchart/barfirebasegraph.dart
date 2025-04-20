@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:petsymp/barchart/metricsfirebase.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 
@@ -10,7 +11,9 @@ class BarChartRetrieve extends StatefulWidget {
   final List<double> fcScores;
   final List<double> gbScores;
   final List<double> abScores;
-  final Map<String, List<Map<String, dynamic>>> symptomDetails; // Stored symptom details
+  final Map<String, List<Map<String, dynamic>>> symptomDetails;
+  final String petName;
+  final String petType; // Stored symptom details
 
   const BarChartRetrieve({
     Key? key,
@@ -19,6 +22,9 @@ class BarChartRetrieve extends StatefulWidget {
     required this.gbScores,
     required this.abScores,
     required this.symptomDetails,
+    required this.petName,     // ← add
+    required this.petType,
+    
   }) : super(key: key);
 
   // Enhanced colors with better contrast
@@ -195,6 +201,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                                 details: details,
                                 chartData: chartData,
                                 scores: scores,
+                                illnessName: widget.illnessLabels[index], 
                                 context: context,
                               );
                             },
@@ -417,6 +424,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
     required List<Map<String, dynamic>> details,
     required List<_ChartData> chartData,
     required Map<String, double> scores,
+    required String illnessName,
     required BuildContext context,
   }) {
     return AlertDialog(
@@ -727,10 +735,83 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                   ],
                 ),
               ),
+
+              const SizedBox(height: 16),
+              
+              // Info box
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.blue[700],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "Insight: Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,  AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%, by reweighting the symptoms and resolving the overlaps, Making the result more accurate.",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 12.sp,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              
+                            Align(
+                            alignment: Alignment.bottomRight,
+                            child: TextButton(
+                             style: ButtonStyle(
+                              overlayColor: WidgetStateProperty.all(Colors.transparent),
+                              splashFactory: NoSplash.splashFactory,
+                              padding: WidgetStateProperty.all(EdgeInsets.zero),
+                              minimumSize: WidgetStateProperty.all(Size(0,0)),
+                            ),
+
+
+                              onPressed: () {
+                              Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => IllnessMetricsScreen(
+                                illnessName: illnessName,
+                                 petName:  widget.petName,   // ← now valid
+                                petType: widget.petType,     // pass in from historyData
+                              ),
+                            ),
+                          );
+                            },
+
+                          
+                
+                              child: const Text(
+                                'Metrics',
+                                style: TextStyle(
+                                   color: Colors.blueAccent,
+                                  fontSize: 16,
+                                  fontFamily: 'Oswald',
+                               
+                                ),
+                              ),
+                            )),
+
             ],
           ),
         ),
       ),
+      
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
