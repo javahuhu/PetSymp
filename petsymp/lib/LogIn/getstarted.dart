@@ -46,7 +46,11 @@ class GetstartedScreenState extends State<GetstartedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    
+     PopScope(
+      canPop: false,
+      child:  Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
@@ -178,7 +182,7 @@ class GetstartedScreenState extends State<GetstartedScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   // Helper method to build animated images
