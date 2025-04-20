@@ -233,14 +233,22 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
     final String petName = data['petName'] as String? ?? "Pet";
     final List<dynamic> petDetails = data['petDetails'] is List ? data['petDetails'] : [];
 
-    final String breed = petDetails.length > 2 && petDetails[2]['value'] != null
-        ? petDetails[2]['value'] as String
-        : "Unknown";
-    final String size = petDetails.length > 1 && petDetails[1]['value'] != null
-        ? petDetails[1]['value'] as String
-        : "Medium";
-    final String age = petDetails.length > 0 && petDetails[0]['value'] != null
+
+    final String petType = petDetails.length > 0 && petDetails[0]['value'] != null
         ? petDetails[0]['value'].toString()
+        : "Unknown";
+
+
+    final String age = petDetails.length > 2 && petDetails[2]['value'] != null
+        ? petDetails[2]['value'].toString()
+        : "Unknown";
+
+      final String size = petDetails.length > 3 && petDetails[3]['value'] != null
+        ? petDetails[3]['value'] as String
+        : "Medium";
+
+      final String breed = petDetails.length > 4 && petDetails[4]['value'] != null
+        ? petDetails[4]['value'] as String
         : "Unknown";
 
     String accountCreated = "";
@@ -267,7 +275,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: Text(
+              title: const Text(
                 "Delete Pet Profile",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -397,8 +405,8 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
               // Enhanced header with gradient
               Container(
                 padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                decoration: const BoxDecoration(
+                  gradient:  LinearGradient(
                     colors: [Color(0xFF52AAA4), Color(0xFF489E98)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -457,7 +465,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                breed,
+                                petType,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 13.sp,
@@ -551,6 +559,9 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
               fontWeight: FontWeight.bold,
               color: const Color(0xFF333333),
             ),
+            softWrap: true, 
+            overflow: TextOverflow.ellipsis,  
+            maxLines: 1, 
           ),
         ],
       ),
