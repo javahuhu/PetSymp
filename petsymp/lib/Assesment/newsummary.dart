@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'illnessdetails.dart';
 import 'package:petsymp/HomePage/homepage.dart';
-import 'package:petsymp/HomePage/profile.dart';
 import 'package:provider/provider.dart';
 import '../userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,47 +23,16 @@ class NewSummaryScreen extends StatefulWidget {
 
 class NewSummaryScreenState extends State<NewSummaryScreen> {
    bool _isNavigating = false;
-  final List<ListItem> items = [
-    const ListItem(
-      title: 'Provide Medicine for Lethargy',
-      subtitle: 'techniques on how can dog drink a vitamins quickly',
-      route: HomePageScreen(),
-      isExternal: false,
-      imageUrl: 'assets/youtube1.jpg',
-    ),
-    const ListItem(
-      title: 'How to Easily Give Your Pet Medicine Without Stress!',
-      subtitle:
-          "Learn simple and stress-free techniques to give your pet medicine, whether it's a pill, liquid, or injection, ensuring their health and comfort",
-      route: Profilescreen(),
-      isExternal: false,
-      imageUrl: 'assets/youtube1.jpg',
-    ),
-    const ListItem(
-      title: 'ricks to Give Your Pet Medicine Without a Fight!',
-      subtitle:
-          'Discover easy and effective ways to give your pet medicine without stress, making it a smooth experience for both of you.',
-      url: 'https://www.youtube.com/results?search_query=flutter+list+with+images',
-      isExternal: true,
-      imageUrl: 'assets/youtube1.jpg',
-    ),
-    const ListItem(
-      title: 'How to Hide Medicine in Treats for Your Pet!',
-      subtitle:
-          'Learn sneaky yet safe ways to hide pills in treats and food so your pet takes their medicine without even noticing.',
-      route: HomePageScreen(),
-      isExternal: false,
-      imageUrl: 'assets/youtube1.jpg',
-    ),
-    const ListItem(
-      title: 'The Right Way to Give Your Pet Liquid Medicine!',
-      subtitle:
-          "Master the best techniques to give your pet liquid medicine without mess or resistance.",
-      route: Profilescreen(),
-      isExternal: false,
-      imageUrl: 'assets/youtube1.jpg',
-    ),
-  ];
+ 
+ @override
+void initState() {
+  super.initState();
+  // once the first frame is up, call fetchDiagnosis()
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Provider.of<UserData>(context, listen: false).fetchDiagnosis();
+  });
+}
+
   
 
 
@@ -121,6 +89,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
 
     final List<Map<String, String>> petDetails = [
       {"icon": "🎂", "label": "Pet", "value": userData.selectedPetType.toString()},
+      {"icon": "🎂", "label": "Pet Name", "value": userData.userName.toString()},
       {"icon": "🎂", "label": "Age", "value": userData.age.toString()},
       {"icon": "📏", "label": "Size", "value": userData.size.toString()},
       {"icon": "🐶", "label": "Breed", "value": userData.breed},
@@ -435,8 +404,7 @@ Padding(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
         child: SizedBox(
-          height: 350.h,
-           // card height
+          height: 400.h,
           child: Consumer<UserData>(
             builder: (_, userData, __) {
               final diagnoses = List<Map<String, dynamic>>.from(userData.diagnosisResults)
@@ -462,13 +430,13 @@ Padding(
                     builder: DotSwiperPaginationBuilder(
                       color: const Color.fromARGB(255, 69, 19, 78).withOpacity(0.2), // inactive dots
                       activeColor: Colors.purple,             // the “filled” dot
-                      size: 8.0,        // diameter of inactive dots
-                      activeSize: 10.0, // diameter of active dot
-                      space: 4.0,       // space between dots
+                      size: 8.0,        
+                      activeSize: 10.0, 
+                      space: 4.0,       
                     ),
                   ),
   
-                control: SwiperControl(),        
+                   
                 itemBuilder: (context, index) {
                   final d    = top10[index];
                   final name = d['illness'] as String;
@@ -533,148 +501,157 @@ Padding(
 
 
          
-             Padding(
-              padding: EdgeInsets.symmetric(vertical: 15.h),
-              child: Center( child: 
-              SizedBox(
-              width: 350.w, 
-              child: Card(
-                  margin: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(25.0), 
-                    side: BorderSide.none,
+           Padding(
+  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+  child: Card(
+    elevation: 2,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20.r),
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(15.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Illness Comparison",
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color.fromRGBO(29, 29, 44, 1.0),
+            ),
+          ),
+          SizedBox(height: 10.h),
+
+          // Legend Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _legendDot(Colors.red, "Confidence Score"),
+                SizedBox(width: 15.w),
+                _legendDot(Colors.blue, "Weighted Symptoms"),
+                SizedBox(width: 15.w),
+                _legendDot(Colors.green, "ML Adjustment"),
+                SizedBox(width: 15.w),
+                _legendDot(Colors.orange, "Subtype Coverage"),
+              ],
+            ),
+          ),
+          SizedBox(height: 15.h),
+
+          // Comparison Table (guarded)
+          Builder(
+            builder: (context) {
+              final topDiagnoses = Provider.of<UserData>(context, listen: false).diagnosisResults;
+              
+              // No results
+              if (topDiagnoses.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.h),
+                  child: Center(
+                    child: Text(
+                      'No results to compare',
+                      style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+                    ),
                   ),
-                  elevation: 3,
-                  child: 
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
-                child: Center(
-                  child: Container(
-                    color: const Color.fromARGB(0, 19, 19, 44),
-                    height: 325.h,
-                    width: 355.w,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                );
+              }
+
+              // Prepare two columns
+              final ill1 = topDiagnoses[0];
+              final ill2 = topDiagnoses.length > 1 ? topDiagnoses[1] : null;
+
+              final double confAb1 = (ill1['confidence_ab'] as num).toDouble();
+              final double confFc1 = (ill1['confidence_fc'] as num).toDouble();
+              final double mlScore1 = confAb1 - confFc1;
+              final double coverage1 = (ill1['subtype_coverage'] as num).toDouble();
+
+              final String name2 = ill2?['illness'] as String? ?? '—';
+              final double confAb2 = (ill2?['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+              final double confFc2 = (ill2?['confidence_fc'] as num?)?.toDouble() ?? 0.0;
+              final double mlScore2 = confAb2 - confFc2;
+              final double coverage2 = (ill2?['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+
+              return Column(
+                children: [
+                  // Header
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(82, 170, 164, 0.1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10.r),
+                        topRight: Radius.circular(10.r),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Center(
-                          child: Text(
-                            "Illness Comparison",
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              fontFamily: 'Oswald',
-                              color: const Color.fromARGB(255, 0, 0, 0),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.w),
+                            child: Text(
+                              "Top 1: ${ill1['illness']}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 30.h,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Row(
-                              children: [
-                                _legendDot(Colors.blue, "Confidence Score"),
-                                SizedBox(width: 24.w),
-                                _legendDot(Colors.green, "Weighted Symptoms Matches"),
-                                SizedBox(width: 24.w),
-                                _legendDot(Colors.orange, "ML Score Adjustment"),
-                                SizedBox(width: 24.w),
-                                _legendDot(Colors.purple, "Subtype Coverage Score"),
-                              ],
+                        Container(width: 1, height: 40.h, color: Colors.grey.withOpacity(0.3)),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.w),
+                            child: Text(
+                              "Top 2: $name2",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
- 
-                        SizedBox(
-                          width: 400.w,
-                          child: Builder(
-                            builder: (context) {
-                              if (topDiagnoses.length < 2) {
-                                return Padding(
-                                  padding: EdgeInsets.all(10.w),
-                                  child: Text(
-                                    "Not enough illnesses to compare (need at least 2).",
-                                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
-                                  ),
-                                );
-                              }
- 
-                              final ill1 = topDiagnoses[0];
-                              final ill2 = topDiagnoses[1];
- 
-                              final double confAb1 = (ill1['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-                              final double confAb2 = (ill2['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-                              final double confFc1 = (ill1['confidence_fc'] as num?)?.toDouble() ?? 0.0;
-                              final double confFc2 = (ill2['confidence_fc'] as num?)?.toDouble() ?? 0.0;
-                              final double mlScore1 = confAb1 - confFc1;
-                              final double mlScore2 = confAb2 - confFc2;
- 
-                              // Use the computed subtype coverage from the diagnosis JSON.
-                              final double coverage1 = (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
-                              final double coverage2 = (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
- 
-                              return Table(
-                                border: const TableBorder(
-                                  verticalInside: BorderSide(color:Color.fromARGB(221, 0, 0, 0), width: 2),
-                                
-                                ),
-                                children: [
-
-                                   const TableRow(
-                                  children: [
-                                    Center(child: Text("Top 1", style: TextStyle(fontWeight: FontWeight.bold))),
-                                    Center(child: Text("Top 2", style: TextStyle(fontWeight: FontWeight.bold))),
-                                  ],
-                                ),
-
-                                
-
-
-
-                                  // 1st Row: Confidence Score
-                                  // 1st Row: Confidence Score
-                                  TableRow(
-                                    children: [
-                                      _smallCell("Confidence Score", confAb1.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                      _smallCell("Confidence Score", confAb2.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                    ],
-                                  ),
-                                  // 2nd Row: Weighted Symptoms Matches
-                                  TableRow(
-                                    children: [
-                                      _smallCell("Weighted Symptoms Matches", confFc1.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                      _smallCell("Weighted Symptoms Matches", confFc2.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                    ],
-                                  ),
-                                  // 3rd Row: ML Score Adjustment
-                                  TableRow(
-                                    children: [
-                                      _smallCell("ML Score Adjustment", mlScore1.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                      _smallCell("ML Score Adjustment", mlScore2.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                    ],
-                                  ),
-                                  // 4th Row: Subtype Coverage Score
-                                  TableRow(
-                                    children: [
-                                      _smallCell("Subtype Coverage Score", coverage1.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                      _smallCell("Subtype Coverage Score", coverage2.toStringAsFixed(2), const Color.fromARGB(255, 77, 76, 76)),
-                                    ],
-                                  ),
-
-                                ],
-                              );
-                            },
-                          ),
-                        ),
- 
                       ],
                     ),
                   ),
-                ),
-              ),
 
-              )))),
-
+                  // Rows
+                  _buildComparisonRow(
+                    "Confidence Score",
+                    confAb1.toStringAsFixed(2),
+                    confAb2.toStringAsFixed(2),
+                    Colors.red.shade100,
+                  ),
+                  _buildComparisonRow(
+                    "Weighted Symptoms",
+                    confFc1.toStringAsFixed(2),
+                    confFc2.toStringAsFixed(2),
+                    Colors.blue.shade100,
+                  ),
+                  _buildComparisonRow(
+                    "ML Adjustment",
+                    mlScore1.toStringAsFixed(2),
+                    mlScore2.toStringAsFixed(2),
+                    Colors.green.shade100,
+                  ),
+                  _buildComparisonRow(
+                    "Subtype Coverage",
+                    coverage1.toStringAsFixed(2),
+                    coverage2.toStringAsFixed(2),
+                    Colors.orange.shade100,
+                    isLast: true,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    ),
+  ),
+),
 
     SizedBox(height: 0.h,),
 
@@ -682,8 +659,8 @@ Padding(
               top: 0.h,
               child: Center( child: 
               SizedBox(
-              width: 350.w, 
-              height: 0.68.sh,
+              width: 325.w, 
+              height: 590.h,
               child: Card(
                   margin: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
@@ -719,6 +696,22 @@ Padding(
                                           strokeWidth: 8.w,
                                         ),
                                       ),
+                                      Container (
+                                        height: 50.w,
+                                        width: 50.w,
+                                         alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50.r),
+                                        boxShadow: [
+                                        BoxShadow(
+                                          color: const Color.fromARGB(255, 208, 38, 38).withOpacity(0.25),  
+                                          offset: const Offset(0, 0),                   
+                                          blurRadius: 10,                          
+                                          spreadRadius: 5,                        
+                                        ),
+                                      ], 
+                                      ),
+                                      child:
                                       Text(
                                         "${((topDiagnoses[0]['confidence_ab'] ?? 0.0) * 100).round()}%",
                                         style: TextStyle(
@@ -726,7 +719,7 @@ Padding(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
-                                      ),
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -735,7 +728,7 @@ Padding(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
                                     children: [
-                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      Padding(padding: EdgeInsets.only(left: 10.w,top: 15.h),
                                       child: // Padding for left alignment
                                       Text(
                                         topDiagnoses[0]['illness'] ?? "",
@@ -750,7 +743,7 @@ Padding(
                                         ),
                                       )),
                                       SizedBox(height: 0.h),
-                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      Padding(padding: EdgeInsets.only(left: 10.w),
                                       child: // Proper spacing between items
                                       Text(
                                         "Top 1",
@@ -835,12 +828,28 @@ Padding(
                                         width: 90.w,
                                         height: 90.w,
                                         child: CircularProgressIndicator(
-                                          value: topDiagnoses[0]['confidence_ab'] ?? 0.0,
+                                          value: topDiagnoses[1]['confidence_ab'] ?? 0.0,
                                           backgroundColor: Colors.grey,
-                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          color: const Color.fromARGB(255, 255, 140, 32),
                                           strokeWidth: 8.w,
                                         ),
                                       ),
+                                      Container (
+                                        height: 50.w,
+                                        width: 50.w,
+                                         alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50.r),
+                                        boxShadow: [
+                                        BoxShadow(
+                                          color: const Color.fromARGB(255, 225, 135, 10).withOpacity(0.25),  
+                                          offset: const Offset(0, 0),                   
+                                          blurRadius: 10,                          
+                                          spreadRadius: 5,                        
+                                        ),
+                                      ], 
+                                      ),
+                                      child:
                                       Text(
                                         "${((topDiagnoses[1]['confidence_ab'] ?? 0.0) * 100).round()}%",
                                         style: TextStyle(
@@ -848,7 +857,7 @@ Padding(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
-                                      ),
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -857,7 +866,7 @@ Padding(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
                                     children: [
-                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      Padding(padding: EdgeInsets.only(left: 10.w,top: 15.h),
                                       child: // Padding for left alignment
                                       Text(
                                         topDiagnoses[1]['illness'] ?? "",
@@ -872,7 +881,7 @@ Padding(
                                         ),
                                       )),
                                       SizedBox(height: 0.h),
-                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      Padding(padding: EdgeInsets.only(left: 10.w),
                                       child: // Proper spacing between items
                                       Text(
                                         "Top 2",
@@ -901,7 +910,7 @@ Padding(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => IllnessdetailsScreen(
-                                                illnessName: topDiagnoses[0]['illness']),
+                                                illnessName: topDiagnoses[1]['illness']),
                                           ),
                                         );
                                       },
@@ -959,10 +968,26 @@ Padding(
                                         child: CircularProgressIndicator(
                                           value: topDiagnoses[2]['confidence_ab'] ?? 0.0,
                                           backgroundColor: Colors.grey,
-                                          color: const Color.fromARGB(255, 255, 0, 0),
+                                          color: const Color.fromARGB(255, 13, 253, 0),
                                           strokeWidth: 8.w,
                                         ),
                                       ),
+                                      Container (
+                                        height: 50.w,
+                                        width: 50.w,
+                                         alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50.r),
+                                        boxShadow: [
+                                        BoxShadow(
+                                          color: const Color.fromARGB(255, 69, 190, 45).withOpacity(0.25),  
+                                          offset: const Offset(0, 0),                   
+                                          blurRadius: 10,                          
+                                          spreadRadius: 5,                        
+                                        ),
+                                      ], 
+                                      ),
+                                      child:
                                       Text(
                                         "${((topDiagnoses[2]['confidence_ab'] ?? 0.0) * 100).round()}%",
                                         style: TextStyle(
@@ -970,7 +995,7 @@ Padding(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
-                                      ),
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -979,7 +1004,7 @@ Padding(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start, // Ensures left alignment
                                     children: [
-                                      Padding(padding: EdgeInsets.only(left: 20.w,top: 15.h),
+                                      Padding(padding: EdgeInsets.only(left: 10.w,top: 15.h),
                                       child: // Padding for left alignment
                                       Text(
                                         topDiagnoses[2]['illness'] ?? "",
@@ -994,7 +1019,7 @@ Padding(
                                         ),
                                       )),
                                       SizedBox(height: 0.h),
-                                      Padding(padding: EdgeInsets.only(left: 20.w),
+                                      Padding(padding: EdgeInsets.only(left: 10.w),
                                       child: // Proper spacing between items
                                       Text(
                                         "Top 3",
@@ -1056,87 +1081,6 @@ Padding(
               ))))),
             
 
-            ///Recommendation//////////
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 15.h),
-              child: Center( child: 
-              SizedBox(
-              width: 350.w, 
-              child: Card(
-                  margin: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(10.0), 
-                    side: BorderSide.none,
-                  ),
-                  elevation: 3,
-                  child: Theme(
-                    data: Theme.of(context)
-                        .copyWith(dividerColor: Colors.transparent),
-                    child: ExpansionTile(
-                title: const Text(
-                  'Recommendations',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
-                ),
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: 525.h,
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: items.map((item) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8.0,
-                              horizontal: 10,
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(8),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  item.imageUrl,
-                                  width: 80.w,
-                                  height: 80.h,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              title: Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Color.fromRGBO(66, 134, 130, 1.0),
-                                ),
-                              ),
-                              subtitle: Text(
-                                item.subtitle,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  color: Color.fromRGBO(29, 29, 44, 1.0),
-                                ),
-                              ),
-                              onTap: () async {
-                                if (item.isExternal) {
-                                  await _launchURL(item.url!);
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => item.route!,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ))))),
 
              Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -1169,17 +1113,58 @@ Padding(
                                   .limit(1)
                                   .get();
 
+
+
+
+                                final Map<String, Map<String, dynamic>> metricsWithCm = {};
+
+                                for (var d in diagnoses) {
+                                  final illness = d['illness'] as String;
+                                  try {
+                                    final url  = Uri.parse(AppConfig.getMetricsWithCmURL(illness));
+                                    final resp = await http.get(url);
+                                    if (resp.statusCode == 200) {
+                                      final data = jsonDecode(resp.body);
+
+                                      // Extract confusion matrix
+                                      final cmRaw = data['confusion_matrix'] as Map<String, dynamic>;
+                                      final confMatrix = {
+                                        'TP': cmRaw['TP'] as int,
+                                        'FP': cmRaw['FP'] as int,
+                                        'FN': cmRaw['FN'] as int,
+                                        'TN': cmRaw['TN'] as int,
+                                      };
+
+                                      // Extract the flat metrics
+                                      final mRaw = data['metrics'] as Map<String, dynamic>;
+                                      final metrics = {
+                                      'accuracy'   : (mRaw['Accuracy'] as num).toDouble(), 
+                                      'precision'  : (mRaw['Precision'] as num).toDouble(),
+                                      'recall'     : (mRaw['Recall'] as num).toDouble(),
+                                      'specificity': (mRaw['Specificity'] as num).toDouble(),
+                                      'f1Score'    : (mRaw['F1 Score'] as num).toDouble(),
+                                    };
+
+                                      metricsWithCm[illness] = {
+                                        'metrics'          : metrics,
+                                        'confusion_matrix': confMatrix,
+                                      };
+                                    }
+                                  } catch (e) {
+                                    print("⚠️ Failed to fetch metrics+CM for $illness: $e");
+                                  }
+                                }
                               // Build a new assessment entry
                               final assessmentEntry = {
                                 'date': Timestamp.now(),
                                 'diagnosisResults': diagnoses,
                                 'allSymptoms': allSymptoms,
                                 'symptomDetails': userData.symptomDetails,
+                                'Metrics/Confusion': metricsWithCm,    
                               };
 
                               if (existing.docs.isNotEmpty) {
-                                // If found, update that document by adding the new assessment entry to its 'assessments' array,
-                                // and update the top-level 'date' so sorting by date shows the latest update.
+
                                 final docRef = existing.docs.first.reference;
                                 await docRef.update({
                                   'assessments': FieldValue.arrayUnion([assessmentEntry]),
@@ -1210,31 +1195,31 @@ Padding(
                         }
                       },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                      backgroundColor: WidgetStateProperty.resolveWith((states) {
                         if (states.contains(MaterialState.pressed)) {
                           return const Color.fromARGB(255, 0, 0, 0);
                         }
                         return Colors.transparent;
                       }),
-                      foregroundColor: MaterialStateProperty.resolveWith((states) {
-                        if (states.contains(MaterialState.pressed)) {
+                      foregroundColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.pressed)) {
                           return const Color.fromARGB(255, 255, 255, 255);
                         }
                         return const Color.fromRGBO(29, 29, 44, 1.0);
                       }),
-                      shadowColor: MaterialStateProperty.all(Colors.transparent),
-                      side: MaterialStateProperty.all(
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
+                      side: WidgetStateProperty.all(
                         const BorderSide(
                           color: Color.fromRGBO(82, 170, 164, 1),
                           width: 2.0,
                         ),
                       ),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(100)),
                         ),
                       ),
-                      fixedSize: MaterialStateProperty.all(
+                      fixedSize: WidgetStateProperty.all(
                         const Size(100, 55),
                       ),
                     ),
@@ -1312,21 +1297,71 @@ Padding(
     );
   }
 
-class ListItem {
-  final String title;
-  final String subtitle;
-  final Widget? route;
-  final String? url;
-  final bool isExternal;
-  final String imageUrl;
-
-  const ListItem({
-    required this.title,
-    required this.subtitle,
-    this.route,
-    this.url,
-    required this.isExternal,
-    required this.imageUrl,
-  });
-}
-
+  
+// Helper method for comparison rows
+  Widget _buildComparisonRow(String label, String value1, String value2, Color bgColor, {bool isLast = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: isLast 
+              ? BorderSide.none 
+              : BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 120.w,
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: bgColor.withOpacity(0.3),
+              border: Border(
+                right: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+              ),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: const Color.fromRGBO(29, 29, 44, 0.8),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+              alignment: Alignment.center,
+              child: Text(
+                value1,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromRGBO(29, 29, 44, 1.0),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 40.h,
+            color: Colors.grey.withOpacity(0.3),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+              alignment: Alignment.center,
+              child: Text(
+                value2,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromRGBO(29, 29, 44, 1.0),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
