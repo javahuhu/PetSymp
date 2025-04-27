@@ -59,18 +59,20 @@ class UserPetScreenState extends State<UserPetScreen>
   void _navigateToSymptomScreen(int index) {
   if (_isAnimating) return;
   final userData = Provider.of<UserData>(context, listen: false);
-  
-  // Filter the history to only include entries of the current pet type.
+
   final filteredHistory = userData.history
-      .where((entry) => entry['petType'] == userData.selectedPetType)
-      .toList();
-  
+    .where((entry) => entry['petType'] == userData.selectedPetType)
+    .toList();
+
   if (filteredHistory.isNotEmpty && index < filteredHistory.length) {
-    final entry = filteredHistory[index];
+    final entry      = filteredHistory[index];
     final petDetails = entry['petDetails'] as List<dynamic>? ?? [];
-    final age = int.tryParse(petDetails.length > 1 ? petDetails[1]['value'] ?? '' : '') ?? 0;
-    final size = petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '';
-    final breed = petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '';
+
+    // Corrected indices:
+    final age   = int.tryParse(petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '') ?? 0;
+    final size  =             petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '';
+    final breed =             petDetails.length > 4 ? petDetails[4]['value'] ?? '' : '';
+
     userData
       ..setUserName(entry['petName'] ?? '')
       ..setpetAge(age)
@@ -324,8 +326,8 @@ class UserPetScreenState extends State<UserPetScreen>
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? accentColor.withOpacity(0.4)
-                  : Colors.black.withOpacity(0.2),
+                  ? accentColor.withValues(alpha:0.4)
+                  : Colors.black.withValues(alpha:0.2),
               blurRadius: 8.r,
               offset: Offset(0, 4.h),
             ),
@@ -343,7 +345,7 @@ class UserPetScreenState extends State<UserPetScreen>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: accentColor.withOpacity(0.3),
+                      color: accentColor.withValues(alpha:0.3),
                       blurRadius: 10.r,
                       spreadRadius: 2.r,
                     ),

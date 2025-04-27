@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:petsymp/Connection/dynamicconnections.dart';
 import 'metrics.dart';
+
 class BarChartSample2 extends StatefulWidget {
   final List<String> illnessLabels;
   final List<double> fcScores;
@@ -31,7 +32,7 @@ class BarChartSample2 extends StatefulWidget {
   State<BarChartSample2> createState() => _BarChartSample2State();
 }
 
-// New model to represent a symptom's details from the knowledge base.
+
 class SymptomDetail {
   final String name;
   final double baseWeight;
@@ -72,11 +73,6 @@ class SymptomDetail {
   }
 }
 
-
-
-
-
-
 // Internal chart data model.
 class _ChartData {
   _ChartData(this.x, this.y);
@@ -90,9 +86,11 @@ class _BarChartSample2State extends State<BarChartSample2> {
   late List<BarChartGroupData> showingBarGroups;
   int touchedGroupIndex = -1;
 
- 
-   Future<List<SymptomDetail>> _fetchKnowledgeDetailsForIllness(String illness) async {
-    final url = Uri.parse(AppConfig.getKnowledgeDetailsURL(illness));
+  Future<List<SymptomDetail>> _fetchKnowledgeDetailsForIllness(
+      String illness) async {
+    final userData = Provider.of<UserData>(context);
+    final petType = userData.selectedPetType.toLowerCase();
+    final url = Uri.parse(  AppConfig.getKnowledgeDetailsURL(petType, illness),);
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -105,25 +103,24 @@ class _BarChartSample2State extends State<BarChartSample2> {
     }
   }
 
+  Map<String, double> _computeFinalScores(
+      List<SymptomDetail> symptoms, String illnessName) {
+    final userData = Provider.of<UserData>(context, listen: false);
+    final match = userData.diagnosisResults.firstWhere(
+      (element) => element['illness'] == illnessName,
+      orElse: () => {
+        'confidence_fc': 0.0,
+        'confidence_gb': 0.0,
+        'confidence_ab': 0.0,
+      },
+    );
 
-  Map<String, double> _computeFinalScores(List<SymptomDetail> symptoms, String illnessName) {
-  final userData = Provider.of<UserData>(context, listen: false);
-  final match = userData.diagnosisResults.firstWhere(
-    (element) => element['illness'] == illnessName,
-    orElse: () => {
-      'confidence_fc': 0.0,
-      'confidence_gb': 0.0,
-      'confidence_ab': 0.0,
-    },
-  );
-
-  return {
-    "confidence_fc": (match['confidence_fc'] ),
-    "confidence_gb": (match['confidence_gb'] ),
-    "confidence_ab": (match['confidence_ab'] ),
-  };
-}
-
+    return {
+      "confidence_fc": (match['confidence_fc']),
+      "confidence_gb": (match['confidence_gb']),
+      "confidence_ab": (match['confidence_ab']),
+    };
+  }
 
   @override
   void initState() {
@@ -139,12 +136,8 @@ class _BarChartSample2State extends State<BarChartSample2> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
- 
-
     return AspectRatio(
       aspectRatio: 1.3,
       child: Padding(
@@ -156,7 +149,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 makeTransactionsIcon(),
-                 SizedBox(width: 10.w),
+                SizedBox(width: 10.w),
                 Text(
                   'Confidence Comparison',
                   style: TextStyle(
@@ -172,8 +165,8 @@ class _BarChartSample2State extends State<BarChartSample2> {
             Expanded(
               child: BarChart(
                 BarChartData(
-                  maxY: 100.h,
-                  groupsSpace: 20,
+                  maxY: 100,
+                  groupsSpace: 10,
                   barGroups: showingBarGroups,
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
@@ -199,602 +192,1257 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            
                             return FutureBuilder<List<SymptomDetail>>(
-                      future: _fetchKnowledgeDetailsForIllness(widget.illnessLabels[index]),
-                      builder: (context, snapshot) {
-                        
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return AlertDialog(
-                            title: const Text("Loading details..."),
-                            content: SizedBox(
-                              height: 100.h,
-                              child: const Center(child: CircularProgressIndicator()),
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return AlertDialog(
-                            title: const Text("Error"),
-                            content: Text(snapshot.error.toString()),
-                          );
-                        } else {
+                              future: _fetchKnowledgeDetailsForIllness(
+                                  widget.illnessLabels[index]),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return AlertDialog(
+                                    title: const Text("Loading details..."),
+                                    content: SizedBox(
+                                      height: 100.h,
+                                      child: const Center(
+                                          child: CircularProgressIndicator()),
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return AlertDialog(
+                                    title: const Text("Error"),
+                                    content: Text(snapshot.error.toString()),
+                                  );
+                                } else {
+                                  final details = snapshot.data!;
+                                  // Get user input symptoms from the provider.
+                                  final userData = Provider.of<UserData>(
+                                      context,
+                                      listen: false);
+                                  final userSymptoms = userData.petSymptoms
+                                      .map((s) => s.toLowerCase())
+                                      .toList();
 
-                      
-                          final details = snapshot.data!;
-                          // Get user input symptoms from the provider.
-                          final userData = Provider.of<UserData>(context, listen: false);
-                          final userSymptoms = userData.petSymptoms.map((s) => s.toLowerCase()).toList();
-                           
-                          final illnessName = widget.illnessLabels[index];
-                          final result = userData.diagnosisResults.firstWhere(
-                            (illness) => illness['illness'] == illnessName,
-                            orElse: () => {
-                              'confidence_fc': 0.0,
-                              'confidence_gb': 0.0,
-                              'confidence_ab': 0.0,
-                            },
-                          );
-                          
-   
-                          // Filter the fetched details to only include symptoms that match the user input.
-                          final filteredDetails = details.where((d) => userSymptoms.contains(d.name.toLowerCase())).toList();
-                          final scores = _computeFinalScores(filteredDetails, illnessName);
+                                  final illnessName =
+                                      widget.illnessLabels[index];
+                                  final result =
+                                      userData.diagnosisResults.firstWhere(
+                                    (illness) =>
+                                        illness['illness'] == illnessName,
+                                    orElse: () => {
+                                      'confidence_fc': 0.0,
+                                      'confidence_gb': 0.0,
+                                      'confidence_ab': 0.0,
+                                    },
+                                  );
 
-                          
-                          // If no matching symptoms, you can show a message.
-                          if (filteredDetails.isEmpty) {
-                            return AlertDialog(
-                              title: const Text("No Matching Symptoms"),
-                              content:  const  Text("The selected illness does not contain any symptoms that match your input."),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child:const Text("OK"),
-                                ),
-                              ],
-                            );
-                          }
+                                  // Filter the fetched details to only include symptoms that match the user input.
+                                  final filteredDetails = details
+                                      .where((d) => userSymptoms
+                                          .contains(d.name.toLowerCase()))
+                                      .toList();
+                                  final scores = _computeFinalScores(
+                                      filteredDetails, illnessName);
 
-                          // Build chart data from the filtered details.
-                          final List<_ChartData> chartData =
-                              filteredDetails.map((d) => _ChartData(d.name, d.baseWeight)).toList();
+                                  // If no matching symptoms, you can show a message.
+                                  if (filteredDetails.isEmpty) {
+                                    return AlertDialog(
+                                      title: const Text("No Matching Symptoms"),
+                                      content: const Text(
+                                          "The selected illness does not contain any symptoms that match your input."),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: const Text("OK"),
+                                        ),
+                                      ],
+                                    );
+                                  }
 
-                          return AlertDialog(
-                            insetPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            title: Text("Why ${widget.illnessLabels[index]} ?"),
-                            content: SizedBox(
-                              width: 500.w,
-                              height: 600.h,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Doughnut chart displaying the filtered symptom base weights.
-                                    Center(
-                                      child: SizedBox(
-                                        height: 250.w,
-                                        width: 250.w,
-                                        child: SfCircularChart(
-                                          tooltipBehavior: TooltipBehavior(enable: true),
-                                          series: <CircularSeries<_ChartData, String>>[
-                                            DoughnutSeries<_ChartData, String>(
-                                              dataSource: chartData,
-                                              xValueMapper: (_ChartData data, _) => data.x,
-                                              yValueMapper: (_ChartData data, _) => data.y,
-                                              dataLabelSettings: const DataLabelSettings(isVisible: true),
-                                            )
+                                  // Build chart data from the filtered details.
+                                  final List<_ChartData> chartData =
+                                      filteredDetails
+                                          .map((d) =>
+                                              _ChartData(d.name, d.baseWeight))
+                                          .toList();
+
+                                  return AlertDialog(
+                                    insetPadding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 5),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    title: Text(
+                                        "Why ${widget.illnessLabels[index]} ?"),
+                                    content: SizedBox(
+                                      width: 500.w,
+                                      height: 600.h,
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            
+                                            Center(
+                                              child: SizedBox(
+                                                height: 250.w,
+                                                width: 250.w,
+                                                child: SfCircularChart(
+                                                  tooltipBehavior:
+                                                      TooltipBehavior(
+                                                          enable: true),
+                                                  series: <CircularSeries<
+                                                      _ChartData, String>>[
+                                                    DoughnutSeries<_ChartData,
+                                                        String>(
+                                                      dataSource: chartData,
+                                                      xValueMapper:
+                                                          (_ChartData data,
+                                                                  _) =>
+                                                              data.x,
+                                                      yValueMapper:
+                                                          (_ChartData data,
+                                                                  _) =>
+                                                              data.y,
+                                                      dataLabelSettings:
+                                                          const DataLabelSettings(
+                                                              isVisible: true),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "Symptoms Doughnut Graph",
+                                                style: TextStyle(
+                                                    fontSize: 22.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+                                            SizedBox(height: 20.h),
+                                            // Table showing each filtered symptom's details.
+                                            SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Table(
+                                                defaultColumnWidth:
+                                                    FixedColumnWidth(200.w),
+                                                textDirection:
+                                                    TextDirection.ltr,
+                                                defaultVerticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                border: TableBorder.all(
+                                                    width: 1,
+                                                    color: const Color.fromARGB(
+                                                        255, 151, 150, 150)),
+                                                children: [
+                                                  const TableRow(
+                                                    decoration: BoxDecoration(
+                                                        color: Color.fromARGB(
+                                                            255,
+                                                            239,
+                                                            239,
+                                                            239)),
+                                                    children: [
+                                                      Center(
+                                                          child: Text("Symptom",
+                                                              textScaler:
+                                                                  TextScaler
+                                                                      .linear(
+                                                                          1.4),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold))),
+                                                      Center(
+                                                          child: Text(
+                                                              "Base Weight",
+                                                              textScaler:
+                                                                  TextScaler
+                                                                      .linear(
+                                                                          1.4),
+                                                              textAlign: TextAlign
+                                                                  .center,
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold))),
+                                                      Center(
+                                                          child: Text(
+                                                              "Severity",
+                                                              textScaler:
+                                                                  TextScaler
+                                                                      .linear(
+                                                                          1.4),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold))),
+                                                      Center(
+                                                          child: Text(
+                                                              "Priority",
+                                                              textScaler:
+                                                                  TextScaler
+                                                                      .linear(
+                                                                          1.4),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold))),
+                                                    ],
+                                                  ),
+                                                  ...filteredDetails.map((d) {
+                                                    return TableRow(
+                                                      children: [
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(
+                                                                    d.name,
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(
+                                                                    d.baseWeight
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(
+                                                                    d.severity,
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(
+                                                                    d.priority
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                      ],
+                                                    );
+                                                  })
+                                                ],
+                                              ),
+                                            ),
+
+                                            
+                                            SizedBox(height: 50.h),
+                                            Container (
+                                            width: 308.w,
+                                            
+                                            decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          25.r),
+                                                  color: const Color.fromRGBO(82, 170, 164, 1),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withValues(alpha: 0.1), // shadow color
+                                                      blurRadius: 8, 
+                                                      offset: const Offset(2, 10), // (horizontal, vertical)
+                                                    ),
+                                                  ],
+                                                ),
+                                            child: Padding(padding: const EdgeInsets.all(10),
+                                            child: Column(children: [
+                                              Center(
+                                              child: Text(
+                                                "Forward Chaining",
+                                                style: TextStyle(
+                                                    fontSize: 22.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+
+                                            SizedBox(height: 10.h),
+                                            SizedBox(
+                                                
+                                                width: 400.w,
+                                                
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: Table(
+                                                      defaultColumnWidth:
+                                                          FixedColumnWidth(
+                                                              50.w),
+                                                      textDirection:
+                                                          TextDirection.ltr,
+                                                      defaultVerticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      border: TableBorder.all(
+                                                          width: 2.w,
+                                                          color: const Color.fromARGB(255, 255, 255, 255)),
+                                                      children: [
+                                                        const TableRow(
+                                                          children: [
+                                                            Center(
+                                                                child: 
+                                                                Padding (padding: EdgeInsets.all(8),
+                                                              child: Text(
+                                                                    "Symptom",
+                                                                    textScaler:
+                                                                        TextScaler.linear(
+                                                                            1.2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Oswald')))),
+                                                            Center(
+                                                                child: 
+                                                                Padding (padding: EdgeInsets.all(8),
+                                                              child: Text(
+                                                                    "FC Weight",
+                                                                    textScaler:
+                                                                        TextScaler.linear(
+                                                                            1.2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Oswald')))),
+                                                          ],
+                                                        ),
+                                                        ...filteredDetails
+                                                            .map((d) {
+                                                          return TableRow(
+                                                            children: [
+                                                              Center(
+                                                                  child: Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                      child: Text(
+                                                                          d
+                                                                              .name,
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Inter',
+                                                                              fontSize: 15.sp)))),
+                                                              Center(
+                                                                  child: Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                      child: Text(
+                                                                          d.fcWeight.toStringAsFixed(
+                                                                              2),
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Inter',
+                                                                              fontSize: 15.sp)))),
+                                                            ],
+                                                          );
+                                                        })
+                                                      ],
+                                                    ))),
+
+                                            SizedBox(height: 15.h),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 188.w),
+                                              child: Text(
+                                                "Formula:",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Inter',
+                                                    color: const Color.fromARGB(255, 255, 255, 255)),
+                                              ),
+                                            ),
+                                            SizedBox(height: 10.h),
+                                            Center(
+                                              child: Text(
+                                                "Base × Severity × Priority",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Oswald',
+                                                    ),
+                                              ),
+                                            ),
+
+                                            ],),),
+                                            ),
+                                            
+                                            SizedBox(
+                                              height: 50.h,
+                                            ),
+
+
+                                            Container (
+                                            
+                                            width: 308.w,
+                                            
+                                            decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          25.r),
+                                                  color: const Color.fromRGBO(82, 170, 164, 1),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withValues(alpha: 0.1), // shadow color
+                                                      blurRadius: 8, 
+                                                      offset: const Offset(2, 10), // (horizontal, vertical)
+                                                    ),
+                                                  ],
+                                                ),
+                                            child: Padding(padding: const EdgeInsets.all(10),
+                                            child: Column(children: [
+
+                                              
+                                            Center(
+                                              child: Text(
+                                                "Gradient Boosting",
+                                                style: TextStyle(
+                                                    fontSize: 21.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 10.h,
+                                            ),
+
+                                            SizedBox(
+                                                
+                                                width: 400.w,
+                                                
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: Table(
+                                                      defaultColumnWidth:
+                                                          FixedColumnWidth(
+                                                              50.w),
+                                                      textDirection:
+                                                          TextDirection.ltr,
+                                                      defaultVerticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      border: TableBorder.all(
+                                                          width: 2.w,
+                                                          color: const Color.fromARGB(255, 255, 255, 255),
+                                                          style: BorderStyle.solid),
+                                                      children: [
+                                                        const TableRow(
+                                                          children: [
+                                                            Center(
+                                                                child: 
+                                                                Padding (padding: EdgeInsets.all(8),
+                                                              child: Text(
+                                                                    "GB Adjustment",
+                                                                    textScaler:
+                                                                        TextScaler.linear(
+                                                                            1.2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Oswald')))),
+                                                            Center(
+                                                                child: 
+                                                                Padding (padding: EdgeInsets.all(8),
+                                                              child: Text(
+                                                                    "GB Weight",
+                                                                    textScaler:
+                                                                        TextScaler.linear(
+                                                                            1.2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Oswald')))),
+                                                          ],
+                                                        ),
+                                                        ...filteredDetails
+                                                            .map((d) {
+                                                          return TableRow(
+                                                            children: [
+                                                              Center(
+                                                                  child: Padding(
+                                                                      padding: const EdgeInsets.all(8.0),
+                                                                      child: Text(
+                                                                        d.gbAdjustment
+                                                                            .toStringAsFixed(2),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'Inter',
+                                                                            fontSize:
+                                                                                15.sp),
+                                                                      ))),
+                                                              Center(
+                                                                  child: Padding(
+                                                                      padding: const EdgeInsets.all(8.0),
+                                                                      child: Text(
+                                                                        d.gbWeight
+                                                                            .toStringAsFixed(2),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'Inter',
+                                                                            fontSize:
+                                                                                15.sp),
+                                                                      ))),
+                                                            ],
+                                                          );
+                                                        })
+                                                      ],
+                                                    ))),
+
+                                            SizedBox(
+                                              height: 15.h,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 188.w),
+                                              child: Text(
+                                                "Formula:",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Inter',
+                                                    color: const Color.fromARGB(255, 255, 255, 255)),
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 10.h,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "FC Weight + GB Adjustment",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+
+
+                                            ]))),
+
+                                            SizedBox(
+                                              height: 50.h,
+                                            ),
+
+
+                                            Container (
+                                            
+                                            width: 308.w,
+                                            
+                                            decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          25.r),
+                                                   color: const Color.fromRGBO(82, 170, 164, 1),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withValues(alpha: 0.1), // shadow color
+                                                      blurRadius: 8, 
+                                                      offset: const Offset(2, 10), // (horizontal, vertical)
+                                                    ),
+                                                  ],
+                                                ),
+                                            child: Padding(padding: const EdgeInsets.all(10),
+                                            child: Column(children: [
+                                                Center(
+                                              child: Text(
+                                                "AdaBoost",
+                                                style: TextStyle(
+                                                    fontSize: 22.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 10.h,
+                                            ),
+                                            SizedBox(
+                                                
+                                                width: 400.w,
+                                                
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: Table(
+                                                      defaultColumnWidth:
+                                                          FixedColumnWidth(
+                                                              50.w),
+                                                      textDirection:
+                                                          TextDirection.ltr,
+                                                      defaultVerticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      border: TableBorder.all(
+                                                          width: 2.w,
+                                                          color: const Color.fromARGB(255, 255, 255, 255)),
+                                                      children: [
+                                                        const TableRow(
+                                                          children: [
+                                                            Center(
+                                                              child: 
+                                                              Padding (padding: EdgeInsets.all(8),
+                                                              child: Text(
+                                                                "AB Factor",
+                                                                textScaler:
+                                                                    TextScaler
+                                                                        .linear(
+                                                                            1.2),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Oswald'),
+                                                              )),
+                                                            ),
+                                                            Center(
+                                                              child: 
+                                                               Padding (padding: EdgeInsets.all(8),
+                                                              child:Text(
+                                                                "AB Weight",
+                                                                textScaler:
+                                                                    TextScaler
+                                                                        .linear(
+                                                                            1.2),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'Oswald'),
+                                                              )),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        ...filteredDetails
+                                                            .map((d) {
+                                                          return TableRow(
+                                                            children: [
+                                                              Center(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child: Text(
+                                                                    d.abFactor
+                                                                        .toStringAsFixed(
+                                                                            2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter',
+                                                                        fontSize:
+                                                                            15.sp),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Center(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child: Text(
+                                                                    d.abWeight
+                                                                        .toStringAsFixed(
+                                                                            2),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter',
+                                                                        fontSize:
+                                                                            15.sp),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        })
+                                                      ],
+                                                    ))),
+
+                                            SizedBox(
+                                              height: 15.h,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 188.w),
+                                              child: Text(
+                                                "Formula:",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Inter',
+                                                    color: const Color.fromARGB(255, 255, 255, 255)),
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 10.h,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "GB Weight × AB Factor",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+                                            ]))),
+
+                                          
+
+                                            SizedBox(height: 30.h),
+                                            Center(
+                                              child: Text(
+                                                "Complete Symptom Breakdown",
+                                                style: TextStyle(
+                                                    fontSize: 20.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+                                            SizedBox(height: 10.h),
+                                            SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Table(
+                                                defaultColumnWidth:
+                                                    FixedColumnWidth(140.w),
+                                                textDirection:
+                                                    TextDirection.ltr,
+                                                defaultVerticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                border: TableBorder.all(
+                                                    width: 1,
+                                                    color: Colors.grey),
+                                                children: [
+                                                  const TableRow(
+                                                    decoration: BoxDecoration(
+                                                        color: Color.fromARGB(
+                                                            255,
+                                                            239,
+                                                            239,
+                                                            239)),
+                                                    children: [
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "Symptom",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "FC Weight",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "GB Adj.",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "GB Weight",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "AB Factor",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                      Center(
+                                                          child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(8),
+                                                              child: Text(
+                                                                  "AB Weight",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)))),
+                                                    ],
+                                                  ),
+                                                  ...filteredDetails.map((d) {
+                                                    return TableRow(
+                                                      children: [
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(
+                                                                    d.name))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(d
+                                                                    .fcWeight
+                                                                    .toStringAsFixed(
+                                                                        2)))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(d
+                                                                    .gbAdjustment
+                                                                    .toStringAsFixed(
+                                                                        2)))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(d
+                                                                    .gbWeight
+                                                                    .toStringAsFixed(
+                                                                        2)))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(d
+                                                                    .abFactor
+                                                                    .toStringAsFixed(
+                                                                        2)))),
+                                                        Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child: Text(d
+                                                                    .abWeight
+                                                                    .toStringAsFixed(
+                                                                        2)))),
+                                                      ],
+                                                    );
+                                                  })
+                                                ],
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 50.h,
+                                            ),
+
+                                             Container(
+                                                width: 400.w,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.r),
+                                                  color: const Color.fromARGB(255, 123, 231, 87),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withValues(alpha: 0.1), // shadow color
+                                                      blurRadius: 8, // how soft the shadow is
+                                                      offset: const Offset(0, 4), // (horizontal, vertical)
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child:  Table(
+                                                  defaultColumnWidth:
+                                                      FixedColumnWidth(50.w),
+                                                  
+                                                  children: [
+                                                    const TableRow(
+                                                      children: [
+                                                        Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  8.0),
+                                                          child: Text(
+                                                              "Algorithm",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontFamily:
+                                                                      'Inter')),
+                                                        )),
+                                                        Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  8.0),
+                                                          child: Text(
+                                                              "Final Score",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontFamily:
+                                                                      'Inter')),
+                                                        )),
+                                                      ],
+                                                    ),
+                                                    TableRow(
+                                                      children: [
+                                                        const Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            8.0),
+                                                                child: Text(
+                                                                    "Forward Chaining",
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                        Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                              "${scores["confidence_fc"]!.toStringAsFixed(2)}%",
+                                                              style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter')),
+                                                        )),
+                                                      ],
+                                                    ),
+                                                    TableRow(
+                                                      children: [
+                                                        const Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            8.0),
+                                                                child: Text(
+                                                                    "Gradient Boosting",
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter',
+                                                                        )))),
+                                                        Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                              "${scores["confidence_gb"]!.toStringAsFixed(2)}%",
+                                                              style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter')),
+                                                        )),
+                                                      ],
+                                                    ),
+                                                    TableRow(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                              color: Color.fromARGB(255, 240, 241, 240)),
+                                                      children: [
+                                                        const Center(
+                                                            child: Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            8.0),
+                                                                child: Text(
+                                                                    "AdaBoost",
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'Inter')))),
+                                                        Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                              "${scores["confidence_ab"]!.toStringAsFixed(2)}%",
+                                                              style: const TextStyle(
+                                                                  fontFamily:
+                                                                      'Inter')),
+                                                        )),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ))),
+
+                                            SizedBox(
+                                              height: 15.h,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "Final Score",
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontFamily: 'Oswald'),
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              height: 60.h,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.info_outline,
+                                                  color: Colors.blueAccent,
+                                                  size: 24.sp,
+                                                ),
+                                                SizedBox(width: 8.w),
+                                                Expanded(
+                                                  child: Text.rich(
+                                                    TextSpan(
+                                                      style: TextStyle(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 127, 127, 127),
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                      children: const [
+                                                        TextSpan(
+                                                            text:
+                                                                "Note: The table above illustrates the final scores computed using different algorithms. "),
+                                                        TextSpan(
+                                                            text:
+                                                                "Forward Chaining (FC)",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        TextSpan(text: ", "),
+                                                        TextSpan(
+                                                            text:
+                                                                "Gradient Boosting (GB)",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        TextSpan(
+                                                            text: ", and "),
+                                                        TextSpan(
+                                                            text:
+                                                                "AdaBoost (AB)",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        TextSpan(
+                                                            text:
+                                                                " are combined to produce the Final Score."),
+                                                      ],
+                                                    ),
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            SizedBox(
+                                              height: 10.h,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.info_outline,
+                                                  color: Colors.blueAccent,
+                                                  size: 24.sp,
+                                                ),
+                                                SizedBox(width: 8.w),
+                                                Expanded(
+                                                  child: Text.rich(
+                                                    TextSpan(
+                                                      style: TextStyle(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 127, 127, 127),
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                      children: [
+                                                        const TextSpan(
+                                                            text: "Insight:",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal)),
+                                                        TextSpan(
+                                                            text:
+                                                                " Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,",
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        TextSpan(
+                                                            text:
+                                                                " AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%",
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        const TextSpan(
+                                                            text: ", "),
+                                                        const TextSpan(
+                                                            text:
+                                                                ("by reweighting the symptoms and resolving the overlaps")),
+                                                        const TextSpan(
+                                                          text:
+                                                              (" Making the result more accurate."),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            Align(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                child: TextButton(
+                                                  style: ButtonStyle(
+                                                    overlayColor:
+                                                        WidgetStateProperty.all(
+                                                            Colors.transparent),
+                                                    splashFactory:
+                                                        NoSplash.splashFactory,
+                                                    padding:
+                                                        WidgetStateProperty.all(
+                                                            EdgeInsets.zero),
+                                                    minimumSize:
+                                                        WidgetStateProperty.all(
+                                                            const Size(0, 0)),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            MetricsScreen(
+                                                          petType: userData.selectedPetType,
+                                                          illnessName: widget
+                                                                  .illnessLabels[
+                                                              index],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: const Text(
+                                                    'Metrics',
+                                                    style: TextStyle(
+                                                      color: Colors.blueAccent,
+                                                      fontSize: 16,
+                                                      fontFamily: 'Oswald',
+                                                    ),
+                                                  ),
+                                                )),
+
+                                            SizedBox(height: 5.h),
                                           ],
                                         ),
                                       ),
                                     ),
-                                    Center(
-                                      child: Text(
-                                        "Symptoms Doughnut Graph",
-                                        style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
-                                      ),
-                                    ),
-                                    SizedBox(height: 20.h),
-                                    // Table showing each filtered symptom's details.
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Table(
-                                        defaultColumnWidth: FixedColumnWidth(200.w),
-                                        textDirection: TextDirection.ltr,
-                                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                        border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
-                                        children: [
-                                          const TableRow(
-                                            children: [
-                                              Center(child: Text("Symptom", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold))),
-                                              Center(child: Text("Base Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold))),
-                                              Center(child: Text("Severity", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold))),
-                                              Center(child: Text("Priority", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold))),
-                                            ],
-                                          ),
-                                          ...filteredDetails.map((d) {
-                                            return TableRow(
-                                              children: [
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.name, style: const TextStyle(fontFamily: 'Inter')))),
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.baseWeight.toString(), style: const TextStyle(fontFamily: 'Inter')))),
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.severity, style: const TextStyle(fontFamily: 'Inter')))),
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.priority.toString(), style: const TextStyle(fontFamily: 'Inter')))),
-                                              ],
-                                            );
-                                          }).toList(),
-                                        ],
-                                      ),
-                                    ),
-                                    // Keep the remaining UI sections (Forward Chaining, Gradient Boosting, Ada Boost) unchanged.
-                                    SizedBox(height: 15.h),
-                                    Center(
-                                      child: Text(
-                                        "Forward Chaining",
-                                        style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                     SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                                        defaultColumnWidth:  FixedColumnWidth(155.w),
-                                        textDirection: TextDirection.ltr,
-                                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                        border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
-                                        children: [
-                                          const TableRow(
-                                            children: [
-                                              Center(child: Text("Symptom", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
-                                              Center(child: Text("FC Weight", textScaleFactor: 1.4, textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Inter'))),
-                                            ],
-                                          ),
-                                          ...filteredDetails.map((d) {
-                                            return TableRow(
-                                              children: [
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.name, style:  TextStyle(fontFamily: 'Inter', fontSize: 15.sp)))),
-                                                Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.fcWeight.toStringAsFixed(2), style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp)))),
-                                                
-                                              ],
-                                            );
-                                          }).toList(),
-                                        ],
-                                     )),
-                                    
-
-                                    SizedBox(height: 15.h),
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 210.w),
-                                      child: Text(
-                                        "Formula:",
-                                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Center(
-                                      child: Text(
-                                        "Base × Severity × Priority",
-                                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
-                                      ),
-                                    ),
-
-                                       SizedBox(height: 50.h,),
-                  Center(
-                      child: Text(
-                            "Gradient Boosting",
-                            style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
-                          ),
-                        ),
-
-
-                                    SizedBox(height: 10.h,),
-
-                   SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child:Table(
-                  defaultColumnWidth:  FixedColumnWidth(155.w),
-                  textDirection: TextDirection.ltr,
-                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                  border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
-                  children: [
-                    const TableRow(
-                      children: [
-                        Center(
-                            child: Text("GB Adjustment",
-                                textScaleFactor: 1.4,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontFamily: 'Inter'))),
-                        Center(
-                            child: Text("GB Weight",
-                                textScaleFactor: 1.4,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontFamily: 'Inter'))),
-                      ],
-                    ),
-                    ...filteredDetails.map((d) {
-                      return TableRow(
-                        children: [
-                          Center(
-                              child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    d.gbAdjustment.toStringAsFixed(2),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp),
-                                  ))),
-                          Center(
-                              child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    d.gbWeight.toStringAsFixed(2),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp),
-                                  ))),
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                )),
-
-
-                SizedBox(height: 15.h,),
-              Padding(
-                padding: EdgeInsets.only(right: 210.w),
-                  child: Text(
-                        "Formula:",
-                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
-                      ),
-                    ),
-
-
-                SizedBox(height: 10.h,),
-              Center(
-                  child: Text(
-                        "FC Weight + GB Adjustment",
-                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
-                      ),
-                    ),
-
-
-                    
-
-
-
-                    
-
-                     SizedBox(height: 50.h,),
-                  Center(
-                      child: Text(
-                            "Ada Boost",
-                            style: TextStyle(fontSize: 22.sp, fontFamily: 'Oswald'),
-                          ),
-                        ),
-
-
-                    SizedBox(height: 10.h,),
-                     SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                    defaultColumnWidth:  FixedColumnWidth(155.w),
-                    textDirection: TextDirection.ltr,
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    border: TableBorder.all(width: 1, color: const Color.fromARGB(255, 151, 150, 150)),
-                    children: [
-                      const TableRow(
-                        children: [
-                          Center(
-                            child: Text(
-                              "AB Factor",
-                              textScaleFactor: 1.4,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontFamily: 'Inter'),
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              "AB Weight",
-                              textScaleFactor: 1.4,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontFamily: 'Inter'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      ...filteredDetails.map((d) {
-                        return TableRow(
-                          children: [
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  d.abFactor.toStringAsFixed(2),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp),
-                                ),
-                              ),
-                            ),
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  d.abWeight.toStringAsFixed(2),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 15.sp),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    ],
-                  )),
-
-
-
-                SizedBox(height: 15.h,),
-              Padding(
-                padding: EdgeInsets.only(right: 210.w),
-                  child: Text(
-                        "Formula:",
-                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Inter', color: Colors.blueAccent),
-                      ),
-                    ),
-
-
-                SizedBox(height: 10.h,),
-              Center(
-                  child: Text(
-                        "GB Weight × AB Factor",
-                        style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
-                      ),
-                    ),
-                          
-
-
-
-
-                          SizedBox(height: 30.h),
-                          Center(
-                            child: Text(
-                              "Complete Symptom Breakdown",
-                              style: TextStyle(fontSize: 20.sp, fontFamily: 'Oswald'),
-                            ),
-                          ),
-                          SizedBox(height: 10.h),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                              defaultColumnWidth: FixedColumnWidth(140.w),
-                              textDirection: TextDirection.ltr,
-                              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                              border: TableBorder.all(width: 1, color: Colors.grey),
-                              children: [
-                                const TableRow(
-                                  decoration: BoxDecoration(color: Color.fromARGB(255, 239, 239, 239)),
-                                  children: [
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("Symptom", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("FC Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("GB Adj.", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("GB Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("AB Factor", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                    Center(child: Padding(padding: EdgeInsets.all(8), child: Text("AB Weight", style: TextStyle(fontWeight: FontWeight.bold)))),
-                                  ],
-                                ),
-                                ...filteredDetails.map((d) {
-                                  return TableRow(
-                                    children: [
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.name))),
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.fcWeight.toStringAsFixed(2)))),
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.gbAdjustment.toStringAsFixed(2)))),
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.gbWeight.toStringAsFixed(2)))),
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.abFactor.toStringAsFixed(2)))),
-                                      Center(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(d.abWeight.toStringAsFixed(2)))),
-                                    ],
                                   );
-                                }).toList(),
-                              ],
-                            ),
-                          ),
-
-
-
-
-
-
-                          
-                                       SizedBox(height: 50.h,),
-                                
-
-                                 SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Table(
-                                  defaultColumnWidth: FixedColumnWidth(160.w),
-                                  border: TableBorder.all(width: 1, color: Colors.grey),
-                                  children: [
-                                    const TableRow(
-                                      children: [
-                                        Center(child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text("Algorithm", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                                        )),
-                                        Center(child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text("Final Score", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                                        )),
-                                      ],
-                                    ),
-                                    TableRow(
-                                      children: [
-                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Forward Chaining", style: TextStyle(fontFamily: 'Inter')))),
-                                        Center(child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text("${scores["confidence_fc"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                        )),
-                                      ],
-                                    ),
-                                    TableRow(
-                                      children: [
-                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("Gradient Boosting", style: TextStyle(fontFamily: 'Inter')))),
-                                        Center(child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text("${scores["confidence_gb"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                        )),
-                                      ],
-                                    ),
-                                    TableRow(
-                                       decoration: BoxDecoration(color: Color.fromARGB(255, 121, 216, 104)),
-                                      children: [
-                                        const Center(child: Padding(padding: EdgeInsets.all(8.0), child: Text("AdaBoost", style: TextStyle(fontFamily: 'Inter')))),
-                                        Center(child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text("${scores["confidence_ab"]!.toStringAsFixed(2)}%", style: TextStyle(fontFamily: 'Inter')),
-                                        )),
-                                      ],
-                                    ),
-                                  ],
-                                )),
-
-
-                            SizedBox(height: 15.h,),
-                            Center(
-                              child: Text(
-                                "Final Score",
-                                style: TextStyle(fontSize: 18.sp, fontFamily: 'Oswald'),
-                              ),
-                            ),
-
-                            SizedBox(height: 60.h,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  color: Colors.blueAccent,
-                                  size: 24.sp,
-                                ),
-                                SizedBox(width: 8.w),
-                                Expanded(
-                                  child: Text.rich(
-                                    TextSpan(
-                                      style: TextStyle(
-                                        color: const Color.fromARGB(255, 127, 127, 127),
-                                        fontSize: 12.sp,
-                                      ),
-                                      children: const [
-                                        TextSpan(
-                                            text: "Note: The table above illustrates the final scores computed using different algorithms. "),
-                                        TextSpan(
-                                            text: "Forward Chaining (FC)",
-                                            style: TextStyle(fontWeight: FontWeight.bold)),
-                                        TextSpan(text: ", "),
-                                        TextSpan(
-                                            text: "Gradient Boosting (GB)",
-                                            style: TextStyle(fontWeight: FontWeight.bold)),
-                                        TextSpan(text: ", and "),
-                                        TextSpan(
-                                            text: "AdaBoost (AB)",
-                                            style: TextStyle(fontWeight: FontWeight.bold)),
-                                        TextSpan(text: " are combined to produce the Final Score."),
-                                      ],
-                                    ),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-
-                            
-                           
-                            SizedBox(height: 10.h,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  color: Colors.blueAccent,
-                                  size: 24.sp,
-                                ),
-                                SizedBox(width: 8.w),
-                                Expanded(
-                                  child: Text.rich(
-                                    TextSpan(
-                                      style: TextStyle(
-                                        color: const Color.fromARGB(255, 127, 127, 127),
-                                        fontSize: 12.sp,
-                                      ),
-                                      children:  [
-                                       const TextSpan(
-                                            text: "Insight:",
-                                            style: const TextStyle(fontWeight: FontWeight.normal)),
-                                        TextSpan(
-                                            text: " Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,",  style: const TextStyle(fontWeight: FontWeight.bold)),
-                                        TextSpan(
-                                            text: " AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%",
-                                            style: const TextStyle(fontWeight: FontWeight.bold)),
-                                       const TextSpan(text: ", "),
-                                       const TextSpan(
-                                            text: ("by reweighting the symptoms and resolving the overlaps")),
-                                       
-                                       const TextSpan (
-                                            text: (" Making the result more accurate."),),
-                                   
-                                      ],
-                                    ),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            Align(
-                            alignment: Alignment.bottomRight,
-                            child: TextButton(
-                             style: ButtonStyle(
-                              overlayColor: WidgetStateProperty.all(Colors.transparent),
-                              splashFactory: NoSplash.splashFactory,
-                              padding: WidgetStateProperty.all(EdgeInsets.zero),
-                              minimumSize: WidgetStateProperty.all(Size(0,0)),
-                            ),
-
-
-                              onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MetricsScreen(
-                                    illnessName: widget.illnessLabels[index],
-                                  ),
-                                ),
-                              );
-                            },
-
-                          
-                
-                              child: const Text(
-                                'Metrics',
-                                style: TextStyle(
-                                   color: Colors.blueAccent,
-                                  fontSize: 16,
-                                  fontFamily: 'Oswald',
-                               
-                                ),
-                              ),
-                            )),
-
-                             SizedBox(height: 5.h),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    );
-
+                                }
+                              },
+                            );
                           },
                         );
                       }
@@ -817,7 +1465,8 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         reservedSize: 40,
                         getTitlesWidget: (value, meta) => Text(
                           '${value.toInt()}',
-                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0)),
                         ),
                       ),
                     ),
@@ -826,9 +1475,11 @@ class _BarChartSample2State extends State<BarChartSample2> {
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
                           final i = value.toInt();
-                          if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
+                          if (i < 0 || i >= widget.illnessLabels.length)
+                            return const SizedBox.shrink();
                           String label = widget.illnessLabels[i];
-                          if (label.length > 10) label = '${label.substring(0, 10)}…';
+                          if (label.length > 10)
+                            label = '${label.substring(0, 10)}…';
                           return SideTitleWidget(
                             space: 3,
                             meta: meta,
@@ -860,14 +1511,14 @@ class _BarChartSample2State extends State<BarChartSample2> {
                     horizontalInterval: 20,
                     getDrawingHorizontalLine: (value) {
                       return const FlLine(
-                        color: Color.fromARGB(192, 0, 0, 0),
+                        color: Color.fromARGB(192, 176, 175, 175),
                         strokeWidth: 1.5,
                         dashArray: [5, 5],
                       );
                     },
                     getDrawingVerticalLine: (value) {
                       return const FlLine(
-                        color: Color.fromARGB(177, 0, 0, 0),
+                        color: Color.fromARGB(192, 176, 175, 175),
                         strokeWidth: 1.5,
                         dashArray: [5, 5],
                       );
@@ -894,31 +1545,31 @@ class _BarChartSample2State extends State<BarChartSample2> {
         Container(
           width: width,
           height: 10,
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+          color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.4),
         ),
         const SizedBox(width: space),
         Container(
           width: width,
           height: 28,
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
+          color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.8),
         ),
         const SizedBox(width: space),
         Container(
           width: width,
           height: 42,
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(1),
+          color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 1),
         ),
         const SizedBox(width: space),
         Container(
           width: width,
           height: 28,
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
+          color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.8),
         ),
         const SizedBox(width: space),
         Container(
           width: width,
           height: 10,
-          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+          color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.4),
         ),
       ],
     );
@@ -928,7 +1579,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
     double cap(double value) => (value * 100).clamp(0, 100);
     return BarChartGroupData(
       x: x,
-      barsSpace: 4,
+      barsSpace: 10,
       barRods: [
         BarChartRodData(toY: cap(y1), color: widget.fcColor, width: width),
         BarChartRodData(toY: cap(y2), color: widget.gbColor, width: width),
@@ -947,7 +1598,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-           SizedBox(height: 5.h),
+          SizedBox(height: 5.h),
           _legendItem(widget.fcColor, "Forward Chaining"),
           SizedBox(height: 5.h),
           _legendItem(widget.gbColor, "Gradient Boosting"),
@@ -970,7 +1621,8 @@ class _BarChartSample2State extends State<BarChartSample2> {
           ),
         ),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+        Text(label,
+            style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
       ],
     );
   }

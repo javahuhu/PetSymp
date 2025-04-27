@@ -171,8 +171,7 @@ class SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
+
 
     return Scaffold(
     resizeToAvoidBottomInset: false,
@@ -186,15 +185,17 @@ class SignupScreenState extends State<SignupScreen> {
             child: ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(
-                Icons.arrow_back_sharp,
+                Icons.arrow_back_ios_new,
                 color: const Color.fromRGBO(61, 47, 40, 1),
-                size: 40.sp,
+                size: 26.sp,
               ),
               label: const Text(''),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-              ),
+                 style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  elevation: WidgetStateProperty.all(0),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent), // 👈 removes ripple/splash
+                ),
             ),
           ),
           // 

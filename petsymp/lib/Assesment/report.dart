@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/Assesment/newsummary.dart';
 import '../userdata.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -12,10 +12,12 @@ class ReportScreen extends StatefulWidget {
 }
 
 class ReportScreenState extends State<ReportScreen> {
-  bool _isAnimated = false; // Animation toggle
-  // State to track the selected tab
+  bool _isAnimated = false; 
+  bool _isLoading = false;
 
-  // Control the visibility of buttons
+  
+
+  
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
@@ -125,12 +127,30 @@ class ReportScreenState extends State<ReportScreen> {
       top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
       right: screenWidth * 0.02,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: _isLoading ? null : () async {
+          setState(() {
+            _isLoading = true; 
+          });
+
+          try {
+
+            await Future.delayed(const Duration(seconds: 3)); 
+
+             Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Something went wrong: $e',))
+            );
+
+           } finally {
+            if (mounted) setState(() => _isLoading = false); 
+          }
           
-         Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => destination),
-      );
+        
         },
         style: ButtonStyle(
                     // Dynamic background color based on button state
@@ -167,7 +187,16 @@ class ReportScreenState extends State<ReportScreen> {
                       const Size(155, 55),
                     ),
                   ),
-              child: Text(
+              child: 
+              _isLoading ? SizedBox(
+                height: 20.w,
+                width: 20.w,
+                child: const CircularProgressIndicator(
+                  color: Color.fromARGB(255, 64, 35, 93),
+                  strokeWidth: 5,
+                ),
+              )
+              : Text(
           label,
           style: const TextStyle(
             fontSize: 22.0,

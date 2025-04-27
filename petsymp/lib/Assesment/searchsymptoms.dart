@@ -9,6 +9,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/SymptomsCatalog/symptomscatalog.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:petsymp/Assesment/anothersymptoms.dart';
+import 'package:petsymp/searchdescription.dart';
 
 class SearchsymptomsScreen extends StatefulWidget {
   /// Expected to be a single-element list with the input symptom.
@@ -24,28 +26,19 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
     with SingleTickerProviderStateMixin {
   bool _isNavigating = false;
   AnimationController? _bubbleAnimationController;
-  
-  // Map for additional descriptions.
-  final Map<String, String> _symptomDescriptions = {
-    'diarrhea': 'Loose, watery stools occurring more frequently than usual.',
-    'vomiting': 'Forceful expulsion of stomach contents through the mouth.',
-    'coughing': 'Sudden expulsion of air from the lungs to clear the passages.',
-    'fever': 'Abnormally high body temperature, often indicating infection.',
-    'lethargy': 'Unusual tiredness or decreased activity.',
-    'loss of appetite': 'Reduced desire to eat despite a normal feeding schedule.',
-    // Add more as needed.
-  };
-
   @override
-  void initState() {
-    super.initState();
-    _bubbleAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat(reverse: true);
+void initState() {
+  super.initState();
 
-   
-  }
+  _bubbleAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 5),
+  )..repeat(reverse: true);
+
+
+
+}
+
 
   @override
   void dispose() {
@@ -160,8 +153,18 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back_sharp, color: Color.fromRGBO(61, 47, 40, 1), size: 32.0),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+
+                    style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  elevation: WidgetStateProperty.all(0),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent), 
+                ),
+
+                        icon: Icon(Icons.arrow_back_ios_new, color: const Color.fromRGBO(61, 47, 40, 1), size: 26.sp),
                       ),
                     ],
                   ),
@@ -220,8 +223,8 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
   /// Builds a card for a given symptom.
   Widget buildSymptomsContainer(double screenWidth, String title, BuildContext context) {
     final symptomKey = title.toLowerCase();
-    final description = _symptomDescriptions[symptomKey] ??
-        'A common symptom that may indicate health issues in your pet.';
+    final description = symptomDescriptions[symptomKey] ??
+        'No Description available.'; 
         
     return Container(
       padding: EdgeInsets.all(16.sp),
@@ -229,11 +232,11 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
       decoration: BoxDecoration(
         color: const Color.fromRGBO(29, 29, 44, 1.0),
         borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,
-            offset: const Offset(2, 2),
+            offset:  Offset(2, 2),
           ),
         ],
         border: Border.all(
@@ -259,7 +262,7 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
             description,
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withValues(alpha: 0.85),
             ),
           ),
           SizedBox(height: 16.h),
@@ -267,55 +270,62 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: () {
-                final userData = Provider.of<UserData>(context, listen: false);
-                // Instead of immediately adding to pending,
-                // set the selected symptom and update the questions.
-                userData.setSelectedSymptom(title);
-                userData.updateQuestions();
-                debugPrint("✅ Selected Symptom: $title");
-                debugPrint("✅ Updated Questions: ${userData.questions}");
-                // Navigate to QoneScreen.
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QoneScreen(
-                      symptom: title,
-                      questions: List<String>.from(userData.questions),
-                      impactChoices: List<List<String>>.from(userData.impactChoices),
-                    ),
-                  ),
-                );
-              },
+             onPressed: () {
+                  final userData = Provider.of<UserData>(context, listen: false);
+                  userData.setSelectedSymptom(title);
+                  userData.updateQuestions();
+
+                  if (userData.questions.isEmpty) {
+                    // 🔵 No follow-up → instantly add to pending + go to next screen
+                    userData.addPendingSymptom(title);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AnothersympScreen()),
+                    );
+                  } else {
+                   
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QoneScreen(
+                          symptom: title,
+                          questions: List<String>.from(userData.questions),
+                          impactChoices: List<List<String>>.from(userData.impactChoices),
+                        ),
+                      ),
+                    );
+                  }
+                },
+
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.pressed)) {
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return const Color.fromRGBO(66, 134, 130, 1.0);
                   }
                   return Colors.transparent;
                 }),
-                foregroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.pressed)) {
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return const Color.fromARGB(255, 255, 255, 255);
                   }
                   return const Color.fromARGB(255, 255, 255, 255);
                 }),
-                shadowColor: MaterialStateProperty.all(Colors.transparent),
-                side: MaterialStateProperty.all(
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                side: WidgetStateProperty.all(
                   const BorderSide(
                     color: Color.fromRGBO(82, 170, 164, 1),
                     width: 2.0,
                   ),
                 ),
-                shape: MaterialStateProperty.all(
+                shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(6.r)),
                   ),
                 ),
-                padding: MaterialStateProperty.all(
+                padding: WidgetStateProperty.all(
                   EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 ),
-                fixedSize: MaterialStateProperty.all(
+                fixedSize: WidgetStateProperty.all(
                   Size(120.w, 45.h),
                 ),
               ),

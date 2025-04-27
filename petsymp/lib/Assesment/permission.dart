@@ -213,7 +213,7 @@ class PermissionScreenState extends State<PermissionScreen> {
                 // Next Button at the previous position
                 Positioned(
                   top: screenHeight * 0.9,
-                  right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                  right: screenWidth * 0.05, // Adjust dynamically for right alignment
                   child: 
                   SlideInUp(
                     duration: Duration(milliseconds: 1000),
@@ -260,7 +260,7 @@ class PermissionScreenState extends State<PermissionScreen> {
                             ),
                           ),
                           fixedSize: WidgetStateProperty.all(
-                            const Size(100, 55),
+                            const Size(110, 55),
                           ),
                         ),
                         child: const Text(

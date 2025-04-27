@@ -8,7 +8,7 @@ import '../userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../barchart/barfirebasegraph.dart';
 import 'historyillnessdetails.dart';
-
+import 'package:petsymp/symptomsdescriptions.dart';
 class ViewhistoryScreen extends StatefulWidget {
   final Map<String, dynamic> historyData; // Data passed from the history card
   const ViewhistoryScreen({Key? key, required this.historyData}) : super(key: key);
@@ -18,6 +18,28 @@ class ViewhistoryScreen extends StatefulWidget {
 }
 
 class ViewhistoryScreenState extends State<ViewhistoryScreen> {
+    String detailToString(dynamic value) {
+      if (value is List) {
+        return value.join("\n\n");
+      } else if (value is bool) {
+        return value ? "Yes" : "No";
+      } else if (value != null) {
+        return value.toString();
+      }
+      return "No information available.";
+    }
+ 
+
+  String _extractDescription(Map<String, dynamic> diagnosis) {
+    final name = diagnosis['illness'] as String? ?? '';
+    final info = illnessInformation[name];
+    if (info != null && info['Description'] is List<dynamic>) {
+      final list = (info['Description'] as List<dynamic>).cast<String>();
+      if (list.isNotEmpty) return list.join('\n\n');
+    }
+    return 'No description available.';
+  }
+  
   final List<ListItem> recommendations = [
     const ListItem(
       title: 'Provide Medicine for Lethargy',
@@ -59,8 +81,12 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     ),
   ];
 
+  
+
   @override
   Widget build(BuildContext context) {
+
+    
     // Use the passed historyData.
     final Map<String, dynamic> historyData = widget.historyData;
     final String petName = historyData['petName'] ?? "Unknown";
@@ -94,6 +120,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
         }
       });
     }
+
+
 
     return PopScope(
       canPop: true,
@@ -142,7 +170,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.5),
                         blurRadius: 10,
                         spreadRadius: 1,
                       ),
@@ -161,7 +189,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                               end: Alignment.bottomCenter,
                               colors: [
                                 const Color.fromARGB(255, 82, 107, 106)
-                                    .withOpacity(0.7),
+                                    .withValues(alpha: 0.7),
                                 const Color(0xFF52AAA4),
                               ],
                             ),
@@ -180,7 +208,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 10,
                                         spreadRadius: 2,
                                       ),
@@ -217,7 +245,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                       begin: Alignment.bottomCenter,
                                       end: Alignment.topCenter,
                                       colors: [
-                                        Colors.black.withOpacity(0.5),
+                                        Colors.black.withValues(alpha: 0.5),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -450,61 +478,39 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     );
   }
 
-  Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
-    return Container(
-      padding: EdgeInsets.all(15.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.medical_information_rounded,
-                color: Color(0xFF52AAA4),
-              ),
-              SizedBox(width: 10.w),
-              Text(
-                "Diagnosis Results",
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF3D4A5C),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20.h),
+   Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
+    final primary   = topDiagnoses[0];
+    final secondary = topDiagnoses.length > 1 ? topDiagnoses[1] : null;
+    final tertiary  = topDiagnoses.length > 2 ? topDiagnoses[2] : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Primary
+        _buildDiagnosisItem(
+          primary,
+          isPrimary: true,
+          description: _extractDescription(primary),
+        ),
+
+        // Secondary
+        if (secondary != null) ...[
+          SizedBox(height: 16.h),
           _buildDiagnosisItem(
-            topDiagnoses[0],
-            isPrimary: true,
-            description:
-                "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
+            secondary,
+            description: _extractDescription(secondary),
           ),
-          if (topDiagnoses.length > 1)
-            _buildDiagnosisItem(
-              topDiagnoses[1],
-              description:
-                  "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
-            ),
-          if (topDiagnoses.length > 2)
-            _buildDiagnosisItem(
-              topDiagnoses[2],
-              description:
-                  "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies.",
-            ),
         ],
-      ),
+
+        // Tertiary
+        if (tertiary != null) ...[
+          SizedBox(height: 16.h),
+          _buildDiagnosisItem(
+            tertiary,
+            description: _extractDescription(tertiary),
+          ),
+        ],
+      ],
     );
   }
 
@@ -534,7 +540,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 5,
                       spreadRadius: 1,
                     ),
@@ -548,14 +554,14 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         width: 60.w,
                         height: 60.w,
                         child: CircularProgressIndicator(
-                          value: confidence,
-                          backgroundColor: Colors.grey.withOpacity(0.2),
+                          value: 100,
+                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
                           color: isPrimary ? const Color(0xFF52AAA4) : const Color(0xFFFFA726),
                           strokeWidth: 8.w,
                         ),
                       ),
                       Text(
-                        "${(confidence * 100).round()}%",
+                        "1",
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -614,13 +620,19 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton.icon(
+                
                 onPressed: () {
-                  // When tapping "See Details" pass the full diagnosis record.
+                  final Map<String, dynamic> historyData = widget.historyData;
+                  final List<Map<String, dynamic>> diagnoses =
+                  List<Map<String, dynamic>>.from(historyData['diagnosisResults'] ?? []);
+
+                 
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => HistoryIllnessdetailsScreen(
-                        diagnosisData: diagnosis,
+                        diagnosisData: diagnosis, totalIllnesses: diagnoses.length,
+                        allDiagnoses: diagnoses,
                       ),
                     ),
                   );
@@ -664,7 +676,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.5),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -787,7 +799,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     return Table(
       border: TableBorder(
         horizontalInside: BorderSide(
-          color: Colors.grey.withOpacity(0.2),
+          color: Colors.grey.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -871,7 +883,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
   Widget _tableScoreCell(double value, bool isHighlighted) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
-      color: isHighlighted ? const Color(0xFFEFF8F7).withOpacity(0.3) : Colors.transparent,
+      color: isHighlighted ? const Color(0xFFEFF8F7).withValues(alpha: 0.3) : Colors.transparent,
       child: Text(
         value.toStringAsFixed(2),
         textAlign: TextAlign.center,

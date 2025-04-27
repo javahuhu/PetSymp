@@ -1,12 +1,5 @@
 final Map<String, dynamic> symptomQuestionsDog = {
-  "abdominal bloating": {
-    "questions": [
-      "How long has your dog had this symptom?",
-      "How severe is this symptom?"
-    ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "moderate", "severe"],
-  },
+  "abdominal bloating": {},
   "bloody stool": {
     "questions": [
       "How long has your dog had this symptom?",

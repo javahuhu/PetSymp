@@ -18,6 +18,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
   final List<bool> _buttonVisible = [false, false];
   late AnimationController _bubblesController;
   late List<Bubble> _bubbles;
+  final ScrollController _scrollController = ScrollController();
   
   @override
   void initState() {
@@ -51,6 +52,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
   @override
   void dispose() {
     _bubblesController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -59,7 +61,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
-
+    
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
@@ -83,7 +85,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                         height: size,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: RadialGradient(
+                          gradient: const RadialGradient(
                             colors: [
                               Color.fromRGBO(82, 170, 164, 0.8),
                               Color.fromRGBO(82, 170, 164, 0.2),
@@ -105,114 +107,103 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
             },
           ),
           
-          // Content Layer
-          Stack(
-            children: [
-              // Back Button
-              Positioned(
-                top: screenHeight * 0.03,
-                left: screenWidth * 0.01,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(8),
+          SafeArea(
+            child: Column(
+              children: [
+                // Back Button
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: const Icon(Icons.arrow_back, size: 28, color: Colors.black),
+                    padding: const EdgeInsets.all(16),
                   ),
-                  child: const Icon(Icons.arrow_back, size: 40, color: Colors.black),
                 ),
-              ),
-              
-              // Animated Header with Paw Icon
-              AnimatedPositioned(
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeInOut,
-                top: _isAnimated ? screenHeight * 0.13 : -100,
-                left: screenWidth * 0.1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
+                
+                // Paw Icon centered
+                Padding(
+                  padding: EdgeInsets.only(right: 225.w),
+                  child: 
+                AnimatedOpacity(
+                  duration: const Duration(seconds: 1),
+                  opacity: _isAnimated ? 1.0 : 0.0,
+                  child: Center(
+                    child: Container(
                       width: screenWidth * 0.15,
                       height: screenWidth * 0.15,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle, 
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(82, 170, 164, 0.3),
-                            blurRadius: 12,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
+                      margin: const EdgeInsets.only(top: 8, bottom: 16),
                       child: Image.asset('assets/paw.png', fit: BoxFit.contain),
                     ),
-                    SizedBox(width: screenWidth * 0.05),
-                  ],
+                  ),
+                )),
+                
+                // Question and Subtitle
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Does she/he have another symptoms?",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Add all relevant symptoms for an accurate diagnosis",
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              
-              // Title with enhanced styling
-              Positioned(
-                top: screenHeight * 0.22,
-                left: screenWidth * 0.12,
-                right: screenWidth * 0.02,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Does she/he have another symptoms?",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Subtle subtitle
-                    Text(
-                      "Add all relevant symptoms for an accurate diagnosis",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    
-                    // Current Symptoms display - Bubble design
-                    if (userData.finalizedSymptoms.isNotEmpty || userData.pendingSymptoms.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Current Symptoms:",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromRGBO(29, 29, 44, 0.8),
-                            ),
+                
+                // Symptoms Display (if any)
+                if (userData.finalizedSymptoms.isNotEmpty || userData.pendingSymptoms.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Current Symptoms:",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color.fromRGBO(29, 29, 44, 0.8),
                           ),
-                          const SizedBox(height: 8),
-                          Container(
-                            width: screenWidth * 0.8,
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: screenHeight * 0.3, // Set a maximum height
+                          ),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            physics: const BouncingScrollPhysics(),
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
                             child: Wrap(
                               spacing: 8,
                               runSpacing: 8,
@@ -222,36 +213,182 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                               ],
                             ),
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                
+                SizedBox(height: 50.h,),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                  child: Column(
+                    children: [
+                      // Yes, Add Another Button
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 800),
+                        opacity: _buttonVisible[0] ? 1.0 : 0.0,
+                        child: Container(
+                          width: double.infinity,
+                          height: 55.h,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (_) => const MentionsympScreen()),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return const Color.fromRGBO(82, 170, 164, 1);
+                                }
+                                return Colors.white.withOpacity(0.9);
+                              }),
+                              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.white;
+                                }
+                                return const Color.fromRGBO(29, 29, 44, 1.0);
+                              }),
+                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                              side: MaterialStateProperty.all(
+                                const BorderSide(
+                                  color: Color.fromRGBO(82, 170, 164, 0.8),
+                                  width: 2.0
+                                ),
+                              ),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Yes, Add Another",
+                                  style: TextStyle(
+                                    fontSize: 16.0, 
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                  ],
+                      
+                      // No, Get Diagnosis Button
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 800),
+                        opacity: _buttonVisible[1] ? 1.0 : 0.0,
+                        child: Container(
+                          width: double.infinity,
+                          height: 55.h,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  title: const Text("Are you sure?"),
+                                  content: const Text(
+                                      "Once you proceed, you won't be able to go back and edit previous answers."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text("Cancel"),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: const Text("Confirm"),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm != true) return;
+
+                              final userData = Provider.of<UserData>(context, listen: false);
+
+                              // Finalize all pending symptoms
+                              for (final sym in userData.pendingSymptoms.toList()) {
+                                userData.finalizeSymptom(sym);
+                              }
+
+                              // Send to backend after finalizing
+                              await userData.fetchDiagnosis();
+                              
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (_) => const ReportScreen()),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return const Color.fromRGBO(82, 170, 164, 1);
+                                }
+                                return const Color.fromRGBO(82, 170, 164, 0.1);
+                              }),
+                              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return Colors.white;
+                                }
+                                return const Color.fromRGBO(29, 29, 44, 1.0);
+                              }),
+                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                              side: MaterialStateProperty.all(
+                                const BorderSide(
+                                  color: Color.fromRGBO(82, 170, 164, 1),
+                                  width: 2.0
+                                ),
+                              ),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  "No, Get Diagnosis",
+                                  style: TextStyle(
+                                    fontSize: 16.0, 
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              
-              // Yes Button (adds another symptom)
-              buildAnimatedButton(
-                screenHeight,
-                screenWidth,
-                0.55,
-                "Yes, Add Another Symptom",
-                const MentionsympScreen(),
-                0,
-                shouldFinalizeAndSend: false,
-                iconData: Icons.add_circle_outline,
-              ),
-              
-              // No Button (finalize all and fetch diagnosis)
-              buildAnimatedButton(
-                screenHeight,
-                screenWidth,
-                0.66,
-                "No, Get Diagnosis",
-                const ReportScreen(),
-                1,
-                shouldFinalizeAndSend: true,
-                iconData: Icons.check_circle_outline,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -296,137 +433,6 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget buildAnimatedButton(
-    double screenHeight,
-    double screenWidth,
-    double topPosition,
-    String label,
-    Widget destination,
-    int index, {
-    bool shouldFinalizeAndSend = false,
-    IconData? iconData,
-  }) {
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeInOut,
-      top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
-      left: screenWidth * 0.5 - 150, // Center the button
-      child: Container(
-        width: 325.w,
-        height: 55.h,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: () async {
-            if (shouldFinalizeAndSend) {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  title: const Text("Are you sure?"),
-                  content: const Text(
-                      "Once you proceed, you won't be able to go back and edit previous answers."),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text("Cancel"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text("Confirm"),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm != true) return;
-
-              final userData = Provider.of<UserData>(context, listen: false);
-
-              // ✅ Finalize all pending symptoms
-              for (final sym in userData.pendingSymptoms.toList()) {
-                userData.finalizeSymptom(sym);
-              }
-
-              // ✅ Send to backend after finalizing
-              await userData.fetchDiagnosis();
-            }
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => destination),
-            );
-          },
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.pressed)) {
-                return const Color.fromRGBO(82, 170, 164, 1);
-              }
-              return shouldFinalizeAndSend 
-                ? const Color.fromRGBO(82, 170, 164, 0.1)
-                : Colors.white.withOpacity(0.9);
-            }),
-            foregroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.pressed)) {
-                return Colors.white;
-              }
-              return const Color.fromRGBO(29, 29, 44, 1.0);
-            }),
-            shadowColor: MaterialStateProperty.all(Colors.transparent),
-            side: MaterialStateProperty.all(
-              BorderSide(
-                color: shouldFinalizeAndSend
-                  ? const Color.fromRGBO(82, 170, 164, 1)
-                  : const Color.fromRGBO(82, 170, 164, 0.8),
-                width: 2.0
-              ),
-            ),
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            elevation: MaterialStateProperty.all(0),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (iconData != null) ...[
-                Icon(iconData, size: 22),
-                const SizedBox(width: 10),
-              ],
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 18.0, 
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

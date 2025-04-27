@@ -37,6 +37,9 @@ class UserData with ChangeNotifier {
   List<List<String>> _impactChoices = [];
   List<String> _questionSymptoms = [];
   Map<String, List<Map<String, dynamic>>> _symptomDetails = {};
+  final Set<String> _autoAdded = {};
+
+
 
   // Getters
   String get userName => _userName;
@@ -112,13 +115,32 @@ class UserData with ChangeNotifier {
     notifyListeners();
   }
 
-  void addPendingSymptom(String symptom) {
-    final normalized = symptom.trim().toLowerCase();
-    if (!_pendingSymptoms.contains(normalized)) {
-      _pendingSymptoms.add(normalized);
-      notifyListeners();
-    }
+  void addPendingSymptom(String symptom, {String source = 'manual'}) {
+  final normalized = symptom.trim().toLowerCase();
+  if (!_pendingSymptoms.contains(normalized)) {
+    _pendingSymptoms.add(normalized);
+    if (source == 'auto') _autoAdded.add(normalized);
+    notifyListeners();
   }
+}
+
+bool isAutoAdded(String symptom) {
+  return _autoAdded.contains(symptom.trim().toLowerCase());
+}
+
+
+void removePendingSymptom(String symptom) {
+  final normalized = symptom.trim().toLowerCase();
+  _pendingSymptoms.remove(normalized);
+  _symptomDurations.remove(normalized);
+  _autoAdded.remove(normalized);
+  notifyListeners();
+}
+
+
+
+
+
   void finalizeSymptom(String symptom) {
     final normalized = symptom.trim().toLowerCase();
     _pendingSymptoms.remove(normalized);
@@ -127,12 +149,8 @@ class UserData with ChangeNotifier {
     }
     notifyListeners();
   }
-  void removePendingSymptom(String symptom) {
-    final normalized = symptom.trim().toLowerCase();
-    _pendingSymptoms.remove(normalized);
-    _symptomDurations.remove(normalized);
-    notifyListeners();
-  }
+ 
+
   void addNewSymptom(String symptom) {
     final normalized = symptom.trim().toLowerCase();
     if (!_newSymptoms.contains(normalized)) {
@@ -193,44 +211,55 @@ class UserData with ChangeNotifier {
   }
 
   void updateQuestions() {
-    final key = _selectedSymptom.toLowerCase();
-    final petType = selectedPetType;
-    final Map<String,dynamic> petSymptoms = {
-      ...symptomQuestions,
-      if(petType =='Dog') ...symptomQuestionsDog,
-      if(petType =='Cat') ...symptomQuestionsCat,
-    };
+  final key = _selectedSymptom.toLowerCase();
+  final petType = selectedPetType;
+  final Map<String, dynamic> petSymptoms = {
+    ...symptomQuestions,
+    if (petType == 'Dog') ...symptomQuestionsDog,
+    if (petType == 'Cat') ...symptomQuestionsCat,
+  };
 
-    if (key.isNotEmpty && petSymptoms.containsKey(key)) {
-      final newQuestions = List<String>.from(petSymptoms[key]["questions"]);
-      _questions.clear();
-      _impactChoices.clear();
-      _questionSymptoms.clear();
-      _questions.addAll(newQuestions);
-      _questionSymptoms.addAll(List.filled(newQuestions.length, key));
-      List<String> impactDaysChoices = [];
-      List<String> impactSymptomChoices = [];
-      if (petSymptoms[key].containsKey("impactDays")) {
-       var v = petSymptoms[key]["impactDays"];
-        impactDaysChoices = v is List
+  if (key.isNotEmpty && petSymptoms.containsKey(key)) {
+    final symptomData = petSymptoms[key];
+
+    final List<String> newQuestions = symptomData["questions"] != null
+        ? List<String>.from(symptomData["questions"])
+        : [];
+
+    _questions.clear();
+    _impactChoices.clear();
+    _questionSymptoms.clear();
+    _questions.addAll(newQuestions);
+    _questionSymptoms.addAll(List.filled(newQuestions.length, key));
+
+    List<String> impactDaysChoices = [];
+    List<String> impactSymptomChoices = [];
+
+    if (symptomData.containsKey("impactDays") && symptomData["impactDays"] != null) {
+      var v = symptomData["impactDays"];
+      impactDaysChoices = v is List
           ? List<String>.from(v)
           : List<String>.from((v as Map).keys);
-      }
-      if (petSymptoms[key].containsKey("impactSymptom")) {
-        var v = petSymptoms[key]["impactSymptom"];
-        impactSymptomChoices = v is List
-          ? List<String>.from(v)
-          : List<String>.from((v as Map).keys);
-      }
-      for (int i = 0; i < newQuestions.length; i++) {
-        _impactChoices.add(i == 0 ? impactDaysChoices : impactSymptomChoices);
-      }
-      notifyListeners();
     }
+
+    if (symptomData.containsKey("impactSymptom") && symptomData["impactSymptom"] != null) {
+      var v = symptomData["impactSymptom"];
+      impactSymptomChoices = v is List
+          ? List<String>.from(v)
+          : List<String>.from((v as Map).keys);
+    }
+
+    for (int i = 0; i < newQuestions.length; i++) {
+      _impactChoices.add(i == 0 ? impactDaysChoices : impactSymptomChoices);
+    }
+
+    notifyListeners();
   }
+}
 
   Future<void> fetchDiagnosis() async {
   final Uri url = Uri.parse(AppConfig.diagnoseURL);
+  print("🔵 Calling diagnosis URL: $url");
   final uniqueSymptoms = _finalizedSymptoms.toSet().toList();
   final requestData = {
     "owner": _userName,
@@ -239,22 +268,25 @@ class UserData with ChangeNotifier {
       "age":  _petAge.toString(),
       "breed": _breed,
       "size":  _petSize,
+      "pet_type": _selectedPetType.toLowerCase(), 
     },
     "user_answers": _symptomDurations,
+    
   };
 
   try {
     final response = await http.post(url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(requestData),
-    ).timeout(const Duration(minutes: 2));
+    ).timeout(const Duration(minutes: 5));
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      // ← use top_diagnoses now, not diagnoses
       final illnesses = List<Map<String, dynamic>>.from(
-        (jsonResponse["top_diagnoses"] as List)
-      );
+      (jsonResponse["possible_diagnosis"] as List)
+    );
+    setDiagnosisResults(illnesses);
+
       setDiagnosisResults(illnesses);
     } else {
       print("❌ API Error: ${response.statusCode}");

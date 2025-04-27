@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:petsymp/Connection/dynamicconnections.dart';
 
 class MetricsScreen extends StatefulWidget {
+  final String petType;
   final String illnessName;
   const MetricsScreen({
     super.key,
+    required this.petType,
     required this.illnessName,
   });
 
@@ -45,7 +47,10 @@ class MetricsScreenState extends State<MetricsScreen> {
   Future<void> _fetchMetricsWithCM() async {
     try {
       final url = Uri.parse(
-        AppConfig.getMetricsWithCmURL(widget.illnessName)
+        AppConfig.getMetricsWithCmURL(
+        widget.petType,
+        widget.illnessName,
+      ),
       );
       final resp = await http.get(url);
       

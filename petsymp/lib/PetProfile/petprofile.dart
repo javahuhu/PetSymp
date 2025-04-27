@@ -17,22 +17,20 @@ enum ShapeType {
   heart,
   rectangle,
   diamond,
-
 }
-
 
 class ShapeWidget extends StatelessWidget {
   final ShapeType type;
   final Color color;
   final double size;
-  
+
   const ShapeWidget({
     Key? key,
     required this.type,
     required this.color,
     required this.size,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -45,22 +43,21 @@ class ShapeWidget extends StatelessWidget {
   }
 }
 
-
 class ShapePainter extends CustomPainter {
   final ShapeType type;
   final Color color;
-  
+
   ShapePainter({
     required this.type,
     required this.color,
   });
-  
+
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = color.withOpacity(0.4)
+      ..color = color.withValues(alpha: 0.4)
       ..style = PaintingStyle.fill;
-    
+
     switch (type) {
       case ShapeType.circle:
         canvas.drawCircle(
@@ -69,14 +66,14 @@ class ShapePainter extends CustomPainter {
           paint,
         );
         break;
-      
+
       case ShapeType.square:
         canvas.drawRect(
           Rect.fromLTWH(0, 0, size.width, size.height),
           paint,
         );
         break;
-      
+
       case ShapeType.triangle:
         final Path path = Path();
         path.moveTo(size.width / 2, 0);
@@ -85,12 +82,12 @@ class ShapePainter extends CustomPainter {
         path.close();
         canvas.drawPath(path, paint);
         break;
-      
+
       case ShapeType.star:
         final Path path = _drawStar(size);
         canvas.drawPath(path, paint);
         break;
-      
+
       case ShapeType.heart:
         final Path path = _drawHeart(size);
         canvas.drawPath(path, paint);
@@ -105,8 +102,6 @@ class ShapePainter extends CustomPainter {
         final Path path = _drawRegularPolygon(size, 4);
         canvas.drawPath(path, paint);
         break;
-    
-
     }
   }
 
@@ -116,12 +111,12 @@ class ShapePainter extends CustomPainter {
     final double centerY = size.height / 2;
     final double radius = size.width / 2;
     final double innerRadius = radius * 0.4;
-    
+
     const int numPoints = 5;
-    final double angle = (2 * pi) / (2 * numPoints);
-    
+    const double angle = (2 * pi) / (2 * numPoints);
+
     path.moveTo(centerX + radius * cos(0), centerY + radius * sin(0));
-    
+
     for (int i = 1; i < 2 * numPoints; i++) {
       final double r = i.isOdd ? innerRadius : radius;
       final double currAngle = i * angle;
@@ -130,77 +125,77 @@ class ShapePainter extends CustomPainter {
         centerY + r * sin(currAngle),
       );
     }
-    
+
     path.close();
     return path;
   }
 
-  
-Path _drawDiamond(Size size) {
-  final Path path = Path();
-  final double width = size.width;
-  final double height = size.height;
-  
-  // Draw a diamond (rotated square)
-  path.moveTo(width / 2, 0); // Top point
-  path.lineTo(width, height / 2); // Right point
-  path.lineTo(width / 2, height); // Bottom point
-  path.lineTo(0, height / 2); // Left point
-  path.close();
-  
-  return path;
-}
+  Path _drawDiamond(Size size) {
+    final Path path = Path();
+    final double width = size.width;
+    final double height = size.height;
 
-Path _drawRegularPolygon(Size size, int sides) {
-  final Path path = Path();
-  final double centerX = size.width / 2;
-  final double centerY = size.height / 2;
-  final double radius = size.width / 2;
-  
-  // Calculate the angle between each point
-  final double angle = (2 * pi) / sides;
-  
-  // Start at the top point (0 degrees)
-  path.moveTo(
-    centerX + radius * cos(-pi / 2),
-    centerY + radius * sin(-pi / 2),
-  );
-  
-  // Draw lines to each point
-  for (int i = 1; i < sides; i++) {
-    final double currAngle = (-pi / 2) + (i * angle);
-    path.lineTo(
-      centerX + radius * cos(currAngle),
-      centerY + radius * sin(currAngle),
-    );
+    // Draw a diamond (rotated square)
+    path.moveTo(width / 2, 0); // Top point
+    path.lineTo(width, height / 2); // Right point
+    path.lineTo(width / 2, height); // Bottom point
+    path.lineTo(0, height / 2); // Left point
+    path.close();
+
+    return path;
   }
-  
-  path.close();
-  return path;
-}
 
+  Path _drawRegularPolygon(Size size, int sides) {
+    final Path path = Path();
+    final double centerX = size.width / 2;
+    final double centerY = size.height / 2;
+    final double radius = size.width / 2;
 
+    // Calculate the angle between each point
+    final double angle = (2 * pi) / sides;
+
+    // Start at the top point (0 degrees)
+    path.moveTo(
+      centerX + radius * cos(-pi / 2),
+      centerY + radius * sin(-pi / 2),
+    );
+
+    // Draw lines to each point
+    for (int i = 1; i < sides; i++) {
+      final double currAngle = (-pi / 2) + (i * angle);
+      path.lineTo(
+        centerX + radius * cos(currAngle),
+        centerY + radius * sin(currAngle),
+      );
+    }
+
+    path.close();
+    return path;
+  }
 
   Path _drawHeart(Size size) {
     final Path path = Path();
     final double width = size.width;
     final double height = size.height;
-    
+
     path.moveTo(0.5 * width, height * 0.25);
     path.cubicTo(
-      0.2 * width, 0.1 * height,
-      0, 0.4 * height,
-      0.5 * width, height,
+      0.2 * width,
+      0.1 * height,
+      0,
+      0.4 * height,
+      0.5 * width,
+      height,
     );
     path.cubicTo(
-      width, 0.4 * height,
-      0.8 * width, 0.1 * height,
-      0.5 * width, height * 0.25,
+      width,
+      0.4 * height,
+      0.8 * width,
+      0.1 * height,
+      0.5 * width,
+      height * 0.25,
     );
 
-
-    
-    
     return path;
   }
 
@@ -210,11 +205,10 @@ Path _drawRegularPolygon(Size size, int sides) {
   }
 }
 
-
 class AnimatedShapesBackground extends StatefulWidget {
   final Color baseColor;
   final ShapeType shapeType;
-  
+
   const AnimatedShapesBackground({
     Key? key,
     required this.baseColor,
@@ -222,13 +216,15 @@ class AnimatedShapesBackground extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AnimatedShapesBackgroundState createState() => _AnimatedShapesBackgroundState();
+  _AnimatedShapesBackgroundState createState() =>
+      _AnimatedShapesBackgroundState();
 }
 
-class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground> with TickerProviderStateMixin {
+class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground>
+    with TickerProviderStateMixin {
   late List<AnimatedShape> _shapes;
   final Random _random = Random();
-  
+
   @override
   void initState() {
     super.initState();
@@ -245,29 +241,30 @@ class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground> wit
     // Random position
     final double left = _random.nextDouble() * 250;
     final double top = _random.nextDouble() * 150;
-    
+
     // Random size between 15 and 30
     final double size = 15 + _random.nextDouble() * 15;
-    
+
     // Animation duration between 5 and 10 seconds
     final int duration = 5000 + _random.nextInt(5000);
-    
+
     // Random color variation based on the base color
     final HSLColor hslColor = HSLColor.fromColor(widget.baseColor);
     final double hue = (hslColor.hue + _random.nextDouble() * 30 - 15) % 360;
     final double saturation = 0.5 + _random.nextDouble() * 0.3;
     final double lightness = 0.7 + _random.nextDouble() * 0.2;
-    final Color color = HSLColor.fromAHSL(0.6, hue, saturation, lightness).toColor();
-    
+    final Color color =
+        HSLColor.fromAHSL(0.6, hue, saturation, lightness).toColor();
+
     // Create an AnimationController for this shape
     final AnimationController controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: duration),
     );
-    
+
     // Make the animation loop
     controller.repeat(reverse: true);
-    
+
     return AnimatedShape(
       left: left,
       top: top,
@@ -296,7 +293,7 @@ class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground> wit
           builder: (context, child) {
             // Move the shape in a floating pattern
             final double offset = sin(shape.controller.value * pi * 2) * 10;
-            
+
             return Positioned(
               left: shape.left + offset,
               top: shape.top + (cos(shape.controller.value * pi * 2) * 10),
@@ -321,7 +318,7 @@ class AnimatedShape {
   final Color color;
   final AnimationController controller;
   final ShapeType shapeType;
-  
+
   AnimatedShape({
     required this.left,
     required this.top,
@@ -342,525 +339,517 @@ class PetProfileScreen extends StatefulWidget {
 class _PetProfileScreenState extends State<PetProfileScreen> {
   late final ScrollController _scrollController;
   final Random _random = Random();
-  
-  
+
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    
   }
 
-   @override
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-  
-  
+
   Color generatePastelColor() {
-  // Generate a darker pastel color
-  final int red = 65 + _random.nextInt(75);   
-  final int green = 65 + _random.nextInt(75); 
-  final int blue = 65 + _random.nextInt(75);  
+    // Generate a darker pastel color
+    final int red = 65 + _random.nextInt(75);
+    final int green = 65 + _random.nextInt(75);
+    final int blue = 65 + _random.nextInt(75);
 
-  return Color.fromRGBO(red, green, blue, 1.0);
-}
-
+    return Color.fromRGBO(red, green, blue, 1.0);
+  }
 
   ShapeType getRandomShapeType() {
-    final types = ShapeType.values;
+    const types = ShapeType.values;
     return types[_random.nextInt(types.length)];
   }
-  
-  
+
   Future<List<Map<String, dynamic>>> fetchPetHistory() async {
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       throw Exception("User is not signed in.");
     }
-    
-    
+
     final historyCol = FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
         .collection('History');
-    
+
     // Get the documents ordered by date
-    final snapshot = await historyCol
-        .orderBy('date', descending: true)
-        .get();
-    
-    
-    return snapshot.docs
-        .map((doc) {
-          
-          final data = doc.data();
-          return {
-            ...data,
-            'id': doc.id, 
-          };
-        })
-        .toList();
+    final snapshot = await historyCol.orderBy('date', descending: true).get();
+
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return {
+        ...data,
+        'id': doc.id,
+      };
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-      body: 
-      FutureBuilder<List<Map<String, dynamic>>>(
-        future: fetchPetHistory(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: const Color(0xFF52AAA4),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Colors.red[300],
-                    size: 60.sp,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    "Error: ${snapshot.error}",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {}); // Retry fetching data.
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF52AAA4),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 24.w, vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      "Retry",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.pets,
-                    color: Colors.grey[400],
-                    size: 80.sp,
-                  ),
-                  SizedBox(height: 24.h),
-                  Text(
-                    "No pet profiles found",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    "Add a pet to get started",
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                  SizedBox(height: 32.h),
-                 
-                ],
-              ),
-            );
-          } else {
-
-            final petHistory = snapshot.data!;
-            final DateTime now       = DateTime.now();
-            final String todayDate   = DateFormat('d').format(now);
-            final String todayWeekday  = DateFormat('E').format(now);  
-            final int todayIndex     = now.weekday - 1;
-            return 
-            
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                 Row(
-                crossAxisAlignment: CrossAxisAlignment.start, 
-                children: [
-                SizedBox(width: 50.w),
-
-                
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                    padding: EdgeInsets.only(top: 110.h,),
-                    child: Text(
-                      "Pets Profile",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  
-                  
-                  ],
-                ),
-
-              
-              Padding(padding: EdgeInsets.only( top: 40.h, left: 5.w),
-              child: Container(
-                width: 200.w,
-                height: 150.h,
-                
+      body: Stack(
+        children: [
+          Positioned(
+            top: 15.h,
+            left: 0.w,
+            right: 80.w,
+            child: SizedBox(
+                width: 2.sw,
+                height: 500.h,
                 child: Lottie.asset(
-                  'assets/dogsitanimation.json',
-                  fit: BoxFit.contain,  
-                  repeat: true,
+                  'assets/dotanimation.json',
+                  fit: BoxFit.contain,
+                  repeat: true, 
+                  reverse: false,
                   animate: true,
-                ),
-              )),
-
-              ],
-            ),
-
-
-
-                Expanded(
-                  child: Stack(
+                )),
+          ),
+          FutureBuilder<List<Map<String, dynamic>>>(
+            future: fetchPetHistory(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF52AAA4),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                     
-                      Positioned(
-                        bottom: 0.h,
-                        left: 0.w,
-                        right: 0.w,
-                        child: Container(
-                          height: 0.665.sh,
-                          decoration: const BoxDecoration(
-                            color: Color.fromRGBO(225, 240, 243, 0.884),
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(50)),
-                            border: Border(
-                              top: BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1),
-                                width: 15,
-                              ),
-                            ),
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red[300],
+                        size: 60.sp,
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        "Error: ${snapshot.error}",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24.h),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {}); // Retry fetching data.
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF52AAA4),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24.w, vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: Stack(  
-                            children: [
-                              Padding(padding: EdgeInsets.only(top: 15.h, left: 15.w),
-                              child: Container(
-                                width: 0.187.sw,
-                                height: 0.086.sh,
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(82, 170, 164, 1),
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  border: Border.all(
-                                  color: const Color.fromRGBO(29, 29, 44, 1.0),
-                                  width: 1.w,
-                                  ),
-                                ),
-
-                                child:  Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                  padding: EdgeInsets.only(top: 5.h),
-                                  child: Text(
-                                    petHistory.length.toString(),
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 231, 231, 231),
-                                      fontSize: 25.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                
-                                  Text(
-                                    'Pets',
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 231, 231, 231),
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                                
-                              )),
-
-
-
-
-                               Padding(padding: EdgeInsets.only(top: 15.h, left: 100.w),
-                               
-                              child: Container(
-                                width: 0.187.sw,
-                                height: 0.086.sh,
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(82, 170, 164, 1),
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  border: Border.all(
-                                    color: const Color.fromRGBO(29, 29, 44, 1.0),
-                                    width: 1.w,
-                                  ),
-                                ),
-
-                                child:  Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                  padding: EdgeInsets.only(top: 5.h),
-                                  child: Text(
-                                    todayDate,
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 231, 231, 231),
-                                      fontSize: 25.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                
-                                  Text(
-                                    todayWeekday,
-                                    style: TextStyle(
-                                      color: const Color.fromARGB(255, 231, 231, 231),
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                                
-                              )),
-
-                              
-                              
-                              Padding(
-                                padding: EdgeInsets.only(top: 95.h),
-                                child: ListView.builder(
-                                  controller: _scrollController,
-                                  primary: false,
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.zero,
-                                  itemCount: petHistory.length,
-                                  itemBuilder: (context, index) {
-                                    final petData = petHistory[index];
-                                    return _buildPetCard(context, petData);
-                                  },
-                                ),
-                              ),
-
-                              
-                              Positioned(
-                                top: 100.h,   
-                                bottom: 0,   
-                                left: MediaQuery.of(context).size.width
-                                      - (80.w + 20.w ),
-                                child: Container(
-                                  width: 2.w,
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 63, 62, 62),
-                                    borderRadius: BorderRadius.circular(50.r),
-                                  ),
-                                  
-                                ),
-
-                              ),
-
-                            
-                            ],
+                        ),
+                        child: Text(
+                          "Retry",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.pets,
+                        color: Colors.grey[400],
+                        size: 80.sp,
+                      ),
+                      SizedBox(height: 24.h),
+                      Text(
+                        "No pet profiles found",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        "Add a pet to get started",
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                      SizedBox(height: 32.h),
+                    ],
+                  ),
+                );
+              } else {
+                final petHistory = snapshot.data!;
+                final DateTime now = DateTime.now();
+                final String todayDate = DateFormat('d').format(now);
+                final String todayWeekday = DateFormat('E').format(now);
+                final int todayIndex = now.weekday - 1;
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 50.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: 110.h,
+                                ),
+                                child: Text(
+                                  "Pets Profile",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Expanded( child: 
+                          Padding(
+                              padding: EdgeInsets.only(top: 0.h, left: 5.w),
+                              child: SizedBox(
+                                width: 200.w,
+                                height: 200.h,
+                                child: Lottie.asset(
+                                  'assets/dogsitanimation.json',
+                                  fit: BoxFit.contain,
+                                  repeat: true,
+                                  animate: true,
+                                ),
+                              ))),
+                        ],
+                      ),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              bottom: 0.h,
+                              left: 10.w,
+                              right: 0.w,
+                              child: Container(
+                                height: 0.65.sh,
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 225, 240, 243),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(50)),
+                                  border: Border(
+                                    top: BorderSide(
+                                      color:
+                                          const Color.fromRGBO(82, 170, 164, 1),
+                                      width: 10.w,
+                                    ),
 
-
-                ],
-              ),
-            );
-          }
-        },
+                                    left: BorderSide(
+                                      color:
+                                          const Color.fromRGBO(82, 170, 164, 1),
+                                      width: 10.w,
+                                    ),
+                                  ),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 15.h, left: 15.w),
+                                        child: Container(
+                                          width: 0.187.sw,
+                                          height: 0.086.sh,
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                                82, 170, 164, 1),
+                                            borderRadius:
+                                                BorderRadius.circular(100.r),
+                                            
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 9.5.h),
+                                                child: Text(
+                                                  petHistory.length.toString(),
+                                                  style: TextStyle(
+                                                    color: const Color.fromARGB(
+                                                        255, 231, 231, 231),
+                                                    fontSize: 20.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                'Pets',
+                                                style: TextStyle(
+                                                  color: const Color.fromARGB(
+                                                      255, 231, 231, 231),
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                    Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 15.h, left: 100.w),
+                                        child: Container(
+                                          width: 0.187.sw,
+                                          height: 0.086.sh,
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                                82, 170, 164, 1),
+                                            borderRadius:
+                                                BorderRadius.circular(100.r),
+                                            
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 9.5.h),
+                                                child: Text(
+                                                  todayDate,
+                                                  style: TextStyle(
+                                                    color: const Color.fromARGB(
+                                                        255, 231, 231, 231),
+                                                    fontSize: 20.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                todayWeekday,
+                                                style: TextStyle(
+                                                  color: const Color.fromARGB(
+                                                      255, 231, 231, 231),
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 95.h),
+                                      child: ListView.builder(
+                                        controller: _scrollController,
+                                        primary: false,
+                                        physics: const BouncingScrollPhysics(),
+                                        padding: EdgeInsets.zero,
+                                        itemCount: petHistory.length,
+                                        itemBuilder: (context, index) {
+                                          final petData = petHistory[index];
+                                          return _buildPetCard(
+                                              context, petData);
+                                        },
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 100.h,
+                                      bottom: 0,
+                                      left: MediaQuery.of(context).size.width -
+                                          (99.w + 10.w),
+                                      child: Container(
+                                        width: 2.w,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(
+                                              255, 63, 62, 62),
+                                          borderRadius:
+                                              BorderRadius.circular(50.r),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 
-  
   Widget _buildPetCard(BuildContext context, Map<String, dynamic> petData) {
-  final String petType = petData['petType'] ?? 'Unknown';
-  final String petName   = petData['petName']   ?? 'Unknown';
-  final List details     = petData['petDetails'] is List ? petData['petDetails'] : [];
-  final String age       = details.length > 2 ? '${details[2]['value']} yrs' : '–';
-  final String breed     = details.length > 4 ? details[4]['value'] : 'Unknown';
-  final String imageUrl  = petData['petImage']  ?? 'assets/sampleimage.jpg';
-  final Timestamp? ts = petData['date'] as Timestamp?;
-                                final String dateStr = ts != null
-                                  ? DateFormat('MMM d, yyyy').format(ts.toDate())
-                                  : '';
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 23.h),
-    child: GestureDetector(
-      onTap: () => _showPetDetails(context, petData),
-      child: Container(
-        child: Row(
-          children: [
-          SizedBox(
-          width: 24.w,          
-          child: RotatedBox(
-            quarterTurns: 3,     
-            child: Text(
-              petType,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-            SizedBox(width: 12.w),
-            
-            Container(
-            height: 70.h,
-            width: 215.w,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 235, 233, 233),
-              
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(50.r),
-                bottomLeft: Radius.circular(50.r),
-                topRight: Radius.circular(10.r),
-                bottomRight: Radius.circular(10.r),
-              ),
-                boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.25),  
-                  offset: const Offset(-5, 10),                   
-                  blurRadius: 10,                          
-                  spreadRadius: 1,                        
-                ),
-              ],
-            ),
-            child: 
-              Padding(padding: EdgeInsets.only(left: 12.w),
-              child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container( 
-                  decoration: BoxDecoration(  
-                    borderRadius: BorderRadius.circular(50.r), 
-                    border: Border.all(
-                    color: const Color.fromRGBO(82, 170, 164, 1),  // border color
-                    width: 3.w,           // border thickness
-                  ),),
-                            child: ClipOval(
-                  child: imageUrl.startsWith('http')
-                      ? Image.network(
-                          imageUrl,
-                          width: 48.w,
-                          height: 48.w,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          imageUrl,
-                          width: 48.w,
-                          height: 48.w,
-                          fit: BoxFit.cover,
-                        ),
-                )),
-
-                SizedBox(width: 12.w),
-
-                Padding(padding: EdgeInsets.only(top: 10.w),
-              child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      petName,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromARGB(255, 0, 0, 0),   // white on dark grey
-                      ),
+    final String petType = petData['petType'] ?? 'Unknown';
+    final String petName = petData['petName'] ?? 'Unknown';
+    final List details =
+        petData['petDetails'] is List ? petData['petDetails'] : [];
+    final String age = details.length > 2 ? '${details[2]['value']} yrs' : '–';
+    final String breed = details.length > 4 ? details[4]['value'] : 'Unknown';
+    final String imageUrl = petData['petImage'] ?? 'assets/sampleimage.jpg';
+    final Timestamp? ts = petData['date'] as Timestamp?;
+    final String dateStr =
+        ts != null ? DateFormat('MMM d, yyyy').format(ts.toDate()) : '';
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 23.h),
+      child: GestureDetector(
+        onTap: () => _showPetDetails(context, petData),
+        child: Container(
+          child: Row(
+            children: [
+              SizedBox(
+                width: 24.w,
+                child: RotatedBox(
+                  quarterTurns: 3,
+                  child: Text(
+                    petType,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      '$age • $breed',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: const Color.fromARGB(179, 0, 0, 0),
-                            ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
 
-                              maxLines: 1,                   
-                              overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      )),
-                    
+              Container(
+                  height: 70.h,
+                  width: 215.w,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 235, 233, 233),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50.r),
+                      bottomLeft: Radius.circular(50.r),
+                      topRight: Radius.circular(10.r),
+                      bottomRight: Radius.circular(10.r),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        offset: const Offset(-5, 10),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
                     ],
                   ),
-                )),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 12.w),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50.r),
+                              border: Border.all(
+                                color: const Color.fromRGBO(
+                                    82, 170, 164, 1), // border color
+                                width: 3.w, // border thickness
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: imageUrl.startsWith('http')
+                                  ? Image.network(
+                                      imageUrl,
+                                      width: 48.w,
+                                      height: 48.w,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.asset(
+                                      imageUrl,
+                                      width: 48.w,
+                                      height: 48.w,
+                                      fit: BoxFit.cover,
+                                    ),
+                            )),
+                        SizedBox(width: 12.w),
+                        Padding(
+                            padding: EdgeInsets.only(top: 10.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  petName,
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color.fromARGB(
+                                        255, 0, 0, 0), // white on dark grey
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
 
-                
-                            
+                                SizedBox(
+                                width: 125.w,
+                                child:
+                                Text(
+                                  '$age • $breed',
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: const Color.fromARGB(179, 0, 0, 0),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                              ],
+                            )),
+                      ],
+                    ),
+                  )),
 
-            //       SizedBox(width: 0.w),
+              //       SizedBox(width: 0.w),
 
-            // // 3) The horizontal connector rail
-            // Container(
-            //     height: 2.w,         
-            //     width: 20.w,         // thickness of the rail
-            //     color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
-            //   ),
-            
+              // // 3) The horizontal connector rail
+              // Container(
+              //     height: 2.w,
+              //     width: 20.w,         // thickness of the rail
+              //     color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
+              //   ),
 
-            SizedBox(width: 35.w),
 
-            // 4) Date
-            Text(
-              dateStr,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: const Color.fromARGB(255, 63, 62, 62),
-              )),
-          ],
+              // 4) Date
+    
+    const Spacer(),
+    Padding(
+      padding: EdgeInsets.only(right: 7.w), 
+      child: Text(
+        dateStr,
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: const Color.fromARGB(255, 63, 62, 62),
+        ),
+      )),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   /// Add this method to create/update pets with a random color and shape type
   Future<void> createNewPet(Map<String, dynamic> petData) async {
@@ -872,46 +861,44 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 
       // Generate a random color for this pet
       final Color cardColor = generatePastelColor();
-      
+
       // Generate a random shape type
       final ShapeType shapeType = getRandomShapeType();
-      
+
       // Add the color and shape type to the pet data
-      petData['cardColor'] = cardColor.value;
+      petData['cardColor'] = cardColor.r;
       petData['shapeType'] = shapeType.index; // Store the enum index
-      
+
       // Add the pet to Firestore
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(userId)
           .collection('History')
           .add(petData);
-      
     } catch (e) {
       print("Error creating new pet: $e");
       rethrow;
     }
   }
 
-
   Future<void> updateExistingPetsWithAnimationProperties() async {
     try {
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) return;
-      
+
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('Users')
           .doc(userId)
           .collection('History')
           .get();
-      
+
       for (final doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Only update if the pet doesn't already have animation properties
         if (!data.containsKey('cardColor') || !data.containsKey('shapeType')) {
           await doc.reference.update({
-            'cardColor': generatePastelColor().value,
+            'cardColor': generatePastelColor().r,
             'shapeType': getRandomShapeType().index,
           });
         }
@@ -922,55 +909,66 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   }
 
   void _showPetDetails(BuildContext context, Map<String, dynamic> petData) {
-    final List<dynamic> assessments = petData['assessments'] is List ? petData['assessments'] : [];
+    final List<dynamic> assessments =
+        petData['assessments'] is List ? petData['assessments'] : [];
     final dynamic timestamp = petData['date'];
     final String defaultDateStr = (timestamp != null && timestamp is Timestamp)
         ? "${timestamp.toDate().day} ${_getMonthAbbr(timestamp.toDate().month)} ${timestamp.toDate().year}"
         : "N/A";
-    final List<dynamic> details = petData['petDetails'] is List ? petData['petDetails'] : [];
-    final String age = details.length > 2 ? (details[2]['value']?.toString() ?? "Unknown") : "Unknown";
-    final String size = details.length > 3 ? (details[3]['value']?.toString() ?? "Unknown") : "Unknown";
-    final String breed = details.length > 4 ? (details[4]['value']?.toString() ?? "Unknown") : "Unknown";
+    final List<dynamic> details =
+        petData['petDetails'] is List ? petData['petDetails'] : [];
+    final String age = details.length > 2
+        ? (details[2]['value']?.toString() ?? "Unknown")
+        : "Unknown";
+    final String size = details.length > 3
+        ? (details[3]['value']?.toString() ?? "Unknown")
+        : "Unknown";
+    final String breed = details.length > 4
+        ? (details[4]['value']?.toString() ?? "Unknown")
+        : "Unknown";
 
     List<Widget> healthRecords = [];
     if (assessments.isNotEmpty) {
       for (var assessment in assessments) {
-        String assessmentId = assessment['assessmentId'] ?? 
-                        assessment['date']?.toString() ?? 
-                        DateTime.now().millisecondsSinceEpoch.toString();
-                        
+        String assessmentId = assessment['assessmentId'] ??
+            assessment['date']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString();
+
         // Use the symptom input stored in this assessment
         final String inputSymptoms = assessment['allSymptoms'] ?? "";
-        
+
         // Get the diagnosis results from the assessment
         final List<dynamic> diag = assessment['diagnosisResults'] ?? [];
         String finalIllness = "No Result";
         Timestamp? assessTimestamp;
-        
+
         if (diag.isNotEmpty) {
           List<dynamic> sortedDiag = List.from(diag);
-          sortedDiag.sort((a, b) => (b['confidence_ab'] as num)
-              .compareTo(a['confidence_ab'] as num));
+          sortedDiag.sort((a, b) =>
+              (b['confidence_ab'] as num).compareTo(a['confidence_ab'] as num));
           finalIllness = sortedDiag.first['illness'] ?? "No Result";
           assessTimestamp = sortedDiag.first['date'] is Timestamp
               ? sortedDiag.first['date'] as Timestamp
               : null;
         }
-        
+
         final String assessDate = assessTimestamp != null
             ? "${assessTimestamp.toDate().day} ${_getMonthAbbr(assessTimestamp.toDate().month)} ${assessTimestamp.toDate().year}"
             : defaultDateStr;
 
         // Create a deep copy of the petDetails list
-        List<dynamic> updatedPetDetails = (petData['petDetails'] as List<dynamic>?)
-            ?.map((e) => Map<String, dynamic>.from(e))
-            .toList() ?? [];
-            
+        List<dynamic> updatedPetDetails =
+            (petData['petDetails'] as List<dynamic>?)
+                    ?.map((e) => Map<String, dynamic>.from(e))
+                    .toList() ??
+                [];
+
         // Update or add the Symptoms detail for this assessment
         if (updatedPetDetails.length >= 6) {
           updatedPetDetails[5]['value'] = inputSymptoms;
         } else {
-          updatedPetDetails.add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
+          updatedPetDetails
+              .add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
         }
 
         // Merge the pet's basic data with the assessment-specific fields
@@ -1000,7 +998,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ViewhistoryScreen(historyData: mergedData),
+                  builder: (context) =>
+                      ViewhistoryScreen(historyData: mergedData),
                 ),
               );
             },
@@ -1019,21 +1018,22 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       );
     }
 
-    
-    final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey = GlobalKey<ImageDraggableBottomSheetState>();
+    final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey =
+        GlobalKey<ImageDraggableBottomSheetState>();
 
-    
     final Size screenSize = MediaQuery.of(context).size;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-      enableDrag: false, // Disable default dragging to use our custom implementation
+      enableDrag:
+          false, // Disable default dragging to use our custom implementation
       isDismissible: true,
       builder: (context) {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
-          initialHeight: screenSize.height * 0.85, // Start at 85% of screen height
+          initialHeight:
+              screenSize.height * 0.85, // Start at 85% of screen height
           minHeight: screenSize.height * 0.5, // Minimum height (40%)
           maxHeight: screenSize.height * 0.95, // Maximum height (95%)
           petData: petData,
@@ -1044,7 +1044,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
             boxShadow: [
               BoxShadow(
-                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
+                color:
+                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
                 blurRadius: 10,
                 spreadRadius: 1,
               ),
@@ -1088,8 +1089,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         label: "Breed",
                         value: breed,
                       ),
-
-                      ),
+                    ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: _buildDetailCard(
@@ -1150,19 +1150,29 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         );
       },
       // Set barrier color and other modal properties
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
     );
   }
 
   /// Helper method to get month abbreviation.
   String _getMonthAbbr(int month) {
     const List<String> months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return months[month - 1];
   }
-  
+
   /// Builds a detail card for a pet detail.
   Widget _buildDetailCard({
     required IconData icon,
@@ -1173,7 +1183,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 0.w),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.1),
+        color: Colors.amber.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -1186,7 +1196,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             size: 24.sp,
           ),
           SizedBox(height: 8.h),
-          
           Text(
             label,
             style: TextStyle(
@@ -1195,24 +1204,23 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ),
           ),
           SizedBox(height: 4.h),
-          
           Text(
-          value,
-          textAlign: TextAlign.center,
-          softWrap: false, 
-          overflow: TextOverflow.ellipsis,  
-          maxLines: 1,  
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            value,
+            textAlign: TextAlign.center,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-        ),
         ],
       ),
     );
   }
-  
+
   /// Builds a health record item with swipe-to-delete functionality.
   Widget _buildHealthRecordItem({
     required String title,
@@ -1235,7 +1243,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         ),
       );
     }
-    
+
     // Otherwise, wrap in Dismissible for swipe-to-delete
     return Dismissible(
       key: Key(recordId),
@@ -1276,11 +1284,11 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.r),
               ),
-              title: Text(
+              title: const Text(
                 "Confirm Deletion",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF3D4A5C),
+                  color: Color(0xFF3D4A5C),
                 ),
               ),
               content: Text(
@@ -1309,7 +1317,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                     ),
                   ),
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(
+                  child: const Text(
                     "Delete",
                     style: TextStyle(
                       color: Colors.white,
@@ -1337,7 +1345,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-  
+
   /// Builds the content of a health record item.
   Widget _buildHealthRecordContent({
     required String title,
@@ -1353,7 +1361,9 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              color: isCompleted
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.orange.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -1391,7 +1401,9 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              color: isCompleted
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16.r),
             ),
             child: Text(
@@ -1407,7 +1419,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-  
+
   /// Delete a health record assessment from Firestore.
   Future<void> _deleteHealthRecord(String petDocId, String assessmentId) async {
     try {
@@ -1416,61 +1428,60 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
-              color: const Color(0xFF52AAA4),
+              color: Color(0xFF52AAA4),
             ),
           );
         },
       );
-      
+
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
         throw Exception("User is not signed in.");
       }
-      
+
       // Get the document reference
       final docRef = FirebaseFirestore.instance
           .collection('Users')
           .doc(userId)
           .collection('History')
           .doc(petDocId);
-      
+
       // Get the current document data
       final docSnapshot = await docRef.get();
       if (!docSnapshot.exists) {
         throw Exception("Pet document not found");
       }
-      
+
       final docData = docSnapshot.data() as Map<String, dynamic>;
-      
+
       // Get the assessments array
-      List<dynamic> assessments = docData['assessments'] is List 
-          ? List.from(docData['assessments']) 
+      List<dynamic> assessments = docData['assessments'] is List
+          ? List.from(docData['assessments'])
           : [];
-      
+
       // Find the index of the assessment to remove
-      final int indexToRemove = assessments.indexWhere(
-        (assessment) => assessment['assessmentId'] == assessmentId || 
-                        assessment['date']?.toString() == assessmentId
-      );
-      
+      final int indexToRemove = assessments.indexWhere((assessment) =>
+          assessment['assessmentId'] == assessmentId ||
+          assessment['date']?.toString() == assessmentId);
+
       if (indexToRemove != -1) {
         // Remove the assessment from the array
         assessments.removeAt(indexToRemove);
-        
+
         // Update the document with the modified assessments array
         await docRef.update({
           'assessments': assessments,
         });
-        
-        // Close loading dialog
+
+        if (!mounted) return;
         Navigator.of(context).pop();
-        
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Health record deleted successfully"),
+            content: const Text("Health record deleted successfully"),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1478,17 +1489,17 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ),
           ),
         );
-        
+
         // Refresh the UI
         setState(() {});
       } else {
-        // Close loading dialog
+        if (!mounted) return;
         Navigator.of(context).pop();
-        
+
         // Show error message if assessment not found
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Assessment not found in the record"),
+            content: const Text("Assessment not found in the record"),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1500,7 +1511,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     } catch (e) {
       // Close loading dialog if still showing
       Navigator.of(context).pop();
-      
+
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1527,7 +1538,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.5),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -1557,7 +1568,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-  
+
   /// Builds a recommendation item.
   Widget _buildRecommendationItem(ListItem item) {
     return Container(
@@ -1636,7 +1647,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       ),
     );
   }
-  
+
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -1646,7 +1657,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 }
 
 /// A bottom sheet that can be resized by dragging the image area.
-/// 
+///
 /// This widget displays a bottom sheet with a pet image at the top that
 /// can be dragged to adjust the height of the sheet.
 class ImageDraggableBottomSheet extends StatefulWidget {
@@ -1674,18 +1685,20 @@ class ImageDraggableBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ImageDraggableBottomSheet> createState() => ImageDraggableBottomSheetState();
+  State<ImageDraggableBottomSheet> createState() =>
+      ImageDraggableBottomSheetState();
 }
 
-class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> with SingleTickerProviderStateMixin {
+class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
+    with SingleTickerProviderStateMixin {
   late double _currentHeight;
   bool _isDragging = false;
   late AnimationController _snapController;
   late Animation<double> _snapAnimation;
-  
+
   // Add fixed bottom limit constant
   final double _fixedBottomLimit = 500.0; // Adjust value as needed
-  
+
   // Heights for magnetic snapping
   double? _snapToHeight;
   final List<double> _snapPoints = [];
@@ -1694,13 +1707,13 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
   void initState() {
     super.initState();
     _currentHeight = widget.initialHeight;
-    
+
     // Setup animation controller for smooth snapping
     _snapController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+
     _snapController.addListener(() {
       if (_snapToHeight != null) {
         setState(() {
@@ -1708,7 +1721,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
         });
       }
     });
-    
+
     // Calculate snap points - these are positions where the sheet will "snap" to
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final screenHeight = MediaQuery.of(context).size.height;
@@ -1732,12 +1745,12 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
       _currentHeight = newHeight.clamp(_fixedBottomLimit, widget.maxHeight);
     });
   }
-  
+
   void _snapToNearestPoint(double velocity) {
     // Find the nearest snap point that's above our fixed bottom limit
     double? nearestPoint;
     double minDistance = double.infinity;
-    
+
     for (final point in _snapPoints) {
       // Only consider snap points above our fixed limit
       if (point >= _fixedBottomLimit) {
@@ -1748,32 +1761,34 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
         }
       }
     }
-    
+
     // If there are no valid snap points, default to the fixed bottom limit
     nearestPoint ??= _fixedBottomLimit;
-    
+
     // If the velocity is significant, snap in that direction
     if (velocity.abs() > 800 && nearestPoint != _fixedBottomLimit) {
       final direction = velocity < 0 ? 1 : -1;
       final currentIndex = _snapPoints.indexOf(nearestPoint);
-      int targetIndex = (currentIndex + direction).clamp(0, _snapPoints.length - 1);
-      
+      int targetIndex =
+          (currentIndex + direction).clamp(0, _snapPoints.length - 1);
+
       // Ensure the target snap point is above our fixed limit
-      while (targetIndex >= 0 && targetIndex < _snapPoints.length && 
-             _snapPoints[targetIndex] < _fixedBottomLimit) {
+      while (targetIndex >= 0 &&
+          targetIndex < _snapPoints.length &&
+          _snapPoints[targetIndex] < _fixedBottomLimit) {
         targetIndex += direction > 0 ? 1 : -1;
       }
-      
+
       // If we found a valid target, use it
       if (targetIndex >= 0 && targetIndex < _snapPoints.length) {
         nearestPoint = _snapPoints[targetIndex];
       }
     }
-    
+
     // Snap to the selected point if it differs from current height
     if (nearestPoint != null && (nearestPoint - _currentHeight).abs() > 10) {
       _snapToHeight = nearestPoint;
-      
+
       // Create animation
       _snapAnimation = Tween<double>(
         begin: _currentHeight,
@@ -1782,7 +1797,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
         parent: _snapController,
         curve: Curves.easeOutCubic,
       ));
-      
+
       // Start animation
       _snapController.reset();
       _snapController.forward().then((_) {
@@ -1793,157 +1808,156 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
 
   // Add method to show edit dialog
   void _showEditDialog(BuildContext context) {
-  // Create the controllers inside the builder:
-  showDialog<void>(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      final ageController = TextEditingController(
-        text: (widget.petData['petDetails'] as List<dynamic>? ?? [])
-                .length > 1
-            ? (widget.petData['petDetails'][1]['value']?.toString() ?? '')
-            : '',
-      );
-      final sizeController = TextEditingController(
-        text: (widget.petData['petDetails'] as List<dynamic>? ?? [])
-                .length > 2
-            ? (widget.petData['petDetails'][2]['value']?.toString() ?? '')
-            : '',
-      );
+    // Create the controllers inside the builder:
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final ageController = TextEditingController(
+          text:
+              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 2
+                  ? (widget.petData['petDetails'][2]['value']?.toString() ?? '')
+                  : '',
+        );
+        final sizeController = TextEditingController(
+          text:
+              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 3
+                  ? (widget.petData['petDetails'][3]['value']?.toString() ?? '')
+                  : '',
+        );
 
-      return AlertDialog(
-        title: Text(
-          "Edit Pet Details",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF3D4A5C),
+        return AlertDialog(
+          title: Text(
+            "Edit Pet Details",
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF3D4A5C),
+            ),
           ),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,  // <-- shrink to fit
-            children: [
-              TextField(
-                controller: ageController,
-                decoration: InputDecoration(
-                  labelText: 'Age',
-                  hintText: 'e.g. 2 yrs',
-                  prefixIcon: Icon(Icons.cake, color: Colors.amber),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                    borderSide: BorderSide(
-                        color: const Color(0xFF52AAA4), width: 2),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // <-- shrink to fit
+              children: [
+                TextField(
+                  controller: ageController,
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    hintText: 'e.g. 2 yrs',
+                    prefixIcon: Icon(Icons.cake, color: Colors.amber),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF52AAA4), width: 2),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16.h),
-              TextField(
-                controller: sizeController,
-                inputFormatters: [
-                  FirstLetterUpperCaseTextFormatter(),
-                  FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                ],
-                decoration: InputDecoration(
-                  labelText: 'Size',
-                  hintText: 'e.g. Medium',
-                  prefixIcon: Icon(Icons.straighten, color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                    borderSide: BorderSide(
-                        color: const Color(0xFF52AAA4), width: 2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: Text(
-              "Cancel",
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF52AAA4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-            ),
-            child: Text(
-              "Save",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            onPressed: () async {
-              // Show loading
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => Center(
-                  child: CircularProgressIndicator(
-                    color: const Color(0xFF52AAA4),
+                SizedBox(height: 16.h),
+                TextField(
+                  controller: sizeController,
+                  inputFormatters: [
+                    FirstLetterUpperCaseTextFormatter(),
+                    FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Size',
+                    hintText: 'e.g. Medium',
+                    prefixIcon:
+                        const Icon(Icons.straighten, color: Colors.blue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF52AAA4), width: 2),
+                    ),
                   ),
                 ),
-              );
-
-              try {
-                await _updatePetDetails(
-                    ageController.text, sizeController.text);
-                Navigator.of(context).pop(); // close loading
-                Navigator.of(dialogContext).pop(); // close dialog
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text("Pet details updated successfully"),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF52AAA4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: const Text(
+                "Save",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () async {
+                // Show loading
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF52AAA4),
                     ),
                   ),
                 );
-                if (widget.onPetDetailsUpdated != null) {
-                  widget.onPetDetailsUpdated!();
+
+                try {
+                  await _updatePetDetails(
+                      ageController.text, sizeController.text);
+                  Navigator.of(context).pop(); // close loading
+                  Navigator.of(dialogContext).pop(); // close dialog
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Pet details updated successfully"),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                  );
+                  if (widget.onPetDetailsUpdated != null) {
+                    widget.onPetDetailsUpdated!();
+                  }
+                } catch (e) {
+                  Navigator.of(context).pop(); // close loading
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text("Error updating pet details: ${e.toString()}"),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                  );
                 }
-              } catch (e) {
-                Navigator.of(context).pop(); // close loading
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        "Error updating pet details: ${e.toString()}"),
-                    backgroundColor: Colors.red,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // Add method to update Firestore
   Future<void> _updatePetDetails(String newAge, String newSize) async {
@@ -1953,18 +1967,18 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
       if (userId == null) {
         throw Exception("User is not signed in.");
       }
-      
+
       // Get document ID from petData
       final String documentId = widget.petData['id'] ?? "";
       if (documentId.isEmpty) {
         throw Exception("Document ID not found");
       }
-      
+
       // Create a copy of the pet details
       List<dynamic> updatedDetails = [];
       if (widget.petData['petDetails'] is List) {
         updatedDetails = List.from(widget.petData['petDetails']);
-        
+
         // Update age (index 1)
         if (updatedDetails.length > 1) {
           updatedDetails[1] = {
@@ -1972,7 +1986,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
             'value': newAge
           };
         }
-        
+
         // Update size (index 2)
         if (updatedDetails.length > 2) {
           updatedDetails[2] = {
@@ -1981,7 +1995,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
           };
         }
       }
-      
+
       // Update Firestore
       await FirebaseFirestore.instance
           .collection('Users')
@@ -1989,17 +2003,16 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
           .collection('History')
           .doc(documentId)
           .update({
-            'petDetails': updatedDetails,
-          });
-      
+        'petDetails': updatedDetails,
+      });
+
       // Update local state to reflect changes
       setState(() {
         widget.petData['petDetails'] = updatedDetails;
       });
-      
     } catch (e) {
       print("Error updating pet details: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -2019,36 +2032,33 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
               // Stop any running snap animation
               _snapController.stop();
               _snapToHeight = null;
-              
+
               setState(() {
                 _isDragging = true;
               });
             },
             onVerticalDragUpdate: (details) {
-           
-            final newHeight = _currentHeight - details.delta.dy;
-            
-            
-            final screenHeight = MediaQuery.of(context).size.height;
-            
-            
-            final minVisiblePortion = screenHeight * 0.3;
-            
-            
-            final effectiveBottomLimit = max(_fixedBottomLimit, minVisiblePortion);
-            
-          
-            final limitedHeight = newHeight.clamp(effectiveBottomLimit, widget.maxHeight);
-            
-            setState(() {
-              _currentHeight = limitedHeight;
-            });
-          },
+              final newHeight = _currentHeight - details.delta.dy;
+
+              final screenHeight = MediaQuery.of(context).size.height;
+
+              final minVisiblePortion = screenHeight * 0.3;
+
+              final effectiveBottomLimit =
+                  max(_fixedBottomLimit, minVisiblePortion);
+
+              final limitedHeight =
+                  newHeight.clamp(effectiveBottomLimit, widget.maxHeight);
+
+              setState(() {
+                _currentHeight = limitedHeight;
+              });
+            },
             onVerticalDragEnd: (details) {
               setState(() {
                 _isDragging = false;
               });
-              
+
               // Snap to nearest point when user stops dragging
               _snapToNearestPoint(details.velocity.pixelsPerSecond.dy);
             },
@@ -2061,9 +2071,11 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                     borderRadius: widget.borderRadius,
                     image: DecorationImage(
                       image: widget.petData['petImage'] != null &&
-                              (widget.petData['petImage'] as String).startsWith("http")
+                              (widget.petData['petImage'] as String)
+                                  .startsWith("http")
                           ? NetworkImage(widget.petData['petImage'])
-                          : AssetImage(widget.petData['petImage'] ?? "assets/sampleimage.jpg") as ImageProvider,
+                          : AssetImage(widget.petData['petImage'] ??
+                              "assets/sampleimage.jpg") as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -2077,7 +2089,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                     child: Container(
                       padding: EdgeInsets.all(8.sp),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -2100,7 +2112,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                     child: Container(
                       padding: EdgeInsets.all(8.sp),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -2127,7 +2139,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                           shadows: [
                             Shadow(
                               blurRadius: 8.0,
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               offset: const Offset(0, 1),
                             ),
                           ],
@@ -2142,7 +2154,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet> wi
                           shadows: [
                             Shadow(
                               blurRadius: 8.0,
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               offset: const Offset(0, 1),
                             ),
                           ],
@@ -2203,12 +2215,12 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return newValue; // Return empty value
     }
-    
+
     // Capitalize the first letter and keep the rest as-is
     final text = newValue.text;
     final firstLetter = text[0].toUpperCase();
     final restOfText = text.substring(1);
-    
+
     return newValue.copyWith(
       text: firstLetter + restOfText,
       selection: newValue.selection,

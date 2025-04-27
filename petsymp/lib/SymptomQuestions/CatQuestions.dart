@@ -1,12 +1,5 @@
 final Map<String, dynamic> symptomQuestionsCat = {
-  "bloody urine": {
-    "questions": [
-      "How long has your cat had this symptom?",
-      "How severe is this symptom?"
-    ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "moderate", "severe"],
-  },
+  "bloody urine": {},
   "difficulty breathing": {
     "questions": [
       "How long has your cat had this symptom?",
@@ -135,12 +128,5 @@ final Map<String, dynamic> symptomQuestionsCat = {
     "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
     "impactSymptom": ["mild", "moderate", "severe"],
   },
-  "wheezing": {
-    "questions": [
-      "How long has your cat had this symptom?",
-      "How severe is this symptom?"
-    ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "moderate", "severe"],
-  },
+  "wheezing": {},
 };

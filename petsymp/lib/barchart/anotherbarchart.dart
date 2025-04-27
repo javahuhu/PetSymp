@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         home: Scaffold(
           appBar: AppBar(title: const Text("Bar Chart Sample")),
           body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 100.h),
+            padding: EdgeInsets.only(top: 25.h),
             child: Container(
               decoration: BoxDecoration(
                 color: const Color.fromARGB(0, 19, 19, 44),
@@ -180,7 +180,7 @@ class _BarChartSample3State extends State<BarChartSample3> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 20,
-                        reservedSize: 40, 
+                        reservedSize: 30, 
                         getTitlesWidget: (value, meta) => Text(
                           '${value.toInt()}',
                           style: TextStyle(color: const Color.fromARGB(221, 160, 222, 241)),
@@ -269,7 +269,7 @@ class _BarChartSample3State extends State<BarChartSample3> {
 
   Widget _buildLegend() {
     return Padding(
-      padding: EdgeInsets.only(left: 95.w),
+      padding: EdgeInsets.only(left: 102.w),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(

@@ -60,11 +60,10 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
         _isAnimated = true;
       });
     });
-
-    // Add listener to update suggested symptoms
+    
     _symptomsController.addListener(_updateSuggestedSymptoms);
     
-    // Add focus listener to show/hide suggestions
+    
     _focusNode.addListener(() {
       setState(() {
         _showSuggestions = _focusNode.hasFocus && _symptomsController.text.isNotEmpty && _suggestedSymptoms.isNotEmpty;
@@ -344,15 +343,17 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(
-                    Icons.arrow_back_sharp,
+                    Icons.arrow_back_ios_new,
                     color: Color.fromRGBO(61, 47, 40, 1),
-                    size: 40.0,
+                    size: 26.0,
                   ),
                   label: const Text(''),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                  ),
+                  style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  elevation: WidgetStateProperty.all(0),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent), 
+                ),
                 ),
               ),
               

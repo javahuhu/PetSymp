@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import '../userdata.dart';
 import 'changepassword.dart';
-
+import 'dart:ui'; 
 class RecoveryScreen extends StatefulWidget {
   const RecoveryScreen({Key? key}) : super(key: key);
 
@@ -92,8 +92,9 @@ class RecoveryScreenState extends State<RecoveryScreen> with TickerProviderState
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
@@ -103,9 +104,14 @@ class RecoveryScreenState extends State<RecoveryScreen> with TickerProviderState
             left: screenWidth * 0.01,
             child: ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back_sharp, color:  Color.fromRGBO(61, 47, 40, 1), size: 40.0),
+              icon: Icon(Icons.arrow_back_ios_new, color:  const Color.fromRGBO(61, 47, 40, 1), size: 26.sp),
               label: const Text(''),
-              style: ElevatedButton.styleFrom(elevation: 0, backgroundColor: Colors.transparent),
+               style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                              elevation: WidgetStateProperty.all(0),
+                              shadowColor: WidgetStateProperty.all(Colors.transparent),
+                              overlayColor: WidgetStateProperty.all(Colors.transparent), 
+                            ),
             ),
           ),
           Stack(
@@ -228,7 +234,7 @@ class RecoveryScreenState extends State<RecoveryScreen> with TickerProviderState
                 ),
               ),
               Positioned(
-                top: 0.112.sh,
+                top: lerpDouble(90.h, -0.9.sh, keyboardHeight / screenHeight) ?? 90.h,
                 left: (0.85.sw - 0.87.sw) / 2,
                 child: Container(
                   height: 0.37.sh,

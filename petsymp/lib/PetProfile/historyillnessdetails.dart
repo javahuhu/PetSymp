@@ -1,25 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/barchart/anotherbarchart.dart';
-import '../symptomsdescriptions.dart'; // Contains your illnessInformation map.
- 
+import '../symptomsdescriptions.dart'; 
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/akar_icons.dart';
+
 class HistoryIllnessdetailsScreen extends StatefulWidget {
-  final Map<String, dynamic> diagnosisData; // The full diagnosis record passed from the history screen.
-  const HistoryIllnessdetailsScreen({Key? key, required this.diagnosisData}) : super(key: key);
+  final Map<String, dynamic> diagnosisData;
+  final List<Map<String, dynamic>> allDiagnoses;
+  final int totalIllnesses;// The full diagnosis record passed from the history screen.
+  const HistoryIllnessdetailsScreen({Key? key, required this.diagnosisData, required this.totalIllnesses,required this.allDiagnoses}) : super(key: key);
  
   @override
   HistoryIllnessdetailsScreenState createState() => HistoryIllnessdetailsScreenState();
 }
  
 class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen> {
+  bool _isNavigating = false;
+
+
+
+  void _showThresholdIllnessesDialog() {
+  const double threshold = 0.02;
+  final filtered = widget.allDiagnoses.where((ill) {
+    final prob = (ill['confidence_softmax'] as num? ?? 0).toDouble();
+    return prob >= threshold;
+  }).toList();
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(
+        'Illnesses ≥ ${(threshold * 100).toStringAsFixed(0)}% Prob',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: filtered.isEmpty
+          ? const Text('No illnesses meet that threshold.')
+          : ListView.builder(
+              shrinkWrap: true,
+              itemCount: filtered.length,
+              itemBuilder: (_, i) {
+                final ill = filtered[i];
+                final name = ill['illness'] as String? ?? 'Unknown';
+                final prob = (ill['confidence_softmax'] as num).toDouble();
+                return ListTile(
+                  title: Text(name),
+                  subtitle: Text('${(prob * 100).toStringAsFixed(1)}%'),
+                );
+              },
+            ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+      ],
+    ),
+  );
+}
+
+
+  
+  void _showAllIllnessesDialog() {
+    final diagnoses = widget.allDiagnoses;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('All Diagnosed Illnesses', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: diagnoses.length,
+            itemBuilder: (_, i) {
+              final ill = diagnoses[i];
+              final name = ill['illness'] as String? ?? 'Unknown';
+              final prob = (ill['confidence_softmax'] as num? ?? 0).toDouble();
+              return ListTile(
+                title: Text(name),
+                subtitle: Text('${(prob * 100).toStringAsFixed(1)}%'),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))
+        ],
+      ),
+    );
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
  
-    // Retrieve complete illness details using the diagnosis record.
+    
     final Map<String, dynamic>? details = illnessInformation[widget.diagnosisData['illness']];
  
-    // Define the keys in the order you wish to display additional illness information.
+    
     final List<String> infoKeys = [
       "Description",
       "Severity",
@@ -34,7 +113,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
       "Contagious",
     ];
  
-    // Use only the passed diagnosisData to build the graph.
+   
     final diagnosis = widget.diagnosisData;
     final labels = [diagnosis['illness'] as String];
     final fc = [(diagnosis['confidence_fc'] as num).toDouble()];
@@ -51,27 +130,67 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
       }
       return "No information available.";
     }
- 
+
+    final double softmaxProb = (widget.diagnosisData['confidence_softmax'] as num?)?.toDouble() ?? 0.0;
+    final int totalIllnesses = widget.totalIllnesses;
+
+    
+
+  
+
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
       body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            // Chart container displaying only the selected diagnosis graph.
+        child: 
+        
+        Column(
+        children: [
+        Padding(
+          padding: EdgeInsets.only(
+            top: 20.h,
+            left: 8.w,
+            right: 8.w,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_sharp,
+                  size: 30,
+                  color: Color(0xFFE8F2F5),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              SizedBox(width: screenWidth * 0.097),
+              Text(
+                "Illness Information",
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Oswald',
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                ),
+              ),
+            ],
+          ),
+        ),
+
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 100.h),
+              padding: EdgeInsets.only(right: 24.w, top: 25.h, bottom: 25.h),
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(0, 19, 19, 44),
                   borderRadius: BorderRadius.circular(0),
                 ),
-                height: 370.h,
+                height: 300.h,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const NeverScrollableScrollPhysics(),
                   child: Center(
                     child: SizedBox(
-                      width: MediaQuery.of(context).size.width - 50.w,
+                      width: MediaQuery.of(context).size.width - 25.w,
                       child: BarChartSample3(
                         illnessLabels: labels,
                         fcScores: fc,
@@ -85,7 +204,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
             ),
  
             Padding(
-              padding: EdgeInsets.only(top: 420.h, left: 20.w, right: 5.w),
+              padding: EdgeInsets.only(top: 0.h, left: 30.w, right: 5.w),
               child: Text.rich(
                 TextSpan(
                   style: TextStyle(
@@ -104,10 +223,135 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
                 ),
               ),
             ),
+
+
+            
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 50.h),
+          child: 
+          Column (
+          children:[
+          
+          GestureDetector(
+        behavior: HitTestBehavior.opaque,
+         onTap: _showThresholdIllnessesDialog,
+         child: Container (
+          height: 60.h,
+         
+          decoration: BoxDecoration(
+            color: Colors.blueGrey,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1), // Shadow color with opacity
+              blurRadius: 12, // Soften the shadow
+              spreadRadius: 2, // Extend the shadow
+              offset: Offset(0, 0), // Shadow position (x, y)
+            ),
+          ],
+          ),
+          child: Align(
+          alignment: Alignment.center,
+          child:
+          Padding(padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child:
+          Row(
+            
+            children: [
+          Icon(
+          Icons.lightbulb_circle_outlined,
+          color: const Color.fromARGB(255, 203, 211, 219),
+          size: 24.0.sp,
+          ),
+          SizedBox(width: 10.w),
+          Text.rich(
+            TextSpan(
+              style: TextStyle(
+                color: const Color.fromARGB(255, 203, 211, 219),
+                fontSize: 15.sp,
+              ),
+              children: const [
+                TextSpan(text: "Most Probable Diagnosis", style:  TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          )],))))),
+
+          SizedBox(height: 30.h,),
+         GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          _showAllIllnessesDialog();
+        },
+  child: Container(
+    height: 60.h,
+    decoration: BoxDecoration(
+      color: Colors.blueGrey,
+      borderRadius: BorderRadius.circular(10.r),
+      boxShadow: [
+        BoxShadow(
+          color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.1),
+          blurRadius: 12,
+          spreadRadius: 2,
+          offset: Offset(0, 0),
+        ),
+      ],
+    ),
+    child: Align(
+      alignment: Alignment.center,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Iconify(
+              AkarIcons.statistic_up,
+              size: 24.0.sp,
+              color: const Color.fromARGB(255, 203, 211, 219),
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Baseline(
+                baseline: 25.sp,
+                baselineType: TextBaseline.alphabetic,
+                child: Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 203, 211, 219),
+                      fontSize: 15.sp,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: "Probability: ${(softmaxProb * 100).toStringAsFixed(2)}%",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: " ( Top Ranked out of $totalIllnesses Illnesses )",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ),
+),
+
+
+
+          
+          
+          ]),
+        ),
  
-            // Expansion cards container for additional illness information.
+            
             Padding(
-              padding: EdgeInsets.only(top: 550.h),
+              padding: EdgeInsets.only(top: 0.h),
               child: Column(
                 children: [
                   SizedBox(height: 20.h),
@@ -125,50 +369,14 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
                 ],
               ),
             ),
+              
+             
  
-            // Top bar with back button.
-            Padding(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 20,
-                left: 8,
-                right: 8,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      size: 30,
-                      color: Color(0xFFE8F2F5),
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  SizedBox(width: screenWidth * 0.13),
-                  Text(
-                    "Illness Information",
-                    style: TextStyle(
-                      fontSize: 25.sp,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Oswald',
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("Small Floating Action Button pressed!");
-        },
-        child: const Icon(Icons.menu_book_sharp),
-      ),
-      floatingActionButtonLocation: CustomFABLocation(topOffset: 600.0.h, rightOffset: 16.0.w),
-    );
-  }
+     
+  );}
  
   Widget _buildExpansionCard({required String title, required String description}) {
     return Container(
@@ -212,17 +420,3 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
   }
 }
  
-class CustomFABLocation extends FloatingActionButtonLocation {
-  final double topOffset;
-  final double rightOffset;
- 
-  CustomFABLocation({this.topOffset = 100.0, this.rightOffset = 16.0});
- 
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final fabSize = scaffoldGeometry.floatingActionButtonSize;
-    final double x = scaffoldGeometry.scaffoldSize.width - fabSize.width - rightOffset;
-    final double y = topOffset;
-    return Offset(x, y);
-  }
-}

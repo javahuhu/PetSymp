@@ -64,6 +64,9 @@ dependencies:
   shared_preferences: ^2.5.3
   intl: ^0.20.2
   card_swiper: ^3.0.1
+  iconify_flutter: ^0.0.7
+  animated_text_kit: ^4.2.3
+
   
 
 dev_dependencies:
@@ -153,6 +156,11 @@ flutter:
       - assets/dogsitanimation.json
       - assets/cardCatss.png
       - assets/cardDogss.png
+      - assets/petvet.png
+      - assets/checkanimation.json
+      - assets/dotanimation.json
+      - assets/catdog.png
+      - assets/linebg.png
       - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
       - assets/imgsymptomcatalog/abdominalpain.jpg
       - assets/imgsymptomcatalog/abdominalenlargment.jpg

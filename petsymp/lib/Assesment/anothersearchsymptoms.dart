@@ -9,9 +9,11 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../SymptomsCatalog/symptomscatalog.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:petsymp/Assesment/anothersymptoms.dart';
+import 'mentionsymptoms.dart';
+import 'package:petsymp/searchdescription.dart';
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
-  /// Expected to be a single-element list with the input symptom.
   final List<String> symptoms;
 
   const AnothersearchsymptomsScreen({super.key, required this.symptoms});
@@ -27,18 +29,6 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
   bool _isNavigating = false;
   AnimationController? _bubbleAnimationController;
 
-  // Map for additional symptom descriptions.
-  final Map<String, String> _symptomDescriptions = {
-    'diarrhea': 'Loose, watery stools occurring more frequently than usual.',
-    'vomiting': 'Forceful expulsion of stomach contents through the mouth.',
-    'coughing': 'Sudden expulsion of air from the lungs to clear the passages.',
-    'fever': 'Abnormally high body temperature, often indicating infection.',
-    'lethargy': 'Unusual tiredness or decreased activity.',
-    'loss of appetite': 'Reduced desire to eat despite a normal feeding schedule.',
-    'frequent bowel movements': 'Loose, watery stools.',
-    'frequent episodes': 'Repeated vomiting over a short period',
-    // Add more as needed.
-  };
 
   @override
   void initState() {
@@ -95,7 +85,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       'Frequent Episodes',
     ];
 
-    // Determine the input symptom (if any).
+    
     String inputSymptom = "";
     if (widget.symptoms.isNotEmpty && widget.symptoms[0].trim().isNotEmpty) {
       inputSymptom = widget.symptoms[0].toLowerCase();
@@ -112,13 +102,12 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       candidateSymptom = inputSymptom;
     }
 
-    // Build a candidate list by combining input, predefined, and additional symptoms.
     List<String> candidateList = [];
     if (inputSymptom.isNotEmpty) candidateList.add(inputSymptom);
     candidateList.addAll(predefinedSymptoms);
     candidateList.addAll(additionalSymptoms);
 
-    // Remove duplicates (order preserving, case-insensitive).
+  
     List<String> uniqueList = [];
     for (String s in candidateList) {
       if (!uniqueList.any((u) => u.toLowerCase() == s.toLowerCase())) {
@@ -126,14 +115,12 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       }
     }
 
-    // Filter out any already pending symptoms from the selectable list.
-    // (Assuming you do not want any symptom in userData.pendingSymptoms to be selectable.)
+  
     final Set<String> pendingSet =
         userData.pendingSymptoms.map((s) => s.toLowerCase()).toSet();
     uniqueList.removeWhere((s) => pendingSet.contains(s.toLowerCase()));
 
-    // Now, if candidateSymptom exists, ensure it appears at the top as a header (if needed)
-    // but not repeated in the selectable list.
+    
     if (candidateSymptom.isNotEmpty) {
       uniqueList.removeWhere((s) =>
           s.toLowerCase() == candidateSymptom.toLowerCase());
@@ -165,7 +152,12 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                     style: TextStyle(fontSize: 20, color: Colors.black)),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MentionsympScreen()),
+                  );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
                     foregroundColor: Colors.white,
@@ -341,10 +333,17 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                         children: [
                           IconButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(
-                              Icons.arrow_back_sharp,
-                              color: Color.fromRGBO(61, 47, 40, 1),
-                              size: 32.0,
+                            icon: Icon(
+                              Icons.arrow_back_ios_new,
+                              color: const Color.fromRGBO(61, 47, 40, 1),
+                              size: 26.sp,
+                            ),
+
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                              elevation: WidgetStateProperty.all(0),
+                              shadowColor: WidgetStateProperty.all(Colors.transparent),
+                              overlayColor: WidgetStateProperty.all(Colors.transparent), 
                             ),
                           ),
                         ],
@@ -422,7 +421,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             ),
             // Floating catalog button.
             Positioned(
-              bottom: 15.h,
+              bottom: 50.h,
               right: 16.w,
               child: FloatingActionButton(
                 onPressed: _navigateToSymptomCatalog,
@@ -446,8 +445,8 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
   /// then navigates to QoneScreen. It does not add the symptom to pending immediately.
   Widget buildSymptomsContainer(double screenWidth, String title, BuildContext context) {
     final String symptomKey = title.toLowerCase();
-    final String description = _symptomDescriptions[symptomKey] ??
-        'A common symptom that may indicate health issues in your pet.';
+    final String description = symptomDescriptions[symptomKey] ??
+        'No Description Available.';
         
     return Container(
       padding: EdgeInsets.all(16.sp),
@@ -459,7 +458,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,
-            offset: const Offset(2, 2),
+            offset:  Offset(2, 2),
           ),
         ],
         border: Border.all(
@@ -485,7 +484,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             description,
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withValues(alpha: 0.85),
             ),
           ),
           SizedBox(height: 16.h),
@@ -494,55 +493,61 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final UserData userData = Provider.of<UserData>(context, listen: false);
-                  // Set the selected symptom and update questions.
+                  final userData = Provider.of<UserData>(context, listen: false);
                   userData.setSelectedSymptom(title);
                   userData.updateQuestions();
-                  debugPrint("✅ Selected Symptom: $title");
-                  debugPrint("✅ Updated Questions: ${userData.questions}");
-                  // Navigate to QoneScreen.
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QoneScreen(
-                        symptom: title,
-                        questions: List<String>.from(userData.questions),
-                        impactChoices: List<List<String>>.from(userData.impactChoices),
+
+                  if (userData.questions.isEmpty) {
+                    // 🔵 No follow-up → instantly add to pending + go to next screen
+                    userData.addPendingSymptom(title);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AnothersympScreen()),
+                    );
+                  } else {
+                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QoneScreen(
+                          symptom: title,
+                          questions: List<String>.from(userData.questions),
+                          impactChoices: List<List<String>>.from(userData.impactChoices),
+                        ),
                       ),
-                    ),
-                  );
-                });
-              },
+                    );
+                  }
+                },
+
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.pressed)) {
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return const Color.fromRGBO(66, 134, 130, 1.0);
                   }
                   return Colors.transparent;
                 }),
-                foregroundColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.pressed)) {
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
                     return Colors.white;
                   }
                   return Colors.white;
                 }),
-                shadowColor: MaterialStateProperty.all(Colors.transparent),
-                side: MaterialStateProperty.all(
+                shadowColor: WidgetStateProperty.all(Colors.transparent),
+                side: WidgetStateProperty.all(
                   const BorderSide(
                     color: Color.fromRGBO(82, 170, 164, 1),
                     width: 2.0,
                   ),
                 ),
-                shape: MaterialStateProperty.all(
+                shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(6.r)),
                   ),
                 ),
-                padding: MaterialStateProperty.all(
+                padding: WidgetStateProperty.all(
                   EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 ),
-                fixedSize: MaterialStateProperty.all(Size(120.w, 45.h)),
+                fixedSize: WidgetStateProperty.all(Size(120.w, 45.h)),
               ),
               child: const Text(
                 "Select",

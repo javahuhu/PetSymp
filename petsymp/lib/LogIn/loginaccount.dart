@@ -62,7 +62,10 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    return Scaffold(
+    return 
+    PopScope(
+      canPop: false,
+      child: Scaffold(
       resizeToAvoidBottomInset: true,
       //backgroundColor: const Color.fromARGB(255, 173, 173, 80),
       backgroundColor: const Color(0xFFE8F2F5),
@@ -437,7 +440,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
           ),
 
            Positioned(
-             top: lerpDouble(122.h, -690.h, keyboardHeight / screenHeight) ?? 124.h,// Move up when keyboard is open // Move it higher to ensure visibility
+             top: lerpDouble(122.h, -690.h, keyboardHeight / screenHeight) ?? 124.h,
             left: 0.17.sw, // Adjusts for centering
             child: Container(
               height: 0.35.sh, // Increase size slightly for better visibility
@@ -453,7 +456,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
 
         ],
       ),
-    );
+    ));
   }
 }
 

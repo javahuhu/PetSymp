@@ -22,13 +22,13 @@ class QoneScreen extends StatefulWidget {
   _QoneScreenState createState() => _QoneScreenState();
 }
 
-class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateMixin {
+class _QoneScreenState extends State<QoneScreen>
+    with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
   bool _isNavigating = false;
   int currentQuestionIndex = 0;
   bool _buttonsVisible = false;
-  
-  // Animation controller for background bubbles.
+
   AnimationController? _bubbleAnimationController;
 
   @override
@@ -40,7 +40,7 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
     )..repeat(reverse: true);
     _triggerAnimation();
   }
-  
+
   @override
   void dispose() {
     _bubbleAnimationController?.dispose();
@@ -68,7 +68,8 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
 
   void nextQuestion(BuildContext context, String selectedAnswer) {
     final userData = Provider.of<UserData>(context, listen: false);
-    if (widget.questions.isEmpty || currentQuestionIndex >= widget.questions.length) {
+    if (widget.questions.isEmpty ||
+        currentQuestionIndex >= widget.questions.length) {
       return;
     }
     final currentQuestion = widget.questions[currentQuestionIndex];
@@ -82,7 +83,6 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
       });
       _triggerAnimation();
     } else {
-      // Instead of finalizing the symptom, add it to pending.
       userData.addPendingSymptom(widget.symptom);
       userData.fetchDiagnosis().then((_) {
         Navigator.push(
@@ -101,7 +101,6 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
       });
       _triggerAnimation();
     } else {
-      // On first question, if the user presses back, remove the symptom.
       userData.removePendingSymptom(widget.symptom);
       Navigator.of(context).pop();
     }
@@ -120,16 +119,18 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final String questionText = (widget.questions.isNotEmpty && currentQuestionIndex < widget.questions.length)
+    final String questionText = (widget.questions.isNotEmpty &&
+            currentQuestionIndex < widget.questions.length)
         ? widget.questions[currentQuestionIndex]
         : "No questions available";
     List<String> currentChoices = [];
-    if (widget.impactChoices.isNotEmpty && currentQuestionIndex < widget.impactChoices.length) {
+    if (widget.impactChoices.isNotEmpty &&
+        currentQuestionIndex < widget.impactChoices.length) {
       currentChoices = widget.impactChoices[currentQuestionIndex];
     }
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -147,26 +148,26 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
         ),
         child: Stack(
           children: [
-            // [Add your background decorative widgets here as before.]
-            // Back Button.
             Positioned(
               top: screenHeight * 0.03,
               left: screenWidth * 0.01,
               child: ElevatedButton.icon(
                 onPressed: previousQuestion,
-                icon: const Icon(
-                  Icons.arrow_back_sharp,
-                  color: Color.fromRGBO(61, 47, 40, 1),
-                  size: 40.0,
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: const Color.fromRGBO(61, 47, 40, 1),
+                  size: 26.sp,
                 ),
                 label: const Text(''),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
+                  elevation: MaterialStateProperty.all(0), // Changed from WidgetStateProperty
+                  shadowColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
+                  overlayColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
                 ),
               ),
             ),
-            // Animated Header and Question Text.
+
             Positioned(
               top: screenHeight * 0.22,
               left: screenWidth * 0.05,
@@ -179,7 +180,8 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
                     delay: const Duration(milliseconds: 800),
                     from: 30,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                       child: Text(
                         "About the ${widget.symptom}",
                         style: TextStyle(
@@ -202,7 +204,7 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
                         borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withOpacity(0.05), 
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -223,73 +225,74 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
+                  SizedBox(height: 20.h),
+                  if (_buttonsVisible && currentChoices.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: List.generate(currentChoices.length, (index) {
+                        return FadeInUp(
+                          duration: const Duration(milliseconds: 500),
+                          delay: Duration(milliseconds: 1000 + (index * 100)),
+                          from: 30,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 6.h),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                nextQuestion(context, currentChoices[index]);
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith((states) { // Changed from WidgetStateProperty
+                                  if (states.contains(MaterialState.pressed)) { // Changed from WidgetState.pressed
+                                    return const Color.fromARGB(255, 0, 0, 0);
+                                  }
+                                  return Colors.transparent;
+                                }),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith((states) { 
+                                  if (states.contains(MaterialState.pressed)) { 
+                                    return const Color.fromARGB(
+                                        255, 255, 255, 255);
+                                  }
+                                  return const Color.fromRGBO(29, 29, 44, 1.0);
+                                }),
+                                shadowColor:
+                                    MaterialStateProperty.all(Colors.transparent),
+                                side: MaterialStateProperty.all( 
+                                  const BorderSide(
+                                    color: Color.fromRGBO(82, 170, 164, 1),
+                                    width: 2.0,
+                                  ),
+                                ),
+                                shape: MaterialStateProperty.all( 
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(100.r)),
+                                  ),
+                                ),
+                                fixedSize: MaterialStateProperty.all( // Changed from WidgetStateProperty
+                                  Size(double.infinity, 55.h),
+                                ),
+                                padding: MaterialStateProperty.all( // Changed from WidgetStateProperty
+                                  EdgeInsets.symmetric(vertical: 12.h),
+                                ),
+                              ),
+                              child: Text(
+                                currentChoices[index],
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
                 ],
               ),
             ),
-            // Impact Choices Buttons.
-            if (_buttonsVisible)
-              Positioned(
-                top: screenHeight * 0.46,
-                left: screenWidth * 0.05,
-                right: screenWidth * 0.05,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: List.generate(currentChoices.length, (index) {
-                    return FadeInUp(
-                      duration: const Duration(milliseconds: 500),
-                      delay: Duration(milliseconds: 1000 + (index * 100)),
-                      from: 30,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 6.h),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            nextQuestion(context, currentChoices[index]);
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith((states) {
-                              if (states.contains(MaterialState.pressed)) {
-                                return const Color.fromARGB(255, 0, 0, 0);
-                              }
-                              return Colors.transparent;
-                            }),
-                            foregroundColor: MaterialStateProperty.resolveWith((states) {
-                              if (states.contains(MaterialState.pressed)) {
-                                return const Color.fromARGB(255, 255, 255, 255);
-                              }
-                              return const Color.fromRGBO(29, 29, 44, 1.0);
-                            }),
-                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                            side: MaterialStateProperty.all(
-                              const BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1),
-                                width: 2.0,
-                              ),
-                            ),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(100.r)),
-                              ),
-                            ),
-                            fixedSize: MaterialStateProperty.all(
-                              Size(double.infinity, 55.h),
-                            ),
-                            padding: MaterialStateProperty.all(
-                              EdgeInsets.symmetric(vertical: 12.h),
-                            ),
-                          ),
-                          child: Text(
-                            currentChoices[index],
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
+            
             // Floating catalog button.
             Positioned(
               bottom: 100.h,
@@ -312,13 +315,14 @@ class _QoneScreenState extends State<QoneScreen> with SingleTickerProviderStateM
               child: FadeIn(
                 duration: const Duration(milliseconds: 800),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(100.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.1), 
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

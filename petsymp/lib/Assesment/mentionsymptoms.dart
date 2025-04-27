@@ -49,35 +49,30 @@ class MentionsympScreenState extends State<MentionsympScreen>
   AnimationController? _bubbleAnimationController;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
-    _bubbleAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat(reverse: true);
+  _bubbleAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 5),
+  )..repeat(reverse: true);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        Provider.of<UserData>(context, listen: false).clearNewSymptoms();
-      }
+  Future.delayed(const Duration(milliseconds: 200), () {
+    setState(() {
+      _isAnimated = true;
     });
+  });
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() {
-        _isAnimated = true;
-      });
+  _symptomController.addListener(_updateSuggestedSymptoms);
+  _focusNode.addListener(() {
+    setState(() {
+      _showSuggestions = _focusNode.hasFocus &&
+          _symptomController.text.isNotEmpty &&
+          _suggestedSymptoms.isNotEmpty;
     });
+  });
+}
 
-    _symptomController.addListener(_updateSuggestedSymptoms);
-    _focusNode.addListener(() {
-      setState(() {
-        _showSuggestions = _focusNode.hasFocus &&
-            _symptomController.text.isNotEmpty &&
-            _suggestedSymptoms.isNotEmpty;
-      });
-    });
-  }
 
   @override
   void dispose() {
@@ -157,11 +152,7 @@ class MentionsympScreenState extends State<MentionsympScreen>
         ),
       );
 
-      // If the symptom still exists in pending (i.e. user backed out), remove it.
-      if (userData.pendingSymptoms.contains(inputText)) {
-        userData.removePendingSymptom(inputText);
-        debugPrint("🗑️ Removed $inputText from pending (user backed out)");
-      }
+      
     }
   }
 
@@ -343,17 +334,22 @@ class MentionsympScreenState extends State<MentionsympScreen>
                   top: screenHeight * 0.03,
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.arrow_back_sharp,
-                      color: Color.fromRGBO(61, 47, 40, 1),
-                      size: 40.0,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+
+                    icon:  Icon(
+                      Icons.arrow_back_ios_new,
+                      color: const Color.fromRGBO(61, 47, 40, 1),
+                      size: 26.sp,
                     ),
                     label: const Text(''),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                    ),
+                    style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  elevation: WidgetStateProperty.all(0),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  overlayColor: WidgetStateProperty.all(Colors.transparent), 
+                ),
                   ),
                 ),
                 // Animated Header.
@@ -472,11 +468,9 @@ class MentionsympScreenState extends State<MentionsympScreen>
                                     return 'This symptom is not available for ${petType.toLowerCase()}';
                                   }
                                     if (userData.pendingSymptoms.contains(inputLower)) {
-                                      return 'This symptom is already pending';
+                                      return 'This symptom is already added';
                                     }
-                                    if (userData.finalizedSymptoms.contains(inputLower)) {
-                                      return 'This symptom is already added/finalized';
-                                    }
+                                    
                                     return null;
                                   },
                                 ),

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:petsymp/LogIn/loginaccount.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +23,7 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
   bool _isUpdating = false;
 
   // Your backend URL for resetting password
-  final String resetPasswordURL = AppConfig.resetpass;
+  final String resetPasswordURL = AppConfig.resetPassURL;
 
   Future<void> _updatePassword() async {
     if (_formKey.currentState!.validate()) {
@@ -54,12 +53,7 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
           body: body,
         );
 
-        print("URL: $resetPasswordURL");
-        print("Body: $body");
-        // After the request
-        print("Response status: ${response.statusCode}");
-        print("Response body: ${response.body}");
-
+        
         if (response.statusCode == 200) {
           Fluttertoast.showToast(
             msg: "Password updated successfully!",
@@ -69,7 +63,7 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
             textColor: Colors.white,
           );
 
-          // Automatically navigate to the login screen after password reset
+          if(!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
@@ -127,7 +121,7 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -222,31 +216,18 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
           children: [
             // Background gradient
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    const Color(0xFF1D1D2C),
-                    const Color(0xFF2C2C44),
+                     Color(0xFF1D1D2C),
+                     Color(0xFF2C2C44),
                   ],
                 ),
               ),
             ),
-            // Back button
-            Positioned(
-              top: 10.h,
-              left: 10.w,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Colors.white,
-                  size: 26.sp,
-                ),
-              ),
-            ),
-            // Main content scroll view
+           
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
@@ -272,19 +253,19 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
                             "Create a new secure password",
                             style: TextStyle(
                               fontSize: 16.sp,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
                       ),
                     ),
                     SizedBox(height: 30.h),
-                    Container(
-                      height: 180.h,
+                    SizedBox(
+                      height: 200.h,
                       width: double.infinity,
                       child: Center(
                         child: Image.asset(
-                          'assets/catsit.png',
+                          'assets/petvet.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -293,11 +274,11 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 30.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C44).withOpacity(0.8),
+                        color: const Color(0xFF2C2C44).withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),
@@ -449,11 +430,11 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
                               child: TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
                                 style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white.withOpacity(0.8),
+                                  foregroundColor: Colors.white.withValues(alpha: 0.8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16.r),
                                     side: BorderSide(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withValues(alpha: 0.3),
                                       width: 1.5.w,
                                     ),
                                   ),
