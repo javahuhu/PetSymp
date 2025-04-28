@@ -1028,6 +1028,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                         FontWeight.bold)),
                                           ),
                                         ),
+                                        SizedBox(width: 15.w),
                                         Container(
                                             width: 1,
                                             height: 40.h,

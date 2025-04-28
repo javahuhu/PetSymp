@@ -217,7 +217,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Before we start your assessment, input your PET USERNAME first.",
+                        "Before we start your assessment, input your PET's NAME first.",
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.normal,
@@ -256,7 +256,7 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                                   width: 2.0,
                                 ),
                               ),
-                              hintText: 'Enter your name',
+                              hintText: "Enter Pet's name",
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20.0,
                                 horizontal: 15.0,

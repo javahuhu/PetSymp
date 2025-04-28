@@ -194,11 +194,11 @@ class HomePageScreenState extends State<HomePageScreen>
                       ],
                     ),
                     SizedBox(height: 20.h),
-                    Text("I can help you to analyze your",
+                    Text("I can help you in analyzing your",
                         style: TextStyle(
                             fontSize: 22.sp,
                             color: const Color.fromRGBO(29, 29, 44, 1.0))),
-                    Text(" Pet health issues.",
+                    Text("Pet's health problems.",
                         style: TextStyle(
                             fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
@@ -440,14 +440,14 @@ class _TermsDialogContentState extends State<TermsDialogContent> {
                       onChanged: (val) =>
                           setState(() => localAccepted = val ?? false),
                       title: const Text("I agree to the Terms and Conditions"),
-                      controlAffinity: ListTileControlAffinity.leading,
+                      controlAffinity: ListTileControlAffinity.trailing,
                     ),
                     CheckboxListTile(
                       value: localDontShowAgain,
                       onChanged: (val) =>
                           setState(() => localDontShowAgain = val ?? false),
                       title: const Text("Don't Show This Again"),
-                      controlAffinity: ListTileControlAffinity.leading,
+                      controlAffinity: ListTileControlAffinity.trailing,
                     ),
                   ],
                 ),

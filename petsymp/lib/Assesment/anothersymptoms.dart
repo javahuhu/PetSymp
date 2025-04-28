@@ -148,7 +148,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Does she/he have another symptoms?",
+                        "Does He/She have another symptoms?",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

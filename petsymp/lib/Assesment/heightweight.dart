@@ -188,14 +188,6 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       ),
                       
                       const SizedBox(height: 20),
-                      
-                      const Text(
-                        "Note: You can also enter a breed-specific or custom size description that best describes your pet.",
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          color: Color.fromRGBO(29, 29, 44, 0.7),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -485,7 +477,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                           delay: const Duration(milliseconds: 300),
                         from: 400,
                         child: Text(
-                    "What is the size of your pet",
+                    "What are pet sizes?",
                     style: TextStyle(
                       fontSize: 25.sp,
                       fontWeight: FontWeight.bold,

@@ -198,7 +198,7 @@ class PermissionScreenState extends State<PermissionScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Please provide the following basic information Regarding to your pet",
+                          "Please provide the following basic information regarding your pet",
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.normal,

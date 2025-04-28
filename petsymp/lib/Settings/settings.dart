@@ -16,10 +16,6 @@ class Settingscreen extends StatefulWidget {
 
 class SettingscreenState extends State<Settingscreen> {
   Map<String, Map<String, dynamic>> hashmap = {
-    "img1": {
-      "image": "assets/security.png",
-      "screen": (BuildContext context) => const HomePageScreen(),
-    },
     "img2": {
       "image": "assets/support.png",
       "screen": (BuildContext context) => const HelpandsupportScreen(),
@@ -57,7 +53,6 @@ class SettingscreenState extends State<Settingscreen> {
             children: [
               // First Group
               _buildCardContainer([
-                _buildInputCard("img1", "Security"),
                 _buildInputCard("img2", "Help and Support"),
                 _buildInputCard("img3", "Terms and Conditions", isLast: true),
               ]),

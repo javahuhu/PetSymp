@@ -309,7 +309,7 @@ class LoginaccountScreenState extends State<LoginaccountScreen> {
                           ),
 
                           child:  Text(
-                            "Recovery Password",
+                            "Recover Password",
                             style: TextStyle(fontSize: 16.0.sp, color:const Color.fromRGBO(82, 170, 164, 1)),
                           ),
                         ),
