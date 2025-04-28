@@ -131,29 +131,11 @@ class HelpandsupportScreenState extends State<HelpandsupportScreen> {
                   ),
                 ),
 
-                SizedBox(height: 10.h),
-
-                _buildExpandableCard(
-                  title: "6. Can I share my pet's results with my vet?",
-                  icon: Icons.share,
-                  content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Absolutely! PetSymp makes it easy to share your pet's symptom assessment with your veterinarian. Simply tap the 'Share' button on any completed assessment to generate a detailed report that can be sent via email, text, or saved as a PDF. This information can help your vet understand your pet's symptoms and changes over time.",
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 127, 127, 127),
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
                 SizedBox(height: 10.h),
 
                 _buildExpandableCard(
-                  title: "7. How accurate are the results?",
+                  title: "6. How accurate are the results?",
                   icon: Icons.analytics,
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +154,7 @@ class HelpandsupportScreenState extends State<HelpandsupportScreen> {
                 SizedBox(height: 10.h),
 
                 _buildExpandableCard(
-                  title: "8. Can I assess multiple pets?",
+                  title: "7. Can I assess multiple pets?",
                   icon: Icons.group,
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
