@@ -609,21 +609,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 32.h),
-            ElevatedButton.icon(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFF52AAA4),
-                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              icon: const Icon(Icons.add),
-              label: const Text("Add First Record"),
-            ),
+           
           ],
         ),
       ),
