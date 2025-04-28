@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:ui'; // Import this for lerpDoub
 // Custom TextInputFormatter to capitalize only the first letter
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -171,10 +172,10 @@ class SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
+  double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+  final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-    resizeToAvoidBottomInset: false,
+    resizeToAvoidBottomInset: true,
      backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
@@ -443,7 +444,7 @@ class SignupScreenState extends State<SignupScreen> {
           ),
 
           Positioned(
-            top: 0.15.sh, // Adjust height dynamically
+            top: lerpDouble(122.h, -690.h, keyboardHeight / screenHeight) ?? 124.h, // Adjust height dynamically
             left: (1.sw - 0.85.sw) / 2, // Center horizontally
             child: Container(
               height: 0.2.sh, // Adjust height dynamically
