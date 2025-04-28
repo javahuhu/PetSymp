@@ -380,7 +380,7 @@ class SignupScreenState extends State<SignupScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
                         }
-                        if (value.length < 6) {
+                        if (value.length < 8) {
                           return 'Password must be at least 6 characters';
                         }
                         return null;

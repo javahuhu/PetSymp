@@ -9,26 +9,27 @@ import 'package:url_launcher/url_launcher.dart';
 import '../barchart/barfirebasegraph.dart';
 import 'historyillnessdetails.dart';
 import 'package:petsymp/symptomsdescriptions.dart';
+
 class ViewhistoryScreen extends StatefulWidget {
   final Map<String, dynamic> historyData; // Data passed from the history card
-  const ViewhistoryScreen({Key? key, required this.historyData}) : super(key: key);
+  const ViewhistoryScreen({Key? key, required this.historyData})
+      : super(key: key);
 
   @override
   ViewhistoryScreenState createState() => ViewhistoryScreenState();
 }
 
 class ViewhistoryScreenState extends State<ViewhistoryScreen> {
-    String detailToString(dynamic value) {
-      if (value is List) {
-        return value.join("\n\n");
-      } else if (value is bool) {
-        return value ? "Yes" : "No";
-      } else if (value != null) {
-        return value.toString();
-      }
-      return "No information available.";
+  String detailToString(dynamic value) {
+    if (value is List) {
+      return value.join("\n\n");
+    } else if (value is bool) {
+      return value ? "Yes" : "No";
+    } else if (value != null) {
+      return value.toString();
     }
- 
+    return "No information available.";
+  }
 
   String _extractDescription(Map<String, dynamic> diagnosis) {
     final name = diagnosis['illness'] as String? ?? '';
@@ -39,7 +40,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     }
     return 'No description available.';
   }
-  
+
   final List<ListItem> recommendations = [
     const ListItem(
       title: 'Provide Medicine for Lethargy',
@@ -59,7 +60,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     const ListItem(
       title: 'Tricks to Give Your Pet Medicine Without a Fight!',
       subtitle: 'Discover easy ways to give your pet medicine without stress',
-      url: 'https://www.youtube.com/results?search_query=flutter+list+with+images',
+      url:
+          'https://www.youtube.com/results?search_query=flutter+list+with+images',
       isExternal: true,
       imageUrl: 'assets/youtube1.jpg',
     ),
@@ -81,12 +83,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     ),
   ];
 
-  
-
   @override
   Widget build(BuildContext context) {
-
-    
     // Use the passed historyData.
     final Map<String, dynamic> historyData = widget.historyData;
     final String petName = historyData['petName'] ?? "Unknown";
@@ -121,8 +119,6 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
       });
     }
 
-
-
     return PopScope(
       canPop: true,
       child: Scaffold(
@@ -135,7 +131,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
               children: [
                 // Date display.
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEBF2F7),
                     borderRadius: BorderRadius.circular(12),
@@ -179,7 +176,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   child: Column(
                     children: [
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
                         child: Container(
                           height: 200.h,
                           width: double.infinity,
@@ -208,7 +206,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 10,
                                         spreadRadius: 2,
                                       ),
@@ -216,7 +215,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                   ),
                                   child: ClipOval(
                                     child: (historyData['petImage'] != null &&
-                                            (historyData['petImage'] as String).isNotEmpty)
+                                            (historyData['petImage'] as String)
+                                                .isNotEmpty)
                                         ? ((historyData['petImage'] as String)
                                                 .startsWith("http")
                                             ? Image.network(
@@ -295,7 +295,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -329,7 +330,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   ),
                 ),
                 SizedBox(height: 25.h),
-                if (topDiagnoses.isNotEmpty) _buildDiagnosisSection(topDiagnoses),
+                if (topDiagnoses.isNotEmpty)
+                  _buildDiagnosisSection(topDiagnoses),
                 SizedBox(height: 25.h),
                 _buildExpandableCard(
                   title: "Statistics & Analysis",
@@ -338,7 +340,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                     children: [
                       Container(
                         height: 300.h,
-                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 15.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 5.w, vertical: 15.h),
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 245, 245, 245),
                           borderRadius: BorderRadius.circular(15),
@@ -352,9 +355,11 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                           child: Consumer<UserData>(
                             builder: (_, userData, __) {
                               final diagnoses = List<Map<String, dynamic>>.from(
-                                  historyData['diagnosisResults'] as List? ?? []);
-                              diagnoses.sort((a, b) => (b['confidence_ab'] as num)
-                                  .compareTo((a['confidence_ab'] as num)));
+                                  historyData['diagnosisResults'] as List? ??
+                                      []);
+                              diagnoses.sort((a, b) =>
+                                  (b['confidence_ab'] as num)
+                                      .compareTo((a['confidence_ab'] as num)));
                               final top10 = diagnoses.take(10).toList();
                               while (top10.length < 10) {
                                 top10.add({
@@ -387,9 +392,10 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                       (gapWidth * (labels.length - 1));
                               final double screenWidth =
                                   MediaQuery.of(context).size.width - 20.w;
-                              final double chartWidth = totalRequiredWidth < screenWidth
-                                  ? screenWidth
-                                  : totalRequiredWidth;
+                              final double chartWidth =
+                                  totalRequiredWidth < screenWidth
+                                      ? screenWidth
+                                      : totalRequiredWidth;
                               return SizedBox(
                                 width: chartWidth,
                                 child: BarChartRetrieve(
@@ -398,8 +404,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                                   gbScores: gb,
                                   abScores: ab,
                                   symptomDetails: savedSymptomDetails,
-                                  petName: historyData['petName']  as String,  
-                                  petType: historyData['petType']  as String,  
+                                  petName: historyData['petName'] as String,
+                                  petType: historyData['petType'] as String,
                                 ),
                               );
                             },
@@ -421,10 +427,14 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                           spacing: 20.w,
                           runSpacing: 10.h,
                           children: [
-                            _legendDot(const Color(0xFF4285F4), "Confidence Score"),
-                            _legendDot(const Color(0xFF34A853), "Weighted Symptoms"),
-                            _legendDot(const Color(0xFFFFA726), "ML Score Adjustment"),
-                            _legendDot(const Color(0xFF7B1FA2), "Subtype Coverage"),
+                            _legendDot(
+                                const Color(0xFF4285F4), "Confidence Score"),
+                            _legendDot(
+                                const Color(0xFF34A853), "Weighted Symptoms"),
+                            _legendDot(
+                                const Color(0xFFFFA726), "ML Score Adjustment"),
+                            _legendDot(
+                                const Color(0xFF7B1FA2), "Subtype Coverage"),
                           ],
                         ),
                       ),
@@ -460,16 +470,7 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                   ),
                 ),
                 SizedBox(height: 25.h),
-                _buildExpandableCard(
-                  title: "Recommended Resources",
-                  icon: Icons.lightbulb_outline,
-                  content: Column(
-                    children: recommendations
-                        .map((item) => _buildRecommendationItem(item))
-                        .toList(),
-                  ),
-                ),
-                SizedBox(height: 30.h),
+               
               ],
             ),
           ),
@@ -478,44 +479,52 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     );
   }
 
-   Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
-    final primary   = topDiagnoses[0];
+  Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
+    final primary = topDiagnoses[0];
     final secondary = topDiagnoses.length > 1 ? topDiagnoses[1] : null;
-    final tertiary  = topDiagnoses.length > 2 ? topDiagnoses[2] : null;
+    final tertiary = topDiagnoses.length > 2 ? topDiagnoses[2] : null;
+    final firstType = topDiagnoses[0]['type'];
+    final secondType =
+        topDiagnoses.length > 1 ? topDiagnoses[1]['type'] : "Unknown";
+    final thirdType =
+        topDiagnoses.length > 2 ? topDiagnoses[2]['type'] : "Unknown";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Primary
-        _buildDiagnosisItem(
-          primary,
-          isPrimary: true,
-          description: _extractDescription(primary),
-        ),
+        _buildDiagnosisItem(primary,
+            isPrimary: true,
+            description: _extractDescription(primary),
+            rank: 1,
+            type: firstType),
 
         // Secondary
         if (secondary != null) ...[
           SizedBox(height: 16.h),
-          _buildDiagnosisItem(
-            secondary,
-            description: _extractDescription(secondary),
-          ),
+          _buildDiagnosisItem(secondary,
+              description: _extractDescription(secondary),
+              rank: 2,
+              type: secondType),
         ],
 
         // Tertiary
         if (tertiary != null) ...[
           SizedBox(height: 16.h),
-          _buildDiagnosisItem(
-            tertiary,
-            description: _extractDescription(tertiary),
-          ),
+          _buildDiagnosisItem(tertiary,
+              description: _extractDescription(tertiary),
+              rank: 3,
+              type: thirdType),
         ],
       ],
     );
   }
 
   Widget _buildDiagnosisItem(Map<String, dynamic> diagnosis,
-      {bool isPrimary = false, required String description}) {
+      {bool isPrimary = false,
+      required String description,
+      required int rank,
+      required String type}) {
     final confidence = (diagnosis['confidence_ab'] as num?)?.toDouble() ?? 0.0;
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
@@ -556,16 +565,18 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         child: CircularProgressIndicator(
                           value: 100,
                           backgroundColor: Colors.grey.withValues(alpha: 0.2),
-                          color: isPrimary ? const Color(0xFF52AAA4) : const Color(0xFFFFA726),
+                          color: const Color(0xFF52AAA4),
                           strokeWidth: 8.w,
                         ),
                       ),
                       Text(
-                        "1",
+                        "$rank",
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: isPrimary ? const Color(0xFF52AAA4) : const Color(0xFF3D4A5C),
+                          color: isPrimary
+                              ? const Color(0xFF52AAA4)
+                              : const Color(0xFF3D4A5C),
                         ),
                       ),
                     ],
@@ -585,23 +596,49 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                         color: const Color(0xFF3D4A5C),
                       ),
                     ),
-                    if (isPrimary)
-                      Container(
-                        margin: EdgeInsets.only(top: 5.h),
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF52AAA4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Most Likely",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                    Row(
+                      children: [
+                        if (isPrimary)
+                          Container(
+                            margin: EdgeInsets.only(top: 5.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF52AAA4),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              "Most Likely",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        if (isPrimary) SizedBox(width: 8.w),
+                        if (type.isNotEmpty)
+                          Container(
+                            margin: EdgeInsets.only(top: 5.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border:
+                                  Border.all(color: const Color(0xFF52AAA4)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              type,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF52AAA4),
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -620,18 +657,18 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton.icon(
-                
                 onPressed: () {
                   final Map<String, dynamic> historyData = widget.historyData;
                   final List<Map<String, dynamic>> diagnoses =
-                  List<Map<String, dynamic>>.from(historyData['diagnosisResults'] ?? []);
+                      List<Map<String, dynamic>>.from(
+                          historyData['diagnosisResults'] ?? []);
 
-                 
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => HistoryIllnessdetailsScreen(
-                        diagnosisData: diagnosis, totalIllnesses: diagnoses.length,
+                        diagnosisData: diagnosis,
+                        totalIllnesses: diagnoses.length,
                         allDiagnoses: diagnoses,
                       ),
                     ),
@@ -652,7 +689,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
                 ),
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -707,83 +745,6 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     );
   }
 
-  Widget _buildRecommendationItem(ListItem item) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 15.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F9FA),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            if (item.isExternal) {
-              await _launchURL(item.url!);
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => item.route!,
-                ),
-              );
-            }
-          },
-          borderRadius: BorderRadius.circular(15),
-          child: Padding(
-            padding: EdgeInsets.all(12.w),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    item.imageUrl,
-                    width: 80.w,
-                    height: 80.h,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 15.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF52AAA4),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 5.h),
-                      Text(
-                        item.subtitle,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: const Color(0xFF6B7A8D),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 5.w),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  color: Color(0xFF52AAA4),
-                  size: 18,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildComparisonTable(List<Map<String, dynamic>> topDiagnoses) {
     final ill1 = topDiagnoses[0];
@@ -794,8 +755,10 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
     final double confFc2 = (ill2['confidence_fc'] as num?)?.toDouble() ?? 0.0;
     final double mlScore1 = confAb1 - confFc1;
     final double mlScore2 = confAb2 - confFc2;
-    final double coverage1 = (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
-    final double coverage2 = (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+    final double coverage1 =
+        (ill1['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
+    final double coverage2 =
+        (ill2['subtype_coverage'] as num?)?.toDouble() ?? 0.0;
     return Table(
       border: TableBorder(
         horizontalInside: BorderSide(
@@ -883,14 +846,17 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
   Widget _tableScoreCell(double value, bool isHighlighted) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
-      color: isHighlighted ? const Color(0xFFEFF8F7).withValues(alpha: 0.3) : Colors.transparent,
+      color: isHighlighted
+          ? const Color(0xFFEFF8F7).withValues(alpha: 0.3)
+          : Colors.transparent,
       child: Text(
         value.toStringAsFixed(2),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 14.sp,
           fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
-          color: isHighlighted ? const Color(0xFF52AAA4) : const Color(0xFF3D4A5C),
+          color:
+              isHighlighted ? const Color(0xFF52AAA4) : const Color(0xFF3D4A5C),
         ),
       ),
     );

@@ -303,7 +303,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: const Text(
-                              'All Possible Illnesses',
+                              'All Diagnosed Illnesses',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             content: SizedBox(

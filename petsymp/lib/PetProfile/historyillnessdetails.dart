@@ -30,9 +30,9 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: Text(
-        'Illnesses ≥ ${(threshold * 100).toStringAsFixed(0)}% Prob',
-        style: const TextStyle(fontWeight: FontWeight.bold),
+      title: const Text(
+        'Possible Illnesses',
+        style:  TextStyle(fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: double.maxFinite,

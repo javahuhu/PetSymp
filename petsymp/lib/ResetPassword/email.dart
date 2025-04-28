@@ -125,9 +125,13 @@ class EmailScreenState extends State<EmailScreen> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     
-    return Scaffold(
+    return  Scaffold(
       backgroundColor: const Color(0xFFECF5F8),
-      body: SafeArea(
+      body: Stack(
+  children: [
+    SafeArea(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: 150.h), // Add extra bottom padding so fields are scrolled
         child: AnimatedBuilder(
           animation: _animationController,
           builder: (context, child) {
@@ -356,10 +360,10 @@ class EmailScreenState extends State<EmailScreen> with SingleTickerProviderState
                     ],
                   ),
                 ),
-                const Spacer(),
-                // Enhanced Submit button with dynamic states
+               
+             
                 Padding(
-                  padding: EdgeInsets.only(bottom: 32.h, left: 24.w, right: 24.w),
+                  padding: EdgeInsets.only(top: 300.h, bottom: 5.h, left: 24.w, right: 24.w),
                   child: Center(
                     child: _isLoading
                         ? Container(
@@ -449,13 +453,9 @@ class EmailScreenState extends State<EmailScreen> with SingleTickerProviderState
           ),
         ),
       ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _animationController.dispose();
-    super.dispose();
+    ),
+    
+  ],
+));
   }
 }

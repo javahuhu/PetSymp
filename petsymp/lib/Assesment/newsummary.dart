@@ -15,7 +15,6 @@ import 'package:petsymp/Connection/dynamicconnections.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:intl/intl.dart';
 
-
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
 
@@ -38,47 +37,47 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
   }
 
   Future<void> _generateSymptomDetails(UserData userData) async {
-  final topIllnesses =
-      userData.diagnosisResults.map((d) => d['illness'].toString()).toList();
-  final inputSymptoms =
-      userData.petSymptoms.map((s) => s.toLowerCase()).toList();
+    final topIllnesses =
+        userData.diagnosisResults.map((d) => d['illness'].toString()).toList();
+    final inputSymptoms =
+        userData.petSymptoms.map((s) => s.toLowerCase()).toList();
 
-  Map<String, List<Map<String, dynamic>>> allDetails = {};
+    Map<String, List<Map<String, dynamic>>> allDetails = {};
 
-  for (String illness in topIllnesses) {
-    try {
-      final petType = userData.selectedPetType.toLowerCase();
-      final url = Uri.parse(AppConfig.getKnowledgeDetailsURL(petType, illness));
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final knowledgeList = data["knowledge"] as List<dynamic>;
+    for (String illness in topIllnesses) {
+      try {
+        final petType = userData.selectedPetType.toLowerCase();
+        final url =
+            Uri.parse(AppConfig.getKnowledgeDetailsURL(petType, illness));
+        final response = await http.get(url);
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          final knowledgeList = data["knowledge"] as List<dynamic>;
 
-        final filtered = knowledgeList.where((entry) =>
-            inputSymptoms.contains(entry['name'].toString().toLowerCase()));
+          final filtered = knowledgeList.where((entry) =>
+              inputSymptoms.contains(entry['name'].toString().toLowerCase()));
 
-        allDetails[illness] = filtered.map((entry) {
-          return {
-            "name": entry["name"],
-            "base_weight": entry["base_weight"],
-            "severity": entry["severity"],
-            "priority": entry["priority"],
-            "fc_weight": entry["fc_weight"],
-            "gb_adjustment": entry["gb_adjustment"],
-            "gb_weight": entry["gb_weight"],
-            "ab_factor": entry["ab_factor"],
-            "ab_weight": entry["ab_weight"],
-          };
-        }).toList();
+          allDetails[illness] = filtered.map((entry) {
+            return {
+              "name": entry["name"],
+              "base_weight": entry["base_weight"],
+              "severity": entry["severity"],
+              "priority": entry["priority"],
+              "fc_weight": entry["fc_weight"],
+              "gb_adjustment": entry["gb_adjustment"],
+              "gb_weight": entry["gb_weight"],
+              "ab_factor": entry["ab_factor"],
+              "ab_weight": entry["ab_weight"],
+            };
+          }).toList();
+        }
+      } catch (e) {
+        print("⚠️ Failed to fetch knowledge for $illness: $e");
       }
-    } catch (e) {
-      print("⚠️ Failed to fetch knowledge for $illness: $e");
     }
+
+    userData.setSymptomDetails(allDetails);
   }
-
-  userData.setSymptomDetails(allDetails);
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -154,8 +153,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         itemCount: dateRange.length,
                         itemBuilder: (_, idx) {
                           final date = dateRange[idx];
-                          final isToday =
-                              DateFormat('yMd').format(date) == DateFormat('yMd').format(now);
+                          final isToday = DateFormat('yMd').format(date) ==
+                              DateFormat('yMd').format(now);
                           return Container(
                             width: 50,
                             margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -177,7 +176,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                         },
                       ),
                     ),
-                  ),                
+                  ),
                   SizedBox(
                     height: 450.h,
                     child: Stack(
@@ -219,71 +218,72 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       ],
                     ),
                   ),
-                  
+
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 0.h),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                          Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 35.h,
-                              child: SizedBox(
-                                child: Lottie.asset(
-                                  'assets/wavy.json',
-                                  fit: BoxFit.cover,
-                                  repeat: true,
-                                ),
-                              ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 35.h,
+                          child: SizedBox(
+                            child: Lottie.asset(
+                              'assets/wavy.json',
+                              fit: BoxFit.cover,
+                              repeat: true,
                             ),
-                         Container(
-                              padding: EdgeInsets.all(10.w),
-                              width: double.infinity,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: petDetails.map((detail) {
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 30.w),
-                                      child: SizedBox(
-                                        height: 90.h,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              detail["label"]!,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            Text(
-                                              detail["value"]!,
-                                              style: TextStyle(
-                                                fontSize: 18.sp,
-                                                fontFamily: 'Oswald',
-                                                color: const Color.fromRGBO(
-                                                    29, 29, 44, 1.0),
-                                              ),
-                                            ),
-                                          ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.w),
+                          width: double.infinity,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: petDetails.map((detail) {
+                                return Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 30.w),
+                                  child: SizedBox(
+                                    height: 90.h,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          detail["label"]!,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
+                                        Text(
+                                          detail["value"]!,
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+                                            fontFamily: 'Oswald',
+                                            color: const Color.fromRGBO(
+                                                29, 29, 44, 1.0),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
 
-                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
                     child: Center(
                       child: SizedBox(
                         width: 325.w,
@@ -297,11 +297,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               // Top 1
                               if (topDiagnoses.isNotEmpty)
                                 Padding(
-                                  padding: EdgeInsets.only(top: 20.h, left: 5.w),
+                                  padding:
+                                      EdgeInsets.only(top: 20.h, left: 5.w),
                                   child: SizedBox(
                                     width: 350.w,
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
                                           width: 110.w,
@@ -312,10 +314,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               SizedBox(
                                                 width: 90.w,
                                                 height: 90.w,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   value: 1.0,
                                                   backgroundColor: Colors.grey,
-                                                  color: const Color(0xFF52AAA4),
+                                                  color:
+                                                      const Color(0xFF52AAA4),
                                                   strokeWidth: 8.w,
                                                 ),
                                               ),
@@ -325,10 +329,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(50.r),
+                                                      BorderRadius.circular(
+                                                          50.r),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: const Color(0xFF52AAA4)
+                                                      color: const Color(
+                                                              0xFF52AAA4)
                                                           .withOpacity(0.25),
                                                       blurRadius: 10,
                                                       spreadRadius: 5,
@@ -355,9 +361,11 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 padding: EdgeInsets.only(
                                                     left: 10.w, top: 15.h),
                                                 child: Text(
-                                                  topDiagnoses[0]['illness'] ?? '',
+                                                  topDiagnoses[0]['illness'] ??
+                                                      '',
                                                   maxLines: 4,
-                                                  overflow: TextOverflow.visible,
+                                                  overflow:
+                                                      TextOverflow.visible,
                                                   style: TextStyle(
                                                     fontSize: 22.sp,
                                                     fontWeight: FontWeight.bold,
@@ -366,13 +374,66 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               ),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 10.w),
-                                                child: Text(
-                                                  "Top 1",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    color: const Color(0xFFA9A9A9),
-                                                  ),
+                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .center, // ✅ Important!
+                                                  children: [
+                                                    Text(
+                                                      "Top 1",
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        color: const Color(
+                                                            0xFFA9A9A9),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        width: 10
+                                                            .w), // ✅ Add spacing between "Top 1" and type
+                                                    if (topDiagnoses[0]
+                                                            ['type'] !=
+                                                        null)
+                                                      Container(
+                                                        width: 100.w,
+                                                        height: 25
+                                                            .h, // ❗ Make height smaller so text fits nicely
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    10.w),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          
+                                                          border: Border.all(
+                                                            color: const Color(
+                                                              0xFF52AAA4)
+                                                          .withOpacity(0.25),
+                                                            width: 1,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50.r),
+                                                          color:const Color.fromARGB(126, 82, 170, 164)
+                                                        
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            topDiagnoses[0]
+                                                                ['type'],
+                                                            style: TextStyle(
+                                                              fontSize: 13
+                                                                  .sp, // ❗ Slightly smaller text
+                                                              color: const Color.fromARGB(255, 0, 0, 0),
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -390,7 +451,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[0]['illness']),
+                                            illnessName: topDiagnoses[0]
+                                                ['illness']),
                                       ),
                                     );
                                   },
@@ -398,13 +460,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 16.w, vertical: 8.h),
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                     backgroundColor: Colors.transparent,
                                   ).copyWith(
-                                    overlayColor:
-                                        MaterialStateProperty.all(Colors.transparent),
-                                    shadowColor:
-                                        MaterialStateProperty.all(Colors.transparent),
+                                    overlayColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    shadowColor: MaterialStateProperty.all(
+                                        Colors.transparent),
                                     elevation: MaterialStateProperty.all(0),
                                   ),
                                   child: Text(
@@ -426,11 +489,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               // Top 2
                               if (topDiagnoses.length > 1)
                                 Padding(
-                                  padding: EdgeInsets.only(top: 15.h, left: 5.w),
+                                  padding:
+                                      EdgeInsets.only(top: 15.h, left: 5.w),
                                   child: SizedBox(
                                     width: 350.w,
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
                                           width: 110.w,
@@ -441,10 +506,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               SizedBox(
                                                 width: 90.w,
                                                 height: 90.w,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   value: 1.0,
                                                   backgroundColor: Colors.grey,
-                                                  color: const Color(0xFF52AAA4),
+                                                  color:
+                                                      const Color(0xFF52AAA4),
                                                   strokeWidth: 8.w,
                                                 ),
                                               ),
@@ -454,10 +521,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(50.r),
+                                                      BorderRadius.circular(
+                                                          50.r),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: const Color(0xFF52AAA4)
+                                                      color: const Color(
+                                                              0xFF52AAA4)
                                                           .withOpacity(0.25),
                                                       blurRadius: 10,
                                                       spreadRadius: 5,
@@ -484,9 +553,11 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 padding: EdgeInsets.only(
                                                     left: 10.w, top: 15.h),
                                                 child: Text(
-                                                  topDiagnoses[1]['illness'] ?? '',
+                                                  topDiagnoses[1]['illness'] ??
+                                                      '',
                                                   maxLines: 4,
-                                                  overflow: TextOverflow.visible,
+                                                  overflow:
+                                                      TextOverflow.visible,
                                                   style: TextStyle(
                                                     fontSize: 22.sp,
                                                     fontWeight: FontWeight.bold,
@@ -495,13 +566,65 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               ),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 10.w),
-                                                child: Text(
-                                                  "Top 2",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    color: const Color(0xFFA9A9A9),
-                                                  ),
+                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .center, // ✅ Important!
+                                                  children: [
+                                                    Text(
+                                                      "Top 2",
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        color: const Color(
+                                                            0xFFA9A9A9),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        width: 10
+                                                            .w), // 
+                                                    if (topDiagnoses[1]
+                                                            ['type'] !=
+                                                        null)
+                                                      Container(
+                                                        width: 100.w,
+                                                        height: 25.h,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    10.w),
+                                                        decoration:
+                                                              BoxDecoration(
+                                                          
+                                                          border: Border.all(
+                                                            color: const Color(
+                                                              0xFF52AAA4)
+                                                          .withOpacity(0.25),
+                                                            width: 1,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50.r),
+                                                          color:const Color.fromARGB(126, 82, 170, 164)
+                                                        
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            topDiagnoses[1]
+                                                                ['type'],
+                                                            style: TextStyle(
+                                                              fontSize: 13
+                                                                  .sp, // ❗ Slightly smaller text
+                                                              color: const Color.fromARGB(255, 0, 0, 0),
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -519,7 +642,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[1]['illness']),
+                                            illnessName: topDiagnoses[1]
+                                                ['illness']),
                                       ),
                                     );
                                   },
@@ -527,13 +651,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 16.w, vertical: 8.h),
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                     backgroundColor: Colors.transparent,
                                   ).copyWith(
-                                    overlayColor:
-                                        MaterialStateProperty.all(Colors.transparent),
-                                    shadowColor:
-                                        MaterialStateProperty.all(Colors.transparent),
+                                    overlayColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    shadowColor: MaterialStateProperty.all(
+                                        Colors.transparent),
                                     elevation: MaterialStateProperty.all(0),
                                   ),
                                   child: Text(
@@ -555,11 +680,13 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               // Top 3
                               if (topDiagnoses.length > 2)
                                 Padding(
-                                  padding: EdgeInsets.only(top: 15.h, left: 5.w),
+                                  padding:
+                                      EdgeInsets.only(top: 15.h, left: 5.w),
                                   child: SizedBox(
                                     width: 350.w,
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
                                           width: 110.w,
@@ -570,10 +697,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               SizedBox(
                                                 width: 90.w,
                                                 height: 90.w,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   value: 1.0,
                                                   backgroundColor: Colors.grey,
-                                                  color: const Color(0xFF52AAA4),
+                                                  color:
+                                                      const Color(0xFF52AAA4),
                                                   strokeWidth: 8.w,
                                                 ),
                                               ),
@@ -583,10 +712,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 alignment: Alignment.center,
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(50.r),
+                                                      BorderRadius.circular(
+                                                          50.r),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: const Color(0xFF52AAA4)
+                                                      color: const Color(
+                                                              0xFF52AAA4)
                                                           .withOpacity(0.25),
                                                       blurRadius: 10,
                                                       spreadRadius: 5,
@@ -613,9 +744,11 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 padding: EdgeInsets.only(
                                                     left: 10.w, top: 15.h),
                                                 child: Text(
-                                                  topDiagnoses[2]['illness'] ?? '',
+                                                  topDiagnoses[2]['illness'] ??
+                                                      '',
                                                   maxLines: 4,
-                                                  overflow: TextOverflow.visible,
+                                                  overflow:
+                                                      TextOverflow.visible,
                                                   style: TextStyle(
                                                     fontSize: 22.sp,
                                                     fontWeight: FontWeight.bold,
@@ -624,13 +757,67 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.only(left: 10.w),
-                                                child: Text(
-                                                  "Top 3",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    color: const Color(0xFFA9A9A9),
-                                                  ),
+                                                padding:
+                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .center, // ✅ Important!
+                                                  children: [
+                                                    Text(
+                                                      "Top 3",
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        color: const Color(
+                                                            0xFFA9A9A9),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        width: 10
+                                                            .w), 
+                                                    if (topDiagnoses[2]
+                                                            ['type'] !=
+                                                        null)
+                                                      Container(
+                                                        width: 100.w,
+                                                        height: 25
+                                                            .h, // ❗ Make height smaller so text fits nicely
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    10.w),
+                                                        decoration:
+                                                              BoxDecoration(
+                                                          
+                                                          border: Border.all(
+                                                            color: const Color(
+                                                              0xFF52AAA4)
+                                                          .withOpacity(0.25),
+                                                            width: 1,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50.r),
+                                                          color:const Color.fromARGB(126, 82, 170, 164)
+                                                        
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            topDiagnoses[2]
+                                                                ['type'],
+                                                            style: TextStyle(
+                                                              fontSize: 13
+                                                                  .sp, 
+                                                              color: const Color.fromARGB(255, 0, 0, 0),
+                                                            ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -648,7 +835,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[2]['illness']),
+                                            illnessName: topDiagnoses[2]
+                                                ['illness']),
                                       ),
                                     );
                                   },
@@ -656,13 +844,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 16.w, vertical: 8.h),
                                     minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                     backgroundColor: Colors.transparent,
                                   ).copyWith(
-                                    overlayColor:
-                                        MaterialStateProperty.all(Colors.transparent),
-                                    shadowColor:
-                                        MaterialStateProperty.all(Colors.transparent),
+                                    overlayColor: MaterialStateProperty.all(
+                                        Colors.transparent),
+                                    shadowColor: MaterialStateProperty.all(
+                                        Colors.transparent),
                                     elevation: MaterialStateProperty.all(0),
                                   ),
                                   child: Text(
@@ -681,7 +870,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Swiper section - now placed after the top 3 illness card
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 15.h),
@@ -751,7 +940,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Illness comparison section - now moved after the swiper
                   Padding(
                     padding:
@@ -796,8 +985,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                 );
                               }
                               final ill1 = topDiagnoses[0];
-                              final ill2 =
-                                  topDiagnoses.length > 1 ? topDiagnoses[1] : null;
+                              final ill2 = topDiagnoses.length > 1
+                                  ? topDiagnoses[1]
+                                  : null;
                               final confAb1 =
                                   (ill1['confidence_ab'] as num).toDouble();
                               final confFc1 =
@@ -806,18 +996,22 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                               final coverage1 =
                                   (ill1['subtype_coverage'] as num).toDouble();
                               final confAb2 =
-                                  (ill2?['confidence_ab'] as num? ?? 0.0).toDouble();
+                                  (ill2?['confidence_ab'] as num? ?? 0.0)
+                                      .toDouble();
                               final confFc2 =
-                                  (ill2?['confidence_fc'] as num? ?? 0.0).toDouble();
+                                  (ill2?['confidence_fc'] as num? ?? 0.0)
+                                      .toDouble();
                               final mlScore2 = confAb2 - confFc2;
                               final coverage2 =
-                                  (ill2?['subtype_coverage'] as num? ?? 0.0).toDouble();
+                                  (ill2?['subtype_coverage'] as num? ?? 0.0)
+                                      .toDouble();
 
                               return Column(
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(82, 170, 164, 0.1),
+                                      color: const Color.fromRGBO(
+                                          82, 170, 164, 0.1),
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(10.r)),
                                     ),
@@ -830,27 +1024,30 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                             child: Text("Metrics",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         ),
                                         Container(
                                             width: 1,
                                             height: 40.h,
-                                            color: Colors.grey.withOpacity(0.3)),
+                                            color:
+                                                Colors.grey.withOpacity(0.3)),
                                         Expanded(
                                           child: Padding(
                                             padding: EdgeInsets.all(5.w),
-                                            child: Text(
-                                                "${ill1['illness']}",
+                                            child: Text("${ill1['illness']}",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         ),
                                         Container(
                                             width: 1,
                                             height: 40.h,
-                                            color: Colors.grey.withOpacity(0.3)),
+                                            color:
+                                                Colors.grey.withOpacity(0.3)),
                                         Expanded(
                                           child: Padding(
                                             padding: EdgeInsets.all(5.w),
@@ -858,7 +1055,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                 "${ill2?['illness'] ?? '—'}",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold)),
+                                                    fontWeight:
+                                                        FontWeight.bold)),
                                           ),
                                         ),
                                       ],
@@ -893,9 +1091,10 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                       ),
                     ),
                   ),
-                  
+
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: SizedBox(
@@ -905,8 +1104,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (_) =>
-                                  const Center(child: CircularProgressIndicator()),
+                              builder: (_) => const Center(
+                                  child: CircularProgressIndicator()),
                             );
                             try {
                               final uid =
@@ -939,28 +1138,27 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                   final illness = d['illness'] as String;
                                   try {
                                     final url = Uri.parse(
-                                        AppConfig.getMetricsWithCmURL(userData.selectedPetType, illness));
+                                        AppConfig.getMetricsWithCmURL(
+                                            userData.selectedPetType, illness));
                                     final resp = await http.get(url);
                                     if (resp.statusCode == 200) {
                                       final data = jsonDecode(resp.body)
                                           as Map<String, dynamic>;
-                                      final cmRaw =
-                                          data['confusion_matrix']
-                                              as Map<String, dynamic>;
+                                      final cmRaw = data['confusion_matrix']
+                                          as Map<String, dynamic>;
                                       final confMatrix = {
                                         'TP': cmRaw['TP'] as int,
                                         'FP': cmRaw['FP'] as int,
                                         'FN': cmRaw['FN'] as int,
                                         'TN': cmRaw['TN'] as int,
                                       };
-                                      final mRaw =
-                                          data['metrics'] as Map<String, dynamic>;
+                                      final mRaw = data['metrics']
+                                          as Map<String, dynamic>;
                                       final metrics = {
                                         'accuracy': (mRaw['Accuracy'] as num)
                                             .toDouble(),
-                                        'precision':
-                                            (mRaw['Precision'] as num)
-                                                .toDouble(),
+                                        'precision': (mRaw['Precision'] as num)
+                                            .toDouble(),
                                         'recall':
                                             (mRaw['Recall'] as num).toDouble(),
                                         'specificity':
@@ -989,8 +1187,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                 };
                                 if (existing.docs.isNotEmpty) {
                                   await existing.docs.first.reference.update({
-                                    'assessments':
-                                        FieldValue.arrayUnion([assessmentEntry]),
+                                    'assessments': FieldValue.arrayUnion(
+                                        [assessmentEntry]),
                                     'date': Timestamp.now(),
                                   });
                                 } else {
@@ -1021,25 +1219,50 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                             }
                           },
                           style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith((s) =>
-                                    s.contains(MaterialState.pressed)
-                                        ? Colors.black
-                                        : Colors.transparent),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith((s) =>
-                                    s.contains(MaterialState.pressed)
-                                        ? Colors.white
-                                        : const Color(0xFF1D1D2C)),
-                            side: MaterialStateProperty.all(const BorderSide(
-                                color: Color(0xFF52AAA4), width: 2)),
-                            shape: MaterialStateProperty.all(
-                                const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(100))))),
+                            // Dynamic background color based on button state
+                            backgroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return const Color.fromARGB(255, 0, 0,
+                                      0); // Background color when pressed
+                                }
+                                return Colors
+                                    .transparent; // Default background color
+                              },
+                            ),
+                            // Dynamic text color based on button state
+                            foregroundColor: WidgetStateProperty.resolveWith(
+                              (states) {
+                                if (states.contains(WidgetState.pressed)) {
+                                  return const Color.fromARGB(255, 255, 255,
+                                      255); // Text color when pressed
+                                }
+                                return const Color.fromRGBO(
+                                    29, 29, 44, 1.0); // Default text color
+                              },
+                            ),
+                            shadowColor:
+                                WidgetStateProperty.all(Colors.transparent),
+                            side: WidgetStateProperty.all(
+                              const BorderSide(
+                                color: Color.fromRGBO(82, 170, 164, 1),
+                                width: 2.0,
+                              ),
+                            ),
+                            shape: WidgetStateProperty.all(
+                              const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(100)),
+                              ),
+                            ),
+                            fixedSize: WidgetStateProperty.all(
+                              const Size(155, 55),
+                            ),
+                          ),
                           child: Text("Finish",
-                              style:
-                                  TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                              style: TextStyle(
+                                  fontSize: 22.sp,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
@@ -1123,7 +1346,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
               ),
             ),
           ),
-          Container(width: 1, height: 40.h, color: Colors.grey.withOpacity(0.3)),
+          Container(
+              width: 1, height: 40.h, color: Colors.grey.withOpacity(0.3)),
           Expanded(
             child: Center(
               child: Text(
@@ -1136,5 +1360,4 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
       ),
     );
   }
-
 }

@@ -1,44 +1,115 @@
 final Map<String, dynamic> symptomQuestions = {
-  "vomiting": {
-    "questions": [
-      "How long has your pet had vomiting?",
-      "Is the vomiting Mild or Severe?"
-    ],
-    "impactDays": ["1-4 days", "5-7 days"],
-    "impactSymptom": ["mild", "severe"],
-  },
-  "diarrhea": {
-    "questions": [
-      "How long has your pet had diarrhea?",
-      "Is the diarrhea Watery or Bloody?"
-    ],
-    "impactDays": ["1-4 days", "5-7 days"],
-    "impactSymptom": ["watery", "bloody"],
-  },
+
+
+  
   "coughing": {
     "questions": [
       "How long has your pet had coughing?",
-      "Is the coughing Dry or Wet?"
+      "What type of coughing is it? (Dry, Wet, or Honking)"
     ],
-    "impactDays": ["1-4 days", "5-7 days", "8-14 days", "persistent"],
-    "impactSymptom": ["dry", "wet"],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["dry", "wet", "honking"],
   },
   "fever": {
     "questions": [
-      "How long has your pet had fever?",
-      "Is the fever Mild, Moderate, or Severe?"
+      "How long has your pet had fever?"
     ],
-    "impactDays": ["1-4 days", "5-7 days", "8-14 days"],
-    "impactSymptom": ["mild", "moderate", "severe"],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": [],
   },
   "lethargy": {
     "questions": [
       "How long has your pet had lethargy?",
-      "Is the lethargy Mild or Severe?"
+      "What type of lethargy is it? (Intermittent or Constant)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days", "variable"],
-    "impactSymptom": ["mild", "severe", "variable"],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["intermittent", "constant"],
   },
+  "sneezing": {
+    "questions": [
+      "How long has your pet had sneezing?",
+      "What type of sneezing is it? (Occasional or Frequent)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["occasional", "frequent"],
+  },
+  "diarrhea": {
+    "questions": [
+      "How long has your pet had diarrhea?",
+      "What type of diarrhea is it? (Watery or Bloody)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["watery", "bloody"],
+  },
+  "nasal discharge": {
+    "questions": [
+      "What type of nasal discharge is it? (Mucus or Bloody)"
+    ],
+    "impactDays": [],
+    "impactSymptom": ["mucus", "bloody"],
+  },
+  "seizures": {
+    "questions": [
+      "How long has your pet had seizures?",
+      "What type of seizures is it? (Mild, Severe, or Cluster)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["mild", "severe", "cluster"],
+  },
+  "vomiting": {
+    "questions": [
+      "How long has your pet had vomiting?",
+      "What type of vomiting is it? (Bloody, Foamy, Yellow, or Green)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["bloody", "foamy", "yellow", "green"],
+  },
+  "weight loss": {
+    "questions": [
+      "How long has your pet had weight loss?"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": [],
+  },
+  "breathing difficulty": {
+    "questions": [
+      "How long has your pet had breathing difficulty?",
+      "What type of breathing difficulty is it? (Mild, Severe, or Labored)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["mild", "severe", "labored"],
+  },
+  "loss of appetite": {
+    "questions": [
+      "How long has your pet had loss of appetite?"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": [],
+  },
+  "itching": {
+    "questions": [
+      "How long has your pet had itching?",
+      "What type of itching is it? (Localized or Generalized)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["localized", "generalized"],
+  },
+  "ear discharge": {
+    "questions": [
+      "What type of ear discharge is it? (Brown or Bloody)"
+    ],
+    "impactDays": [],
+    "impactSymptom": ["brown", "bloody"],
+  },
+  "pain": {
+    "questions": [
+      "How long has your pet had pain?",
+      "What type of pain is it? (Sharp, Dull, or Localized)"
+    ],
+    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactSymptom": ["sharp", "dull", "localized"],
+  },
+
   "eye discharge": {
     "questions": [
       "How long has your pet had eye discharge?",
@@ -47,14 +118,7 @@ final Map<String, dynamic> symptomQuestions = {
     "impactDays": ["1-2 days", "3-10 days"],
     "impactSymptom": ["watery", "mucous-like"],
   },
-  "nasal discharge": {
-    "questions": [
-      "How long has your pet had nasal discharge?",
-      "Is the nasal discharge Clear or Purulent?"
-    ],
-    "impactDays": ["1-2 days", "3-10 days"],
-    "impactSymptom": ["clear", "purulent"],
-  },
+
   "muscle twitching": {
     "questions": [
       "How long has your pet had muscle twitching?",
@@ -63,22 +127,8 @@ final Map<String, dynamic> symptomQuestions = {
     "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
     "impactSymptom": ["mild", "severe", "variable"],
   },
-  "seizures": {
-    "questions": [
-      "How long has your pet had seizures?",
-      "Are the seizures Partial or Generalized?"
-    ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days", "generalized"],
-    "impactSymptom": ["partial", "generalized", "intermittent", "progressive", "chronic"],
-  },
-  "sneezing": {
-    "questions": [
-      "How long has your pet had sneezing?",
-      "Is the sneezing Intermittent?"
-    ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days"],
-    "impactSymptom": ["intermittent"],
-  },
+  
+
   "muscle paralysis": {
     "questions": [
       "How long has your pet had muscle paralysis?",
@@ -87,6 +137,9 @@ final Map<String, dynamic> symptomQuestions = {
     "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days", "irreversible"],
     "impactSymptom": ["ascending", "irreversible"],
   },
+
+
+
 
   "abdominal discomfort": {},
   "abdominal enlargement": {},
@@ -108,7 +161,6 @@ final Map<String, dynamic> symptomQuestions = {
   "bloating": {},
   "blood in urine": {},
   "bluish gums": {},
-  "breathing difficulty": {},
   "bruising": {},
   "bunny hopping": {},
   "cataracts": {},
@@ -143,7 +195,6 @@ final Map<String, dynamic> symptomQuestions = {
   "drooling": {},
   "dropping food": {},
   "dull coat": {},
-  "ear discharge": {},
   "ear odor": {},
   "ear scratching": {},
   "edema (swelling)": {},
@@ -188,7 +239,6 @@ final Map<String, dynamic> symptomQuestions = {
   "intermittent lameness": {},
   "intermittent limping": {},
   "irritability": {},
-  "itching": {},
   "jaundice": {},
   "jaw pain": {},
   "joint pain": {},
@@ -197,7 +247,6 @@ final Map<String, dynamic> symptomQuestions = {
   "light sensitivity": {},
   "limb swelling": {},
   "loose teeth": {},
-  "loss of appetite": {},
   "loss of consciousness": {},
   "loss of coordination": {},
   "loss of muscle mass": {},
@@ -214,7 +263,6 @@ final Map<String, dynamic> symptomQuestions = {
   "nosebleeds": {},
   "oral pain": {},
   "osteoarthritis": {},
-  "pain": {},
   "pain in lower back": {},
   "pale gums": {},
   "panting": {},
@@ -282,7 +330,6 @@ final Map<String, dynamic> symptomQuestions = {
   "waddling gait": {},
   "weakness": {},
   "weight gain": {},
-  "weight loss": {},
   "wide-legged stance": {},
   "wobbling": {},
   "wobbly gait": {},
