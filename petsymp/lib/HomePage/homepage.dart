@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:petsymp/Settings/settings.dart';
 import 'package:petsymp/SymptomsCatalog/symptomscatalog.dart';
@@ -19,10 +18,12 @@ class HomePageScreen extends StatefulWidget {
   HomePageScreenState createState() => HomePageScreenState();
 }
 
-class HomePageScreenState extends State<HomePageScreen> with TickerProviderStateMixin {
+class HomePageScreenState extends State<HomePageScreen>
+    with TickerProviderStateMixin {
   int _selectedIndex = 0;
   bool _isAnimated = false;
   bool _isNavigating = false;
+  bool _hasPlayedAnimation = false;
   late final AnimationController _control;
 
   static const List<Widget> _pages = <Widget>[
@@ -37,7 +38,10 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
     final userId = _auth.currentUser?.uid;
 
     if (userId != null) {
-      final doc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
       final data = doc.data();
 
       if (data != null &&
@@ -80,9 +84,17 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
                   },
                 ),
               ),
-              Text("Assessment Saved", style: TextStyle(color: const Color.fromRGBO(82, 170, 164, 1), fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              Text("Assessment Saved",
+                  style: TextStyle(
+                      color: const Color.fromRGBO(82, 170, 164, 1),
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold)),
               SizedBox(height: 5.h),
-              Text("Your assessment has been saved successfully!", style: TextStyle(color: const Color.fromRGBO(82, 170, 164, 1), fontSize: 15.sp), textAlign: TextAlign.center),
+              Text("Your assessment has been saved successfully!",
+                  style: TextStyle(
+                      color: const Color.fromRGBO(82, 170, 164, 1),
+                      fontSize: 15.sp),
+                  textAlign: TextAlign.center),
             ],
           ),
         ),
@@ -103,14 +115,17 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
 
     if (widget.showSuccessDialog) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showSuccessDialog());
-      _control = AnimationController(duration: const Duration(seconds: 3), vsync: this)..forward();
+      _control =
+          AnimationController(duration: const Duration(seconds: 3), vsync: this)
+            ..forward();
     }
   }
 
   void _navigateToSymptomCatalog() async {
     if (_isNavigating) return;
     setState(() => _isNavigating = true);
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => const SymptomscatalogScreen()));
+    await Navigator.push(context,
+        MaterialPageRoute(builder: (_) => const SymptomscatalogScreen()));
     setState(() => _isNavigating = false);
   }
 
@@ -138,61 +153,88 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
                         Container(
                           width: 60.w,
                           height: 60.w,
-                          decoration: const BoxDecoration(shape: BoxShape.circle),
-                          child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                          decoration:
+                              const BoxDecoration(shape: BoxShape.circle),
+                          child: Image.asset('assets/paw.png',
+                              fit: BoxFit.contain),
                         ),
                         SizedBox(width: 15.w),
                         Padding(
                           padding: EdgeInsets.only(top: 10.h),
-                          child:  DefaultTextStyle(
-                          style:  TextStyle(
-                            fontSize: 27.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color.fromRGBO(29, 29, 44, 1.0),
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              fontSize: 27.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromRGBO(29, 29, 44, 1.0),
+                            ),
+                            child: _hasPlayedAnimation
+                                ? const Text(
+                                    "Hi, I'm Etsy") // After animation finishes, just static text
+                                : AnimatedTextKit(
+                                    animatedTexts: [
+                                      TypewriterAnimatedText(
+                                        "Hi, I'm Etsy",
+                                        speed:
+                                            const Duration(milliseconds: 200),
+                                        cursor: '|',
+                                      ),
+                                    ],
+                                    totalRepeatCount: 1,
+                                    pause: const Duration(milliseconds: 200),
+                                    displayFullTextOnTap: true,
+                                    stopPauseOnTap: true,
+                                    onFinished: () {
+                                      setState(() {
+                                        _hasPlayedAnimation = true;
+                                      });
+                                    },
+                                  ),
                           ),
-                          child: AnimatedTextKit(
-                            animatedTexts: [
-                              TypewriterAnimatedText(
-                                "Hi, I'm Etsy",
-                                speed: const Duration(milliseconds: 250),
-                                cursor: '|',
-                              ),
-                            ],
-                            totalRepeatCount: 1,
-                            pause: const Duration(milliseconds: 500),
-                            displayFullTextOnTap: true,
-                            stopPauseOnTap: true,
-                          ),),
-                        ),
+                        )
                       ],
                     ),
                     SizedBox(height: 20.h),
-                    
-                    Text("I can help you to analyze your", style: TextStyle(fontSize: 22.sp, color: const Color.fromRGBO(29, 29, 44, 1.0))) ,
-                    Text(" Pet health issues.", style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: const Color.fromRGBO(29, 29, 44, 1.0))),
+                    Text("I can help you to analyze your",
+                        style: TextStyle(
+                            fontSize: 22.sp,
+                            color: const Color.fromRGBO(29, 29, 44, 1.0))),
+                    Text(" Pet health issues.",
+                        style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromRGBO(29, 29, 44, 1.0))),
                     SizedBox(height: 55.h),
                     Center(
                       child: ElevatedButton(
                         onPressed: () async {
                           bool? accepted = await _showTermsDialog(context);
                           if (accepted == true) {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CardpetScreen()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CardpetScreen()));
                           }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF428682),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100.r)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.r)),
                           fixedSize: Size(250.w, 55.h),
                         ),
-                        child: Text("Start Assessment", style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold)),
+                        child: Text("Start Assessment",
+                            style: TextStyle(
+                                fontSize: 22.sp, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
                 ),
               ),
               AnimatedAlign(
-                alignment: _isAnimated ? const Alignment(1.0, 0.9) : const Alignment(2, 1),
+                alignment: _isAnimated
+                    ? const Alignment(1.0, 0.9)
+                    : const Alignment(2, 1),
                 duration: const Duration(seconds: 2),
                 curve: Curves.easeInOut,
                 child: Transform(
@@ -202,7 +244,9 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
                     height: 180.h,
                     width: 0.8.sw,
                     margin: EdgeInsets.only(top: 200.h, right: 5.w),
-                    child: FittedBox(fit: BoxFit.fill, child: Image.asset("assets/catpeeking.png")),
+                    child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Image.asset("assets/catpeeking.png")),
                   ),
                 ),
               ),
@@ -234,11 +278,21 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
       height: 70.h,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(29, 29, 44, 1.0),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, -3))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -3))
+        ],
       ),
       child: Stack(
         children: [
-          Positioned(top: 0, left: 0, right: 0, child: Container(height: 2, color: Colors.white.withOpacity(0.1))),
+          Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child:
+                  Container(height: 2, color: Colors.white.withOpacity(0.1))),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -263,12 +317,17 @@ class HomePageScreenState extends State<HomePageScreen> with TickerProviderState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: isSelected ? const Color(0xFF5DBFB0) : Colors.white, size: isSelected ? 28 : 24),
+          Icon(icon,
+              color: isSelected ? const Color(0xFF5DBFB0) : Colors.white,
+              size: isSelected ? 28 : 24),
           SizedBox(height: 4.h),
           Container(
             height: 2.h,
             width: 30.w,
-            decoration: BoxDecoration(color: isSelected ? const Color(0xFF5DBFB0) : Colors.transparent, borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(
+                color:
+                    isSelected ? const Color(0xFF5DBFB0) : Colors.transparent,
+                borderRadius: BorderRadius.circular(2)),
           ),
         ],
       ),
@@ -309,13 +368,21 @@ class _TermsDialogContentState extends State<TermsDialogContent> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 20.h),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Welcome!", style: TextStyle(fontFamily: 'Inter', fontSize: 35.sp, fontWeight: FontWeight.bold)),
+                          Text("Welcome!",
+                              style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 35.sp,
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(height: 25.h),
-                          Text("These Terms and Conditions ('Terms') govern your use of the PetSymp mobile application and services. By accessing or using PetSymp, you agree to these Terms. If you do not agree, please do not use the app.", style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp)),
+                          Text(
+                              "These Terms and Conditions ('Terms') govern your use of the PetSymp mobile application and services. By accessing or using PetSymp, you agree to these Terms. If you do not agree, please do not use the app.",
+                              style: TextStyle(
+                                  fontFamily: 'Inter', fontSize: 13.sp)),
                         ],
                       ),
                     ),
@@ -324,36 +391,61 @@ class _TermsDialogContentState extends State<TermsDialogContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Acceptance of Terms", style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                          Text("Acceptance of Terms",
+                              style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(height: 5.h),
-                          Text("By using PetSymp, you confirm that you have read, understood, and agree to comply with these Terms.", style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp)),
+                          Text(
+                              "By using PetSymp, you confirm that you have read, understood, and agree to comply with these Terms.",
+                              style: TextStyle(
+                                  fontFamily: 'Inter', fontSize: 13.sp)),
                           SizedBox(height: 25.h),
-                          Text("Description of Service", style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                          Text("Description of Service",
+                              style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(height: 5.h),
-                          Text("PetSymp provides symptom analysis for pets based on user input. The app generates possible conditions and follow-up questions to refine the assessment. PetSymp does not provide medical diagnoses and should not replace professional veterinary advice.", style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp)),
+                          Text(
+                              "PetSymp provides symptom analysis for pets based on user input. The app generates possible conditions and follow-up questions to refine the assessment. PetSymp does not provide medical diagnoses and should not replace professional veterinary advice.",
+                              style: TextStyle(
+                                  fontFamily: 'Inter', fontSize: 13.sp)),
                           SizedBox(height: 25.h),
-                          Text("User Responsibilities", style: TextStyle(fontFamily: 'Inter', fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                          Text("User Responsibilities",
+                              style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(height: 5.h),
-                          Text("By using PetSymp, you agree to:", style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp)),
+                          Text("By using PetSymp, you agree to:",
+                              style: TextStyle(
+                                  fontFamily: 'Inter', fontSize: 13.sp)),
                           SizedBox(height: 20.h),
-                          _buildBullet("Provide accurate and truthful symptom information."),
+                          _buildBullet(
+                              "Provide accurate and truthful symptom information."),
                           SizedBox(height: 15.h),
-                          _buildBullet("Use the app only for personal, non-commercial purposes."),
+                          _buildBullet(
+                              "Use the app only for personal, non-commercial purposes."),
                           SizedBox(height: 15.h),
-                          _buildBullet("Acknowledge that results are for informational purposes only and consult a veterinarian for medical concerns."),
+                          _buildBullet(
+                              "Acknowledge that results are for informational purposes only and consult a veterinarian for medical concerns."),
                           SizedBox(height: 30.h),
                         ],
                       ),
                     ),
                     CheckboxListTile(
                       value: localAccepted,
-                      onChanged: (val) => setState(() => localAccepted = val ?? false),
+                      onChanged: (val) =>
+                          setState(() => localAccepted = val ?? false),
                       title: const Text("I agree to the Terms and Conditions"),
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
                     CheckboxListTile(
                       value: localDontShowAgain,
-                      onChanged: (val) => setState(() => localDontShowAgain = val ?? false),
+                      onChanged: (val) =>
+                          setState(() => localDontShowAgain = val ?? false),
                       title: const Text("Don't Show This Again"),
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
@@ -365,7 +457,10 @@ class _TermsDialogContentState extends State<TermsDialogContent> {
                   onPressed: localAccepted
                       ? () async {
                           if (userId != null) {
-                            await FirebaseFirestore.instance.collection('Users').doc(userId).set({
+                            await FirebaseFirestore.instance
+                                .collection('Users')
+                                .doc(userId)
+                                .set({
                               "terms_status": {
                                 "Terms": "accept",
                                 "dontshow": localDontShowAgain ? "Yes" : "No",
@@ -397,7 +492,9 @@ class _TermsDialogContentState extends State<TermsDialogContent> {
       children: [
         Icon(Icons.arrow_forward, size: 20.sp, color: Colors.black),
         SizedBox(width: 8.w),
-        Flexible(child: Text(text, style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp))),
+        Flexible(
+            child: Text(text,
+                style: TextStyle(fontFamily: 'Inter', fontSize: 13.sp))),
       ],
     );
   }
