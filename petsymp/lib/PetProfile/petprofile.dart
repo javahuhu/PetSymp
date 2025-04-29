@@ -8,6 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:image_picker/image_picker.dart'; // Import this
+import 'dart:io';
 
 enum ShapeType {
   circle,
@@ -405,7 +407,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                 child: Lottie.asset(
                   'assets/dotanimation.json',
                   fit: BoxFit.contain,
-                  repeat: true, 
+                  repeat: true,
                   reverse: false,
                   animate: true,
                 )),
@@ -526,19 +528,19 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                               ),
                             ],
                           ),
-                          Expanded( child: 
-                          Padding(
-                              padding: EdgeInsets.only(top: 0.h, left: 5.w),
-                              child: SizedBox(
-                                width: 200.w,
-                                height: 200.h,
-                                child: Lottie.asset(
-                                  'assets/dogsitanimation.json',
-                                  fit: BoxFit.contain,
-                                  repeat: true,
-                                  animate: true,
-                                ),
-                              ))),
+                          Expanded(
+                              child: Padding(
+                                  padding: EdgeInsets.only(top: 0.h, left: 5.w),
+                                  child: SizedBox(
+                                    width: 200.w,
+                                    height: 200.h,
+                                    child: Lottie.asset(
+                                      'assets/dogsitanimation.json',
+                                      fit: BoxFit.contain,
+                                      repeat: true,
+                                      animate: true,
+                                    ),
+                                  ))),
                         ],
                       ),
                       Expanded(
@@ -561,7 +563,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                                           const Color.fromRGBO(82, 170, 164, 1),
                                       width: 10.w,
                                     ),
-
                                     left: BorderSide(
                                       color:
                                           const Color.fromRGBO(82, 170, 164, 1),
@@ -582,7 +583,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                                                 82, 170, 164, 1),
                                             borderRadius:
                                                 BorderRadius.circular(100.r),
-                                            
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
@@ -624,7 +624,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                                                 82, 170, 164, 1),
                                             borderRadius:
                                                 BorderRadius.circular(100.r),
-                                            
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
@@ -803,19 +802,18 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 4.h),
-
                                 SizedBox(
-                                width: 125.w,
-                                child:
-                                Text(
-                                  '$age • $breed',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    color: const Color.fromARGB(179, 0, 0, 0),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
+                                    width: 125.w,
+                                    child: Text(
+                                      '$age • $breed',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color:
+                                            const Color.fromARGB(179, 0, 0, 0),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                               ],
                             )),
                       ],
@@ -831,19 +829,18 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               //     color: const Color.fromARGB(255, 63, 62, 62),      // same grey as your timeline
               //   ),
 
-
               // 4) Date
-    
-    const Spacer(),
-    Padding(
-      padding: EdgeInsets.only(right: 7.w), 
-      child: Text(
-        dateStr,
-        style: TextStyle(
-          fontSize: 12.sp,
-          color: const Color.fromARGB(255, 63, 62, 62),
-        ),
-      )),
+
+              const Spacer(),
+              Padding(
+                  padding: EdgeInsets.only(right: 7.w),
+                  child: Text(
+                    dateStr,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: const Color.fromARGB(255, 63, 62, 62),
+                    ),
+                  )),
             ],
           ),
         ),
@@ -1104,7 +1101,6 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                 SizedBox(height: 24.h),
                 // Recent Health Records section.
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Recent Health Records",
@@ -1114,30 +1110,17 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         color: Colors.black87,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          "Swipe",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey[600],
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          "See All",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.orange,
-                          ),
-                        ),
-                      ],
+                    SizedBox(width: 10.w), // spacing
+                    Expanded(
+                      child: Container(
+                        height: 2.h, // thickness of line
+                        color:
+                            const Color.fromARGB(255, 0, 0, 0), // color of line
+                      ),
                     ),
                   ],
                 ),
+
                 SizedBox(height: 16.h),
                 // Display all health record items.
                 Column(
@@ -1807,8 +1790,11 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
   }
 
   // Add method to show edit dialog
+
   void _showEditDialog(BuildContext context) {
-    // Create the controllers inside the builder:
+    XFile? selectedImage; // 📌 Local file reference for new image
+    final picker = ImagePicker();
+
     showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -1825,142 +1811,201 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                   : '',
         );
 
-        return AlertDialog(
-          title: Text(
-            "Edit Pet Details",
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF3D4A5C),
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // <-- shrink to fit
-              children: [
-                TextField(
-                  controller: ageController,
-                  decoration: InputDecoration(
-                    labelText: 'Age',
-                    hintText: 'e.g. 2 yrs',
-                    prefixIcon: Icon(Icons.cake, color: Colors.amber),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF52AAA4), width: 2),
-                    ),
-                  ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(
+                "Edit Pet Details",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF3D4A5C),
                 ),
-                SizedBox(height: 16.h),
-                TextField(
-                  controller: sizeController,
-                  inputFormatters: [
-                    FirstLetterUpperCaseTextFormatter(),
-                    FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Size',
-                    hintText: 'e.g. Medium',
-                    prefixIcon:
-                        const Icon(Icons.straighten, color: Colors.blue),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 📷 Profile picture part
+                    GestureDetector(
+                      onTap: () async {
+                        await Future.delayed(const Duration(
+                            milliseconds: 100)); // 👈 Add this line here
+
+                        final XFile? image = await picker.pickImage(
+                          source: ImageSource.gallery,
+                          imageQuality: 75,
+                        );
+
+                        if (image != null) {
+                          setState(() {
+                            selectedImage = image;
+                          });
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 50.r,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: selectedImage != null
+                            ? FileImage(File(selectedImage!.path))
+                            : (widget.petData['petImage'] != null &&
+                                    (widget.petData['petImage'] as String)
+                                        .startsWith("http")
+                                ? NetworkImage(widget.petData['petImage'])
+                                : AssetImage(widget.petData['petImage'] ??
+                                    "assets/sampleimage.jpg")) as ImageProvider,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: CircleAvatar(
+                            radius: 15.r,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.camera_alt,
+                              size: 20.sp,
+                              color: Color(0xFF52AAA4),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF52AAA4), width: 2),
+                    SizedBox(height: 16.h),
+                    TextField(
+                      controller: ageController,
+                      decoration: InputDecoration(
+                        labelText: 'Age',
+                        hintText: 'e.g. 2 yrs',
+                        prefixIcon: Icon(Icons.cake, color: Colors.amber),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: const BorderSide(
+                              color: Color(0xFF52AAA4), width: 2),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    TextField(
+                      controller: sizeController,
+                      inputFormatters: [
+                        FirstLetterUpperCaseTextFormatter(),
+                        FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Size',
+                        hintText: 'e.g. Medium',
+                        prefixIcon:
+                            const Icon(Icons.straighten, color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                          borderSide: const BorderSide(
+                              color: Color(0xFF52AAA4), width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF52AAA4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  child: const Text(
+                    "Save",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onPressed: () async {
+                    // Show loading
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF52AAA4),
+                        ),
+                      ),
+                    );
+
+                    try {
+                      // 📤 If new image selected, upload it first
+                      String? newImageUrl;
+                      if (selectedImage != null) {
+                        // --- (You need to upload this to Firebase Storage here) ---
+                        // newImageUrl = await uploadToFirebase(selectedImage!.path);
+                        newImageUrl = selectedImage!.path; // For now just local
+                      }
+
+                      // Then update pet details including photo
+                      await _updatePetDetails(
+                          ageController.text, sizeController.text,
+                          newImagePath: newImageUrl);
+
+                      Navigator.of(context).pop(); // close loading
+                      Navigator.of(dialogContext).pop(); // close dialog
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Pet details updated successfully"),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      );
+                      if (widget.onPetDetailsUpdated != null) {
+                        widget.onPetDetailsUpdated!();
+                      }
+                    } catch (e) {
+                      Navigator.of(context).pop(); // close loading
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              "Error updating pet details: ${e.toString()}"),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF52AAA4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-              child: const Text(
-                "Save",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onPressed: () async {
-                // Show loading
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (_) => const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF52AAA4),
-                    ),
-                  ),
-                );
-
-                try {
-                  await _updatePetDetails(
-                      ageController.text, sizeController.text);
-                  Navigator.of(context).pop(); // close loading
-                  Navigator.of(dialogContext).pop(); // close dialog
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Pet details updated successfully"),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                  if (widget.onPetDetailsUpdated != null) {
-                    widget.onPetDetailsUpdated!();
-                  }
-                } catch (e) {
-                  Navigator.of(context).pop(); // close loading
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text("Error updating pet details: ${e.toString()}"),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
   // Add method to update Firestore
-  Future<void> _updatePetDetails(String newAge, String newSize) async {
+  Future<void> _updatePetDetails(String newAge, String newSize,
+      {String? newImagePath}) async {
     try {
       // Get user ID
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
@@ -2004,6 +2049,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
           .doc(documentId)
           .update({
         'petDetails': updatedDetails,
+        if (newImagePath != null) 'petImage': newImagePath,
       });
 
       // Update local state to reflect changes
