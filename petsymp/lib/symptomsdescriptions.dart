@@ -1,5 +1,5 @@
-final Map<String, dynamic> illnessInformation = {
-  "Canine Parvovirus": {
+const Map<String, dynamic> illnessInformation = {
+"Canine Parvovirus": {
     "Description": [
       "A highly contagious viral disease that affects dogs, causing acute gastrointestinal illness, particularly in puppies."
     ],
@@ -16,13 +16,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Diagnosis is typically made through clinical signs and confirmed with tests such as ELISA, hemagglutination, or PCR to detect the virus in fecal samples."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "If you suspect your dog has parvovirus, seek immediate veterinary attention. Isolate your dog from other pets to prevent the spread of the virus."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "With prompt and aggressive treatment, recovery can begin within a week, but full recovery may take several weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies between six weeks and six months old",
       "Unvaccinated dogs",
       "Certain breeds like Rottweilers and Dobermans"
@@ -32,7 +32,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Infectious Canine Hepatitis": {
+"Infectious Canine Hepatitis": {
     "Description": [
       "A contagious viral disease caused by canine adenovirus type 1 (CAV-1), affecting the liver, kidneys, spleen, lungs, and blood vessels."
     ],
@@ -49,13 +49,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Blood tests, PCR, and serologic assays to confirm liver involvement and virus presence."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Seek veterinary care immediately if your dog shows signs of lethargy, fever, or abdominal pain. Isolate infected pets."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Recovery can take 1-2 weeks with supportive care. Some dogs may have lingering complications."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Unvaccinated dogs",
       "Young dogs under one year of age"
     ],
@@ -64,7 +64,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Canine Distemper": {
+"Canine Distemper": {
     "Description": [
       "A serious viral illness that affects the respiratory, gastrointestinal, and nervous systems of dogs and other wildlife."
     ],
@@ -79,13 +79,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Clinical signs, antibody titers, or PCR testing from conjunctival swabs or blood samples."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Immediately isolate the dog and consult a veterinarian. Monitor symptoms closely and administer supportive care."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Some dogs recover within a few weeks; others may suffer lifelong neurological issues."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Unvaccinated puppies and dogs",
       "Dogs in shelters or high-density environments"
     ],
@@ -94,7 +94,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Canine Herpesvirus": {
+"Canine Herpesvirus": {
     "Description": [
       "A viral infection that primarily affects newborn puppies, often causing respiratory distress, weakness, and sudden death."
     ],
@@ -111,13 +111,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Post-mortem histopathology, PCR, or virus isolation from affected tissues or secretions."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "If puppies exhibit lethargy, nasal discharge, or persistent crying, consult a vet immediately and warm the environment."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Survivors may recover in 1–2 weeks, but mortality is high in neonates."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Breeding kennels",
       "Unheated puppy areas",
       "Stress or poor maternal immunity"
@@ -127,7 +127,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Canine Influenza": {
+"Canine Influenza": {
     "Description": ["An infectious respiratory disease in dogs caused by canine influenza virus (CIV)."],
     "Severity": ["Mild to Moderate"],
     "Treatment": [
@@ -138,11 +138,11 @@ final Map<String, dynamic> illnessInformation = {
       "Spread through airborne droplets (coughing, barking), shared objects, and surfaces."
     ],
     "Diagnosis": ["PCR testing of nasal swabs or antibody testing."],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate coughing dogs. Consult a vet if symptoms worsen or fever persists."
     ],
-    "RecoveryTime": ["Most dogs recover in 2–3 weeks with rest and care."],
-    "RiskFactors": [
+    "Recovery Time": ["Most dogs recover in 2–3 weeks with rest and care."],
+    "Risk Factors": [
       "Kennels, daycares, or shelters",
       "Unvaccinated dogs",
       "Travel or shows"
@@ -152,7 +152,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Kennel Cough": {
+"Kennel Cough": {
     "Description": [
       "A contagious respiratory condition characterized by a dry, hacking cough."
     ],
@@ -169,11 +169,11 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Based on clinical history and symptoms. No specific test required in mild cases."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Allow rest and limit exposure to other dogs. Seek veterinary care if symptoms persist or worsen."
     ],
-    "RecoveryTime": ["Most dogs recover in 1–2 weeks."],
-    "RiskFactors": [
+    "Recovery Time": ["Most dogs recover in 1–2 weeks."],
+    "Risk Factors": [
       "Dogs in kennels, daycare, or training facilities",
       "Unvaccinated dogs"
     ],
@@ -182,7 +182,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Rabies": {
+"Rabies": {
     "Description": [
       "A fatal viral disease affecting the brain and nervous system, transmitted through the bite of an infected animal."
     ],
@@ -197,11 +197,11 @@ final Map<String, dynamic> illnessInformation = {
       "Through the bite or saliva of an infected animal (e.g., raccoons, bats, dogs)."
     ],
     "Diagnosis": ["Post-mortem brain tissue analysis. No reliable antemortem diagnostic test."],
-    "WhatToDo": [
+    "What To Do": [
       "Immediate euthanasia is often required. Any exposure warrants urgent vet attention and public health notification."
     ],
-    "RecoveryTime": ["None – the disease is nearly always fatal once symptoms begin."],
-    "RiskFactors": [
+    "Recovery Time": ["None – the disease is nearly always fatal once symptoms begin."],
+    "Risk Factors": [
       "Unvaccinated dogs",
       "Free-roaming or outdoor access",
       "Exposure to wildlife"
@@ -211,7 +211,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Canine Minute Virus": {
+"Canine Minute Virus": {
     "Description": [
       "A parvovirus-like infection that mainly affects puppies, causing enteritis and occasionally myocarditis."
     ],
@@ -226,11 +226,11 @@ final Map<String, dynamic> illnessInformation = {
       "Likely fecal-oral or in utero, but not fully defined. Often subclinical in adults."
     ],
     "Diagnosis": ["PCR testing and clinical signs in neonatal puppies."],
-    "WhatToDo": [
+    "What To Do": [
       "Provide intensive care for affected puppies and isolate them from the rest of the litter."
     ],
-    "RecoveryTime": ["Recovery can take 1–2 weeks. Mortality may occur in very young pups."],
-    "RiskFactors": [
+    "Recovery Time": ["Recovery can take 1–2 weeks. Mortality may occur in very young pups."],
+    "Risk Factors": [
       "Puppies under 3 weeks old",
       "Poor maternal antibody transfer"
     ],
@@ -239,7 +239,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Pseudorabies": {
+"Pseudorabies": {
     "Description": [
       "A viral neurological disease seen in dogs exposed to infected swine, leading to intense itching and rapid death."
     ],
@@ -256,11 +256,11 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Based on history, neurological signs, and confirmed via virus isolation or PCR."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Prevent access to pigs or raw pork. Euthanasia may be required in advanced cases."
     ],
-    "RecoveryTime": ["Rare – most cases are fatal in dogs within 2 days."],
-    "RiskFactors": [
+    "Recovery Time": ["Rare – most cases are fatal in dogs within 2 days."],
+    "Risk Factors": [
       "Hunting dogs",
       "Dogs on farms with swine access"
     ],
@@ -269,8 +269,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-   "Canine Enteric Coronavirus": {
+"Canine Enteric Coronavirus": {
     "Description": [
       "A contagious intestinal infection that usually causes self-limiting, watery to mucoid diarrhea in dogs, most commonly in puppies."
     ],
@@ -287,13 +286,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Veterinary examination plus PCR, ELISA, or electron-microscopy testing of fecal samples to confirm the virus."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate the dog, disinfect the environment, offer frequent small meals of bland food, and consult a veterinarian to rule out co-infections such as parvovirus."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most dogs recover within 3 – 10 days; full restoration of intestinal health may take up to two weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies under 12 weeks old",
       "Crowded or unsanitary kennels",
       "Co-infection with canine parvovirus"
@@ -303,8 +302,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Canine Respiratory Coronavirus": {
+"Canine Respiratory Coronavirus": {
     "Description": [
       "A virus that infects the upper airways and is one of several pathogens in the kennel-cough complex, causing coughing and nasal discharge."
     ],
@@ -321,13 +319,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "History of recent boarding/show exposure, clinical signs, and PCR testing of nasal or pharyngeal swabs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate affected dogs for at least 2 weeks, keep them in a well-ventilated area, and seek veterinary advice if cough worsens or persists."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most dogs improve within 7 – 14 days; complete recovery may take up to 3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs housed in shelters, kennels, or daycare",
       "Young dogs with naïve immunity",
       "Stress or poor ventilation"
@@ -337,8 +335,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Brucellosis": {
+"Brucellosis": {
     "Description": [
       "A chronic bacterial infection (Brucella canis) that affects the reproductive tract, causing infertility, abortion, and systemic illness; zoonotic to humans."
     ],
@@ -355,13 +352,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Rapid slide agglutination test (RSAT), agar-gel immunodiffusion, PCR, and culture of blood or semen."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate the dog, notify kennel/breeding partners, initiate long-term antibiotics, and practise strict biosecurity and zoonosis precautions."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs may improve after weeks, but eradication is difficult; lifelong carrier state is possible."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Breeding kennels and stud dogs",
       "Importation of untested dogs",
       "Lack of routine screening prior to breeding"
@@ -371,8 +368,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Leptospirosis": {
+"Leptospirosis": {
     "Description": [
       "A zoonotic spirochetal infection that damages kidneys and liver, producing fever, vomiting, jaundice, and acute renal failure in dogs."
     ],
@@ -389,13 +385,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR of blood/urine, paired microscopic agglutination test (MAT) titers, or dark-field microscopy."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Hospitalize for IV therapy, begin antibiotics immediately, isolate from other pets, and wear gloves to prevent human infection."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Mild cases recover in 1–2 weeks; severe renal/hepatic injury may require weeks to months and can leave lasting organ damage."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in tropical or rainy climates",
       "Exposure to standing water or wildlife",
       "Working/hunting dogs"
@@ -405,7 +401,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Lyme Disease": {
+"Lyme Disease": {
     "Description": [
       "A tick-borne illness caused by the spirochete Borrelia burgdorferi; it can lead to shifting-leg lameness, enlarged joints, fever, and—rarely—kidney failure in dogs."
     ],
@@ -422,13 +418,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "C6 SNAP/ELISA antibody test, quantitative C6 titer, or Western blot; positive dogs should be screened for proteinuria."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Remove ticks promptly, start doxycycline as prescribed, restrict exercise during treatment, and use year-round tick preventives."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs improve within 48–72 h of antibiotics; complete recovery in 2–4 weeks, though antibodies may persist."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in wooded, tick-endemic areas",
       "Outdoor or hunting dogs without acaricide protection"
     ],
@@ -437,8 +433,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Ehrlichiosis": {
+"Ehrlichiosis": {
     "Description": [
       "A tick-borne rickettsial disease (Ehrlichia canis, E. ewingii) that can cause fever, lethargy, easy bruising/bleeding, and chronic immune-mediated thrombocytopenia."
     ],
@@ -455,13 +450,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "SNAP 4Dx/AccuPlex antibody test, PCR of blood during acute phase, platelet counts, and abnormal globulin levels."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin doxycycline promptly, monitor CBC and platelets every 2 weeks, and maintain strict tick control."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Acute cases respond in 1–2 days; chronic cases may require months and can relapse."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in tropical/subtropical climates",
       "Heavy tick infestations or kennel environments"
     ],
@@ -470,8 +465,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Rocky Mountain Spotted Fever": {
+"Rocky Mountain Spotted Fever": {
     "Description": [
       "A rickettsial infection (Rickettsia rickettsii) producing high fever, petechiae, neurologic signs, and vascular damage in dogs and humans."
     ],
@@ -488,13 +482,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Acute-phase PCR, paired indirect fluorescent antibody (IFA) titers, and thrombocytopenia on CBC."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Initiate treatment based on clinical suspicion, maintain tick control, and monitor neurologic status."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Fever subsides within 24–48 h of antibiotics; vascular healing may take weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in rural/wooded areas of the Americas",
       "Spring and early-summer tick season"
     ],
@@ -503,8 +497,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Clostridial Infections": {
+"Clostridial Infections": {
     "Description": [
       "Gastrointestinal disease caused by overgrowth or toxin production of Clostridium perfringens or C. difficile, leading to acute large-bowel diarrhea with mucus or blood."
     ],
@@ -521,13 +514,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal PCR for enterotoxin/tcdA/tcdB genes, fecal cytology with ‘safety-pin’ rods, or ELISA toxin assays."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Withhold food 12 h, offer bland diet, ensure water intake, and follow veterinarian’s antimicrobial/probiotic plan."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most dogs improve within 3 days; full colonic recovery 1–2 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Recent boarding or stress",
       "High-fat table scraps",
       "Prior antibiotic use"
@@ -537,8 +530,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Anaerobic Bacterial Infections": {
+"Anaerobic Bacterial Infections": {
     "Description": [
       "Deep-tissue or abscess infections by anaerobes such as Bacteroides, Peptostreptococcus, or Fusobacterium, often following bite wounds or surgery."
     ],
@@ -555,13 +547,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Anaerobic culture of exudate, foul odor gas pockets on radiographs, and cytology with mixed bacilli."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Seek veterinary care for wound exploration, flush/debride, place drains if needed, and complete full antibiotic course."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Simple abscesses resolve in 7–14 days; extensive necrotic tissue may take weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Bite wounds, penetrating foreign bodies",
       "Poor surgical asepsis",
       "Compromised blood supply"
@@ -571,8 +563,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Actinomycosis (Bacterial Infection)": {
+"Actinomycosis (Bacterial Infection)": {
     "Description": [
       "Chronic granulomatous infection caused by Actinomyces species, producing firm mandibular swellings, draining tracts, or thoracic pyogranulomas."
     ],
@@ -589,13 +580,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Sulfur granules in exudate, gram-positive branching filaments on cytology, and anaerobic culture."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Flush draining tracts, remove foreign bodies, start long-term antibiotics, and schedule rechecks for relapse."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Lesions regress gradually over months; recurrence common if treatment stops early."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Hunting dogs exposed to grass awns",
       "Oral trauma or poor dental hygiene"
     ],
@@ -604,8 +595,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Campylobacteriosis (Bacterial Infection)": {
+"Campylobacteriosis (Bacterial Infection)": {
     "Description": [
       "Enteric infection by Campylobacter jejuni or C. upsaliensis causing watery to mucoid diarrhea, often in young or immunosuppressed dogs; zoonotic to humans."
     ],
@@ -622,13 +612,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR or culture of fresh feces on Campy-BAP media, dark-field motility, or fecal antigen ELISA."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate dog, practise strict hygiene, provide bland diet, and start antibiotics if diarrhea is severe or persistent."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs usually resolve in 3–7 days with treatment; shedding may persist up to 4 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kennels and shelters",
       "Raw-fed diets",
       "Young (<6 mo) or stressed dogs"
@@ -638,8 +628,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Streptococcus Infections": {
+"Streptococcus Infections": {
     "Description": [
       "Diseases caused by Streptococcus canis or β-hemolytic Strep spp., ranging from neonatal sepsis to necrotizing fasciitis and toxic shock-like syndrome."
     ],
@@ -656,13 +645,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Bacterial culture with Lancefield grouping, PCR, bloodwork showing leukocytosis, and imaging for deep tissue gas."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Seek immediate veterinary care for rapidly spreading skin swelling, start IV antibiotics, and isolate pups with suspected sepsis."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Superficial infections clear in 7–10 days; severe invasive disease may require weeks and can be fatal despite treatment."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Crowded kennel conditions",
       "Recent surgery or viral respiratory disease",
       "Puppies with immature immune systems"
@@ -672,7 +661,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Hookworms": {
+"Hookworms": {
     "Description": [
       "Intestinal parasites (Ancylostoma spp.) that attach to the small-intestinal wall and feed on blood, causing anemia, dark tarry stool, and failure to thrive—especially in puppies."
     ],
@@ -689,13 +678,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal flotation revealing characteristic thin-shelled ova; repeat tests because eggs may be scant early in infection."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin deworming immediately, treat the dam, clean the environment, and remove feces promptly."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement within 48 h of deworming; complete parasite clearance after 2–3 treatments at 2-week intervals."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies <8 weeks old",
       "Dirt runs or kennel floors with poor sanitation",
       "Tropical/humid climates"
@@ -705,8 +694,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Tapeworms": {
+"Tapeworms": {
     "Description": [
       "Intestinal cestodes (Dipylidium caninum, Taenia spp.) that cause mild digestive upset and visible ‘rice-grain’ proglottids around the anus or in stool."
     ],
@@ -723,13 +711,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Identification of proglottids or ova on fecal flotation; microscopic exam of dried segments."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Administer praziquantel, treat environment and pet for fleas, and restrict hunting/scavenging."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Parasites eliminated within 24 h; recheck fecal sample in 3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Flea infestations",
       "Dogs that hunt or are fed raw offal",
       "Poor external-parasite control"
@@ -739,8 +727,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Roundworms": {
+"Roundworms": {
     "Description": [
       "Large intestinal nematodes (Toxocara canis, Toxascaris leonina) causing pot-bellied appearance, vomiting, diarrhea, and potential zoonotic visceral/ocular larva migrans."
     ],
@@ -757,13 +744,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal flotation showing thick-shelled round ova; adult worms may be vomited."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Deworm pups starting at 2 weeks of age, treat the dam, maintain yard sanitation, and educate owners about zoonosis."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs resolve within days; repeated treatments needed until exposure risk ends."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies and nursing dams",
       "Back-yard dirt pens",
       "Poor feces disposal"
@@ -773,8 +760,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Fleas": {
+"Fleas": {
     "Description": [
       "External parasites (Ctenocephalides felis) that bite for blood meals, causing itching, flea allergy dermatitis, anemia in puppies, and transmission of Dipylidium tapeworms."
     ],
@@ -791,13 +777,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Visual fleas/flea dirt, flea comb findings, pruritus and papular dermatitis on tail base."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start fast-acting adulticide, wash bedding at ≥60 °C, vacuum daily, and use premises spray if severe."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Itching often improves within 24 h; full environmental eradication takes 3 months (life-cycle period)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor access in warm seasons",
       "Multi-pet households",
       "Lapses in preventive schedules"
@@ -807,8 +793,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Ticks": {
+"Ticks": {
     "Description": [
       "Blood-sucking ectoparasites (Ixodes, Rhipicephalus, Dermacentor) that cause local irritation and transmit pathogens like Lyme, Ehrlichia, and Babesia."
     ],
@@ -825,13 +810,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Physical exam finding of attached ticks; pathogen screening if clinical signs develop."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Remove ticks promptly, disinfect bite site, start preventive, and consult vet if lethargy or fever occurs."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Skin irritation heals in a few days; pathogen incubation varies (days to weeks)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Rural/wooded or grassy environments",
       "Hunting or hiking dogs",
       "Lack of tick prevention"
@@ -841,8 +826,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Heartworm Disease": {
+"Heartworm Disease": {
     "Description": [
       "Potentially fatal infection by the parasite Dirofilaria immitis living in the pulmonary arteries and heart, causing cough, exercise intolerance, and heart failure."
     ],
@@ -859,13 +843,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Antigen test, microfilaria test (Knott’s), thoracic radiographs, and echocardiography."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Confirm diagnosis, stage disease, begin doxycycline + macrocyclic lactone, schedule melarsomine injections, and restrict activity."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Worm kill occurs over months; full vascular healing may take 6–12 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in endemic warm, humid regions",
       "Outdoor housing without preventives"
     ],
@@ -874,8 +858,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Ear Mites": {
+"Ear Mites": {
     "Description": [
       "Infestation by Otodectes cynotis mites living in the ear canal, causing intense itching, dark crumbly debris, and secondary otitis externa."
     ],
@@ -892,13 +875,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Otoscopy visualizing white motile mites or microscopic exam of ear swab."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat all in-contact pets, clean bedding, recheck ears in 3–4 weeks."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pruritus resolves in a few days after treatment; debris clears in 2-3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies/kittens from shelters",
       "Multi-pet households",
       "Outdoor roaming"
@@ -908,8 +891,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Cheyletiellosis (Walking Dandruff)": {
+"Cheyletiellosis (Walking Dandruff)": {
     "Description": [
       "Superficial infestation by Cheyletiella mites producing excessive scaling that appears to 'walk' on the coat, mild pruritus, and zoonotic dermatitis."
     ],
@@ -926,13 +908,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Coat brushing onto black paper, tape prep, or skin scrapings revealing mites or eggs with accessory claws."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Institute whole-body treatment, wash bedding at hot temperatures, and vacuum thoroughly."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Scaling diminishes within 2 weeks; full eradication after 1–2 monthly life cycles."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Pet shops, shelters, and grooming facilities",
       "Young or immunosuppressed animals"
     ],
@@ -941,8 +923,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Chiggers": {
+"Chiggers": {
     "Description": [
       "Larval trombiculid mites (Neotrombicula spp.) that attach to skin, causing intense itching, papules, and orange crusting—often on feet, belly, or ears."
     ],
@@ -959,13 +940,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Orange mites seen on skin surface or skin scraping; seasonality in late summer/fall."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Bathe dog with insecticidal shampoo, apply preventive, restrict access to infested areas during peak season."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Lesions resolve in 1–2 weeks once mites killed and itching controlled."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor hiking/hunting",
       "Late summer to autumn in temperate zones"
     ],
@@ -974,8 +955,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Mange (Demodectic and Sarcoptic)": {
+"Mange (Demodectic and Sarcoptic)": {
     "Description": [
       "Skin diseases caused by Demodex canis overgrowth (demodectic) or Sarcoptes scabiei var. canis (sarcoptic) producing hair loss, crusting, and pruritus."
     ],
@@ -992,13 +972,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Deep skin scrapings for Demodex mites; superficial scrapings or pinnal-pedal reflex for Sarcoptes."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin appropriate acaricide, treat secondary bacterial infections, improve nutrition, and manage underlying diseases."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Localized demodex resolves in 6–8 weeks; generalized cases and sarcoptic mange may take 2–3 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Young, immunocompromised, or neglected dogs",
       "Shelter/kennel crowding for Sarcoptes"
     ],
@@ -1007,8 +987,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Sarcoptes scabiei (Scabies)": {
+"Sarcoptes scabiei (Scabies)": {
     "Description": [
       "Intensely pruritic skin disease caused by Sarcoptes scabiei var. canis mites burrowing into the epidermis, leading to crusting, alopecia, and self-trauma."
     ],
@@ -1025,13 +1004,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Superficial skin scraping (mites often few), positive pinnal-pedal reflex, or therapeutic trial response."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start acaricide without delay, wash bedding at high heat, isolate dog until mites eliminated."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Itching improves within days; skin heals over 4–6 weeks once mites are gone."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Shelters, strays, or dogs with fox exposure",
       "Lack of regular parasite control"
     ],
@@ -1040,8 +1019,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Ameba Infection": {
+"Ameba Infection": {
     "Description": [
       "Rare protozoal infection (Entamoeba histolytica or Acanthamoeba spp.) causing colitis, bloody diarrhea, or systemic disease in dogs."
     ],
@@ -1058,13 +1036,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal microscopy/PCR for trophozoites or cysts, colon biopsy for invasive cases."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide supportive fluids, start antiprotozoal drugs, and submit water source for testing."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Responds within 5–7 days if intestinal; systemic disease has guarded prognosis."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Drinking from stagnant or contaminated water",
       "Tropical climates",
       "Immunosuppressed dogs"
@@ -1074,7 +1052,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-  "Babesiosis": {
+"Babesiosis": {
     "Description": [
       "A tick-borne protozoal infection (Babesia canis, Babesia gibsoni) that destroys red blood cells, producing fever, pale gums, jaundice, and hemoglobinuria."
     ],
@@ -1091,13 +1069,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR of whole blood, Giemsa-stained blood smear (intra-erythrocytic piroplasms), and indirect fluorescent antibody titers."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start antiprotozoal therapy promptly, institute strict tick control, and screen in-contact dogs for silent infection."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Fever and anemia improve in 3–7 days; carriers may persist for life and can relapse under stress."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Tick-endemic regions, fighting breeds (Pit Bulls) with bite exposure, unscreened blood donors."
     ],
     "Prevention": [
@@ -1105,8 +1083,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Coccidia in Dogs": {
+"Coccidia in Dogs": {
     "Description": [
       "Intestinal protozoa (Isospora/Cystoisospora spp.) that cause watery or bloody diarrhea and weight loss, primarily in puppies or stressed adults."
     ],
@@ -1123,13 +1100,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal flotation revealing small oocysts; may need centrifugation technique for low burdens."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate affected pups, treat all littermates, clean with steam or ammonia (oocysts resist most disinfectants)."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Diarrhea often resolves within 48 h of treatment; oocyst shedding stops after full course."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Puppies <12 weeks, shelters or pet stores, poor sanitation."
     ],
     "Prevention": [
@@ -1137,8 +1114,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Cryptosporidium in Dogs": {
+"Cryptosporidium in Dogs": {
     "Description": [
       "Protozoal infection (Cryptosporidium canis, parvum) causing malabsorptive, sometimes persistent, watery diarrhea—zoonotic to humans."
     ],
@@ -1155,13 +1131,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fecal PCR, acid-fast staining, or ELISA antigen tests for Cryptosporidium."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Institute strict hygiene, bathe dog to remove adhered oocysts, and disinfect with 5 % ammonia or hydrogen peroxide cleaners."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most immunocompetent dogs recover within 1–3 weeks; immunosuppressed animals can shed longer."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kennels with contaminated water bowls, immune-compromised dogs, raw-fed diets."
     ],
     "Prevention": [
@@ -1169,8 +1145,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Toxoplasmosis in Dogs": {
+"Toxoplasmosis in Dogs": {
     "Description": [
       "Systemic protozoal infection by Toxoplasma gondii producing fever, neurologic signs, muscle pain, and respiratory distress—rare in dogs compared with cats."
     ],
@@ -1187,13 +1162,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Paired IgG/IgM serology, PCR of CSF/tissues, thoracic radiographs for pulmonary patterns."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin antibiotics immediately, provide oxygen if dyspneic, avoid raw meat, and test in-contact cats."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical response within 48 h, but full course needed to prevent relapse."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Raw meat feeding, scavenging, immunosuppression (steroids, distemper)."
     ],
     "Prevention": [
@@ -1201,8 +1176,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Osteoarthritis": {
+"Osteoarthritis": {
     "Description": [
       "Degenerative joint disease where cartilage breakdown and osteophyte formation lead to chronic pain, stiffness, and reduced mobility."
     ],
@@ -1219,13 +1193,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Orthopedic exam (crepitus, pain), radiographs showing joint space narrowing and osteophytes, force-plate gait analysis."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Institute weight-loss plan, start NSAID under vet supervision, add physiotherapy (swimming, acupuncture), and consider regenerative therapies."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "No cure; symptom improvement noted within 2 weeks of medical management."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Large breeds, obesity, high-impact activities, previous joint injury."
     ],
     "Prevention": [
@@ -1233,8 +1207,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hip Dysplasia": {
+"Hip Dysplasia": {
     "Description": [
       "Genetic/developmental laxity of the coxofemoral joint causing subluxation, pain, and early onset osteoarthritis."
     ],
@@ -1251,13 +1224,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Ortolani test, radiographs (extended-hip view, PennHIP DI), and CT for surgical planning."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start conservative therapy early, consider surgical correction in young dogs, and follow lifelong joint-health program."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-surgery recovery 6–12 weeks; conservative management lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Large/Giant breeds (Labrador, German Shepherd), rapid weight gain, positive family history."
     ],
     "Prevention": [
@@ -1265,8 +1238,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Elbow Dysplasia": {
+"Elbow Dysplasia": {
     "Description": [
       "Developmental disorders of the elbow (fragmented coronoid process, ununited anconeal process, OCD, incongruity) leading to forelimb lameness and arthritis."
     ],
@@ -1283,13 +1255,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Lameness exam, CT/arthroscopy for lesion identification, radiographs show osteophytes or fragments."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Pursue surgical correction early for best outcome, start lifelong joint supplements and weight management."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Return to controlled activity in 4–6 weeks post-surgery; arthritis management lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Retrievers, German Shepherds, Rottweilers; high-calorie diets in puppies."
     ],
     "Prevention": [
@@ -1297,8 +1269,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Luxating Patella": {
+"Luxating Patella": {
     "Description": [
       "Dislocation of the kneecap medially or laterally, causing intermittent skipping gait and eventual cartilage erosion."
     ],
@@ -1315,13 +1286,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Palpation of patellar instability graded I–IV, radiographs to assess trochlear groove."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Consult orthopedist for grading, schedule surgery if lameness or cartilage wear present, and institute muscle-strengthening exercises."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-op leash walks for 6 weeks, full activity by 3 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Toy/small breeds (Pomeranian, Poodle), shallow trochlear groove, limb deformities."
     ],
     "Prevention": [
@@ -1329,8 +1300,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Osteochondritis Dissecans": {
+"Osteochondritis Dissecans": {
     "Description": [
       "Failure of endochondral ossification causing cartilage flap formation in shoulder, elbow, hock, or stifle, resulting in lameness."
     ],
@@ -1347,13 +1317,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Radiographs (joint defect with mineralized flap) or CT/MRI; arthroscopy confirms."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule arthroscopy early, implement weight control and balanced diet."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Return to normal activity in 8–12 weeks; prognosis good for shoulder OCD."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Large-breed puppies (4–8 months), males slightly over-represented."
     ],
     "Prevention": [
@@ -1361,8 +1331,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Panosteitis": {
+"Panosteitis": {
     "Description": [
       "Self-limiting inflammatory bone disease of long bones in young large-breed dogs causing shifting-leg lameness."
     ],
@@ -1379,13 +1348,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Diaphyseal bone pain on palpation and radiographic ‘thumb-print’ patchy medullary opacity."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide analgesia, restrict strenuous activity, and reassure owners of good long-term prognosis."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Episodes last 2–4 weeks and may recur until 18–24 months of age."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "German Shepherds, Basset Hounds, rapid growth, high-protein diets."
     ],
     "Prevention": [
@@ -1393,8 +1362,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Legg-Calvé-Perthes Syndrome": {
+"Legg-Calvé-Perthes Syndrome": {
     "Description": [
       "Avascular necrosis of the femoral head in small-breed dogs, causing hip pain and progressive lameness between 4–12 months of age."
     ],
@@ -1411,13 +1379,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Hip radiographs show increased radiodensity, femoral head collapse, and joint incongruity."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Refer for orthopedic surgery, institute early rehab to build gluteal muscle support."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Good limb function 4–8 weeks after FHO; full recovery up to 6 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Toy breeds (Yorkshire, Pomeranian), rapid growth."
     ],
     "Prevention": [
@@ -1425,8 +1393,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Back Pain": {
+"Back Pain": {
     "Description": [
       "A clinical sign rather than a disease—commonly caused by intervertebral disc disease, lumbosacral stenosis, spondylosis, or muscular strain."
     ],
@@ -1443,13 +1410,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Neurologic exam, spinal radiographs, CT/MRI to localize lesions."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Strict rest, pain control, and seek advanced imaging if neurologic deficits develop."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Simple strains heal in 1–2 weeks; IVDD recovery varies with severity and surgery."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Chondrodystrophic breeds (Dachshunds), obesity, high-impact activities."
     ],
     "Prevention": [
@@ -1457,8 +1424,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Congenital Vertebral Anomalies": {
+"Congenital Vertebral Anomalies": {
     "Description": [
       "Malformations such as hemivertebrae, block vertebrae, or butterfly vertebrae that may cause spinal curvature, instability, or neurologic signs."
     ],
@@ -1475,13 +1441,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Survey radiographs and CT/MRI for spinal canal narrowing or compression."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Neurologic monitoring, weight control, and surgical consult if deficits worsen."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-surgical improvement depends on chronicity; stabilization healing takes 6–8 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "French/Boston Bulldogs, Pugs, screw-tail breeds."
     ],
     "Prevention": [
@@ -1489,8 +1455,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hypertrophic Osteopathy": {
+"Hypertrophic Osteopathy": {
     "Description": [
       "Painful periosteal bone proliferation on distal limbs secondary to thoracic/abdominal mass (often lung tumor), causing limb swelling and lameness."
     ],
@@ -1507,13 +1472,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Characteristic smooth periosteal new bone on radiographs plus thoracic imaging revealing primary lesion."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Work up for thoracic/abdominal pathology, manage pain, consider surgery if mass resectable."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Periosteal changes regress slowly (months) after primary lesion removed."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Middle-aged to older dogs with lung tumors or chronic infections."
     ],
     "Prevention": [
@@ -1521,8 +1486,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hypertrophic Osteodystrophy": {
+"Hypertrophic Osteodystrophy": {
     "Description": [
       "Metaphyseal inflammatory disease of rapidly growing large-breed puppies causing painful swollen joints, fever, and lameness."
     ],
@@ -1539,13 +1503,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Metaphyseal double-line sign on radiographs, elevated inflammatory markers, age 2–8 months."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide analgesia, ensure balanced large-breed puppy diet, monitor temperature, hospitalize if anorexic."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most recover in 7–10 days; severe cases may have growth-plate deformities."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Great Danes, Weimaraners, rapid growth, high-energy diets."
     ],
     "Prevention": [
@@ -1553,8 +1517,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Spondylosis": {
+"Spondylosis": {
     "Description": [
       "Degenerative spinal disease characterized by bony bridges (osteophytes) forming between vertebrae, often incidental but can cause stiffness."
     ],
@@ -1571,13 +1534,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Radiographs showing ventral bridging osteophytes; CT/MRI for neurologic cases."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Control weight, add low-impact exercise, use anti-inflammatories during flare-ups."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Chronic condition; symptom relief within days of NSAIDs, long-term management lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Older age, large breeds, high-impact athletic history."
     ],
     "Prevention": [
@@ -1585,7 +1548,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-  "Masticatory Muscle Myositis": {
+"Masticatory Muscle Myositis": {
     "Description": [
       "Immune-mediated inflammation targeting type-2M muscle fibers of the temporalis and masseter muscles, leading to jaw pain, swelling, and later muscle atrophy."
     ],
@@ -1602,13 +1565,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Elevated 2M antibody titer, CK/AST, muscle ultrasound/CT, and biopsy showing eosinophilic myositis."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin immunosuppressive steroids immediately to prevent fibrosis, institute soft-food diet, and passive jaw stretching."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pain decreases within 1 week; full muscle mass rarely returns—lifelong management."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "German Shepherds, retrievers; middle-aged dogs."
     ],
     "Prevention": [
@@ -1616,8 +1579,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Thrombocytopenia": {
+"Thrombocytopenia": {
     "Description": [
       "Low platelet count resulting in petechiae, bruising, or spontaneous bleeding; may be immune-mediated (ITP) or secondary to infection/drugs."
     ],
@@ -1634,13 +1596,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "CBC (platelets <150 × 10⁹/L), blood smear, 4Dx tick panel, coag profile, bone-marrow if non-responsive."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Hospitalize if platelets <30k, cage rest, avoid IM injections; transfuse platelets/whole blood for active bleeding."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Platelets rise in 3–5 days on steroids; relapse possible—monitor counts monthly."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Middle-aged female dogs (auto-immune predisposition), tick exposure."
     ],
     "Prevention": [
@@ -1648,8 +1610,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hemolytic Anemia": {
+"Hemolytic Anemia": {
     "Description": [
       "Accelerated destruction of red blood cells leading to pallor, jaundice, pigmenturia, tachycardia, and weakness; immune-mediated (IMHA) is most common form."
     ],
@@ -1666,13 +1627,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCV <30 %, spherocytes, auto-agglutination, positive Coombs’ test, bilirubinuria."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Refer for intensive care, monitor PCV twice daily, screen for thrombo-embolism."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Survivors stabilize in 5–7 days; immunosuppressives tapered over 4–6 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Cocker Spaniels, middle-aged females, recent vaccination/drug exposure."
     ],
     "Prevention": [
@@ -1680,8 +1641,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Dilated Cardiomyopathy": {
+"Dilated Cardiomyopathy": {
     "Description": [
       "Myocardial disease causing ventricular dilation and systolic dysfunction, progressing to arrhythmias and heart failure."
     ],
@@ -1698,13 +1658,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Echocardiography (reduced fractional shortening), thoracic radiographs, Holter monitor for VPCs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start pimobendan early (occult stage), restrict strenuous exercise, monitor resting respiration rate."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "No cure; median survival 6–24 months once CHF develops."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Large/giant breeds, grain-free diets (taurine-low), familial lines."
     ],
     "Prevention": [
@@ -1712,8 +1672,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Congestive Heart Failure": {
+"Congestive Heart Failure": {
     "Description": [
       "Clinical syndrome of pulmonary edema or ascites caused by advanced heart disease (MMVD, DCM, congenital defects)."
     ],
@@ -1730,13 +1689,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Thoracic rads (pulmonary edema), echo confirming underlying disease, NT-proBNP elevation."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Emergency oxygen and IV furosemide for acute edema, then lifelong oral meds and home RR monitoring."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Edema resolves in 12–24 h with therapy; long-term prognosis months–years depending on cause."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Small breeds with MMVD, large breeds with DCM, uncontrolled heartworm disease."
     ],
     "Prevention": [
@@ -1744,8 +1703,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Aortic Stenosis": {
+"Aortic Stenosis": {
     "Description": [
       "Congenital narrowing below or at the aortic valve causing systolic murmur, exercise intolerance, and risk of sudden death."
     ],
@@ -1762,13 +1720,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Echo measuring pressure gradient, Doppler >50 mmHg = significant; ECG for VPCs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Exercise restriction, atenolol therapy, refer for interventional cardiology if gradient >80 mmHg."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Lifelong management; severe cases median survival 2–4 years."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Boxers, Newfoundlands, Rottweilers—familial lines."
     ],
     "Prevention": [
@@ -1776,8 +1734,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Pulmonary Hypertension": {
+"Pulmonary Hypertension": {
     "Description": [
       "Elevated pulmonary arterial pressure causing syncope, cough, right-sided heart failure, and exercise intolerance."
     ],
@@ -1794,13 +1751,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Echo estimating PA systolic pressure >30 mmHg, thoracic radiographs, heartworm test."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start sildenafil, control primary disease, consider oxygen therapy during crises."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement within days of sildenafil; prognosis depends on etiology."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Elderly small breeds with chronic bronchitis, unprevented heartworm infection."
     ],
     "Prevention": [
@@ -1808,8 +1765,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Heart Valve Dysplasia": {
+"Heart Valve Dysplasia": {
     "Description": [
       "Malformation of AV valves (tricuspid/mitral) causing regurgitation, murmur, and eventual CHF."
     ],
@@ -1826,13 +1782,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Echocardiography showing thickened/shortened leaflets, regurgitant jets, atrial enlargement."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Monitor with echo every 6 months, begin meds at first signs of volume overload."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Progressive; survival varies from years (mild) to months (severe)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Labs (tricuspid), German Shepherds (mitral), familial predisposition."
     ],
     "Prevention": [
@@ -1840,8 +1796,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Patent Ductus Arteriosus": {
+"Patent Ductus Arteriosus": {
     "Description": [
       "Failure of fetal ductus to close, shunting blood from aorta to pulmonary artery, leading to volume overload and CHF in puppies."
     ],
@@ -1858,13 +1813,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Continuous ‘machinery’ murmur, bounding pulses, echo with ductal flow, thoracic rads show cardiomegaly."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Refer for occlusion surgery ASAP (best <6 months), start furosemide/enalapril if in CHF."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-op dogs often normal within weeks; excellent long-term prognosis."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Female toy/mini breeds, familial lines."
     ],
     "Prevention": [
@@ -1872,8 +1827,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Syringomyelia": {
+"Syringomyelia": {
     "Description": [
       "Fluid-filled cavities (syrinxes) within spinal cord secondary to Chiari-like malformation causing phantom scratching, pain, and neurologic deficits."
     ],
@@ -1890,13 +1844,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "MRI of brain/cranial cervical cord demonstrating syrinx and Chiari-like malformation."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start medical management, control weight, consider decompression surgery before severe cord damage."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Medical control provides symptomatic relief; surgery may stabilize but not cure—lifelong management."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Cavalier King Charles Spaniels, Brussels Griffons."
     ],
     "Prevention": [
@@ -1904,8 +1858,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Epilepsy": {
+"Epilepsy": {
     "Description": [
       "Recurrent unprovoked seizures originating from the forebrain; classified as idiopathic (genetic) or structural (brain lesion)."
     ],
@@ -1922,13 +1875,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Minimum database, bile acids, MRI & CSF if <6 mo or >6 yr onset; seizure diary."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin AED if >1 seizure/month, cluster, or severe; educate owner on seizure first aid."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Seizure control assessed over months; many dogs achieve ≥50 % reduction."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Border Collies, Australian Shepherds, Beagles—breed predisposition."
     ],
     "Prevention": [
@@ -1936,8 +1889,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Cerebellar Hypoplasia": {
+"Cerebellar Hypoplasia": {
     "Description": [
       "Under-development of the cerebellum causing ataxia, head tremors, and hypermetria present from birth and non-progressive."
     ],
@@ -1954,13 +1906,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Neurologic exam (intention tremor, menace deficit with vision intact), MRI showing small cerebellum."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide non-slip floors, wide food bowls, supervise activity; vaccination of breeding dogs to prevent viral causes."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Signs lifelong but non-progressive; dogs adapt over months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "In-utero viral exposure, toy breeds with genetic predispositions."
     ],
     "Prevention": [
@@ -1968,8 +1920,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Polyneuropathy": {
+"Polyneuropathy": {
     "Description": [
       "Diffuse peripheral nerve disorder leading to generalized weakness, ataxia, decreased reflexes, and exercise intolerance."
     ],
@@ -1986,13 +1937,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Electrodiagnostics (EMG, nerve conduction), neurologic exam, muscle/nerve biopsy, endocrine panels."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Correct metabolic disorders, provide assistive harnesses, avoid slippery floors, and initiate rehab."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Metabolic causes improve in weeks; hereditary degenerative forms progress over months-years."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Alaskan Malamutes, Leonbergers (genetic), endocrine disease in older dogs."
     ],
     "Prevention": [
@@ -2000,8 +1951,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Cauda Equina Syndrome": {
+"Cauda Equina Syndrome": {
     "Description": [
       "Lumbosacral stenosis compressing nerve roots, causing pain, hind-limb weakness, tail paresis, and incontinence."
     ],
@@ -2018,13 +1968,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "MRI/CT of lumbosacral junction, EMG of tail/anal sphincter."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Rest, pain control, physiotherapy; if painful or neurologic decline, consider decompressive surgery."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-surgery improvement in 4–6 weeks; conservative cases managed lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "German Shepherds, working/sporting dogs, obesity."
     ],
     "Prevention": [
@@ -2032,7 +1982,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-  "Tick Paralysis": {
+"Tick Paralysis": {
     "Description": [
       "Ascending flaccid paralysis caused by neurotoxins secreted in the saliva of gravid female ticks (most often Ixodes or Dermacentor species)."
     ],
@@ -2049,13 +1999,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "History of tick exposure, rapidly progressing weakness, and improvement after tick removal; EMG may show neuromuscular blockade."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Clip coat to find hidden ticks, monitor breathing, give oxygen, and start year-round tick preventive for all household pets."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Motor function returns within 24–72 h once ticks removed and toxin cleared."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs in tick-endemic bush/woodland, long-coated breeds, lack of acaricide use."
     ],
     "Prevention": [
@@ -2063,8 +2013,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Granulomatous Meningoencephalitis": {
+"Granulomatous Meningoencephalitis": {
     "Description": [
       "Immune-mediated, idiopathic inflammatory disease of the brain and spinal cord, producing focal or diffuse neurologic signs in young to middle-aged small-breed dogs."
     ],
@@ -2081,13 +2030,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "MRI showing intra-axial granulomatous lesions, CSF pleocytosis (mononuclear), exclusion of infectious agents."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Refer to neurologist, start immunosuppression quickly, monitor with serial MRIs, taper meds slowly over months."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement usually in 1–2 weeks; lifelong immunosuppression often required."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Toy Poodles, Terriers, young females, previous autoimmune disease."
     ],
     "Prevention": [
@@ -2095,8 +2044,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Wobbler Disease": {
+"Wobbler Disease": {
     "Description": [
       "Cervical spondylomyelopathy causing spinal cord compression at C5–C7, leading to wobbly gait, neck pain, and weakness, especially in large or giant breeds."
     ],
@@ -2113,13 +2061,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "MRI of cervical spine, CT myelography, neurologic exam showing proprioceptive deficits."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Restrict activity, control weight, consult veterinary neurologist to discuss surgical options."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-surgery rehab 6–12 weeks; medical therapy may control signs long-term in milder cases."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dobermans (disc-associated), Great Danes (bony malformation), rapid growth, high-protein diets."
     ],
     "Prevention": [
@@ -2127,8 +2075,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Periodontal Disease": {
+"Periodontal Disease": {
     "Description": [
       "Progressive inflammation and infection of gingiva and supporting tooth structures from plaque bacteria, leading to halitosis, tooth loss, and systemic effects."
     ],
@@ -2145,13 +2092,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Oral exam with periodontal probe, dental radiographs showing bone loss."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule COHAT (comprehensive oral health assessment and treatment), institute home dental care, provide appropriate chews."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Gingival inflammation subsides within 1 week post-cleaning; bone regeneration limited."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Small/toy breeds, brachycephalics, soft-food diets, lack of brushing."
     ],
     "Prevention": [
@@ -2159,8 +2106,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Tooth Root Abscess": {
+"Tooth Root Abscess": {
     "Description": [
       "Suppurative infection at the apex of a tooth root, often carnassial, causing facial swelling, pain, and draining tract below the eye."
     ],
@@ -2177,13 +2123,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Oral exam, dental radiographs showing periapical lucency, CT for complex cases."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide pain relief, schedule extraction/root canal, warm compress if draining, recheck in two weeks."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pain relief within days after extraction; bone fills socket over 4–6 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Chewing hard bones/toys, untreated periodontal disease, slab fractures."
     ],
     "Prevention": [
@@ -2191,8 +2137,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Cavities (Dental Caries)": {
+"Cavities (Dental Caries)": {
     "Description": [
       "Demineralization of tooth enamel and dentin by acid-producing bacteria; uncommon in dogs but can affect molar occlusal surfaces."
     ],
@@ -2209,13 +2154,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Visual/tactile exam under anesthesia, probing for soft chalky dentin, intraoral radiographs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Reduce sugary treats, perform restorative dentistry, institute daily brushing."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Immediate after restoration; monitor annually."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Dogs fed high-carb treats, brachycephalics with crowded molars, decreased salivary flow."
     ],
     "Prevention": [
@@ -2223,8 +2168,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Diabetes Mellitus": {
+"Diabetes Mellitus": {
     "Description": [
       "Endocrine disorder characterized by absolute or relative insulin deficiency leading to hyperglycemia, polyuria–polydipsia, weight loss, and cataracts."
     ],
@@ -2241,13 +2185,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Persistent fasting hyperglycemia, glucosuria, elevated fructosamine; rule out stress hyperglycemia."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin insulin, train owner on injection and home glucose monitoring, spay intact females to remove progesterone source."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs improve within days; dose stabilization may take 4–6 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Miniature Schnauzers, Dachshunds, obesity, chronic pancreatitis."
     ],
     "Prevention": [
@@ -2255,8 +2199,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Chronic Kidney Disease (CKD)": {
+"Chronic Kidney Disease (CKD)": {
     "Description": [
       "Irreversible loss of nephron function over time leading to azotemia, polyuria–polydipsia, weight loss, and anemia."
     ],
@@ -2273,13 +2216,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Elevated creatinine/SDMA, urine specific gravity <1.030, ultrasound small irregular kidneys."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Stage disease per IRIS, transition to renal diet, monitor BP and UPC, schedule rechecks every 3–6 months."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Progressive; supportive care can extend quality life months to years."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Aging dogs, genetic breed predispositions (Bull Terriers), chronic dental disease."
     ],
     "Prevention": [
@@ -2287,8 +2230,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Chronic Renal Failure": {
+"Chronic Renal Failure": {
     "Description": [
       "End-stage manifestation of chronic kidney disease with marked azotemia, uremic ulcers, vomiting, and cachexia."
     ],
@@ -2305,13 +2247,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Creatinine >5 mg/dL (IRIS IV), isosthenuric urine, metabolic acidosis, high phosphate."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Hospitalize for crisis management, discuss prognosis and palliative options, continue home SQ fluids."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Cannot reverse; goal is comfort—survival weeks to months depending on response."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Same as CKD—senior dogs, prior renal insults."
     ],
     "Prevention": [
@@ -2319,8 +2261,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Kidney Stones": {
+"Kidney Stones": {
     "Description": [
       "Uroliths (calcium oxalate, struvite, urate) forming within renal pelvis or ureters, leading to hematuria, pain, or obstruction."
     ],
@@ -2337,13 +2278,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Abdominal ultrasound, radiographs, urine culture, stone analysis post-retrieval."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat any UTI, institute prescription diet, monitor with imaging every 3–6 months."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Dissolution of struvite 2–8 weeks; surgical recovery 2–3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Mini Schnauzers (calcium oxalate), UTIs, high-protein diets."
     ],
     "Prevention": [
@@ -2351,8 +2292,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Glomerulonephritis": {
+"Glomerulonephritis": {
     "Description": [
       "Immune-complex deposition in glomeruli causing protein-losing nephropathy, hypoalbuminemia, edema, and eventual renal failure."
     ],
@@ -2369,13 +2309,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "UPC >2.0, hypoalbuminemia, renal biopsy confirming glomerular lesions."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Identify and treat underlying disease, start ACEi/ARB, check BP, monitor UPC and creatinine monthly."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Can stabilize protein loss in weeks; long-term prognosis variable."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Chronic tick-borne disease, systemic lupus, intact males with prostatitis."
     ],
     "Prevention": [
@@ -2383,9 +2323,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-
-     "Ameba Infection in Cats": {
+"Ameba Infection in Cats": {
     "Description": [
       "Rare protozoal infection (most often Acanthamoeba or Entamoeba histolytica) that can cause hemorrhagic colitis or disseminated disease in cats."
     ],
@@ -2402,13 +2340,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Fresh fecal smear/PCR for trophozoites, colon biopsy, or immunohistochemistry for extra-intestinal lesions."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Provide fluid support, begin antiprotozoal drugs, test household water source, and practise strict litter-box hygiene."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs often improve within a week if intestinal; systemic cases have guarded prognosis."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor cats drinking from stagnant water, immunosuppressed cats (FeLV/FIV)."
     ],
     "Prevention": [
@@ -2416,8 +2354,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Anaerobic Bacterial Infections in Cats": {
+"Anaerobic Bacterial Infections in Cats": {
     "Description": [
       "Deep bite-wound or abscess infections caused by anaerobes such as Bacteroides, Fusobacterium, or Peptostreptococcus resulting in swelling, pain, and foul-smelling exudate."
     ],
@@ -2434,13 +2371,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Cytology (mixed bacilli), anaerobic culture, characteristic odor, and location typical of bite sites."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Clip and clean wound, place drain if needed, keep cat indoors while healing, and complete full antibiotic course."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Swelling typically resolves within 3–7 days after drainage; full healing in 2–3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor intact males, dense multi-cat households, lack of vaccination leading to roaming fights."
     ],
     "Prevention": [
@@ -2448,8 +2385,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Arthritis in Cats": {
+"Arthritis in Cats": {
     "Description": [
       "Degenerative joint disease (osteoarthritis) causing chronic pain, decreased jumping, grooming difficulties, and behaviour changes."
     ],
@@ -2466,13 +2402,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Orthopaedic exam (reduced range of motion, crepitus), owner questionnaires, radiographs showing osteophytes."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Optimise body weight, provide ramps/step stools, keep litter boxes low-sided, and administer analgesics long-term under veterinary guidance."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pain relief often noted within 1–2 weeks of therapy; condition managed lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Senior cats (>10 y), obesity, previous orthopaedic injury."
     ],
     "Prevention": [
@@ -2480,8 +2416,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Babesiosis in Cats": {
+"Babesiosis in Cats": {
     "Description": [
       "Tick-borne intra-erythrocytic protozoal infection (Babesia felis, B. cati) producing anaemia, fever, and jaundice—much less common than in dogs."
     ],
@@ -2498,13 +2433,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR on EDTA blood, Giemsa-stained smear (piroplasms), anaemia with regenerative response."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start antiprotozoal therapy early, provide tick control for all pets, monitor PCV weekly."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Fever and pallor improve over 3–5 days; carriers may persist."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor cats in tick-endemic regions (Africa, Asia)."
     ],
     "Prevention": [
@@ -2512,8 +2447,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Bacterial Infection (Actinomycosis) in Cats": {
+"Bacterial Infection (Actinomycosis) in Cats": {
     "Description": [
       "Chronic granulomatous infection caused by Actinomyces israelii or A. viscosus leading to draining tracts under the skin or pleural pyogranulomas."
     ],
@@ -2530,13 +2464,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Granules in exudate, gram-positive branching filaments on cytology, anaerobic culture."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Identify/remove foreign bodies via imaging, flush tracts, and ensure strict antibiotic course is completed."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Gradual regression over weeks; recurrence common if therapy is shortened."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor hunting cats exposed to grass awns."
     ],
     "Prevention": [
@@ -2544,8 +2478,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Bacterial Infection (B. bronchiseptica) in Cats": {
+"Bacterial Infection (B. bronchiseptica) in Cats": {
     "Description": [
       "Upper-respiratory infection by Bordetella bronchiseptica causing sneezing, coughing, and nasal discharge—part of feline ‘kennel-cough’ complex."
     ],
@@ -2562,13 +2495,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Oropharyngeal PCR or bacterial culture, clinical signs in multi-cat environment."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate affected cats, treat all with signs, improve ventilation, disinfect surfaces."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Signs usually improve within a week of antibiotics."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Shelters, catteries, households with dogs carrying Bordetella."
     ],
     "Prevention": [
@@ -2576,8 +2509,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Bacterial Infection (Campylobacteriosis) in Cats": {
+"Bacterial Infection (Campylobacteriosis) in Cats": {
     "Description": [
       "Enteric infection (Campylobacter jejuni) leading to watery or mucus diarrhoea—often subclinical but zoonotic."
     ],
@@ -2594,13 +2526,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR or culture on Campy-BAP media from fresh faeces."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate, treat symptomatic cats, practise strict litter hygiene, and advise owners about zoonosis."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Signs resolve 2–7 days; shedding may continue up to 4 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Young cats, raw diets, shelter environments."
     ],
     "Prevention": [
@@ -2608,8 +2540,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Bacterial Infection (Leptospirosis) in Cats": {
+"Bacterial Infection (Leptospirosis) in Cats": {
     "Description": [
       "Leptospira infection is uncommon in cats but can cause mild fever, lethargy, or subclinical renal colonisation."
     ],
@@ -2626,13 +2557,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR of urine/blood, paired MAT titres; often incidental finding."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat with doxycycline, advise rodent control, practise hygiene (zoonosis)."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement in few days; carrier state cleared by 2-week antibiotic course."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor hunters, flood-prone tropical areas."
     ],
     "Prevention": [
@@ -2640,8 +2571,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Bacterial Infection (Streptococcus) in Cats": {
+"Bacterial Infection (Streptococcus) in Cats": {
     "Description": [
       "Streptococcus canis, equi subsp. zooepidemicus infections causing pneumonia, septic arthritis, or necrotising fasciitis in cats."
     ],
@@ -2658,13 +2588,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Bacterial culture of lesions, blood cultures in sepsis, thoracic imaging for pneumonia."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Hospitalise severe cases, start IV antibiotics, isolate, and disinfect environment."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Simple infections respond in 5–7 days; necrotising fasciitis has guarded prognosis."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Shelter outbreaks, kittens post FHV/FCV infection."
     ],
     "Prevention": [
@@ -2672,8 +2602,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Calicivirus in Cats": {
+"Calicivirus in Cats": {
     "Description": [
       "Feline calicivirus (FCV) respiratory and oral infection causing ulcers, sneezing, fever, and occasionally virulent systemic disease."
     ],
@@ -2690,13 +2619,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR from oral/nasal swabs or characteristic oral ulceration in outbreak."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate infected cats, enforce barrier nursing, disinfect with bleach, vaccinate at-risk populations."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Most recover in 1–2 weeks; chronic carriers shed for months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Unvaccinated kittens, shelters, multi-cat households."
     ],
     "Prevention": [
@@ -2704,8 +2633,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Cat Tooth Abscess": {
+"Cat Tooth Abscess": {
     "Description": [
       "Periapical infection of a feline tooth root leading to pain, swelling under eye (upper carnassial), drooling, and anorexia."
     ],
@@ -2722,13 +2650,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Intra-oral radiographs showing periapical lucency, oral exam revealing draining tract."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule dental extraction, provide soft food post-op, and complete antibiotic course."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pain relief within 48 h post extraction; healing 2–4 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Wet food diets, tooth resorption predisposition, lack of dental care."
     ],
     "Prevention": [
@@ -2736,8 +2664,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Cerebellar Hypoplasia in Cats": {
+"Cerebellar Hypoplasia in Cats": {
     "Description": [
       "Underdevelopment of the cerebellum (often due to in-utero or neonatal feline panleukopenia virus) causing ataxia, intention tremor, and wide-based stance."
     ],
@@ -2754,13 +2681,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Neurologic exam, MRI showing small cerebellum, history of FPV exposure of dam."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Ensure safe housing, spay/neuter to prevent breeding, vaccinate all household cats against FPV."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Signs lifelong but animals adapt; no progression."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kittens from unvaccinated queens, shelter outbreaks of panleukopenia."
     ],
     "Prevention": [
@@ -2768,8 +2695,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Chronic Renal Failure in Cats": {
+"Chronic Renal Failure in Cats": {
     "Description": [
       "Advanced stage of chronic kidney disease with significant azotemia, dehydration, oral ulcers, and weight loss—common in geriatric cats."
     ],
@@ -2786,13 +2712,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "IRIS staging (creatinine, SDMA), dilute urine, ultrasound showing small kidneys."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Teach owner SQ fluid administration, monitor BP and labwork every 3 months, adjust diet."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Cannot reverse; supportive care can extend quality life months to years."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Cats >10 y, Persian with PKD gene, previous nephrotoxic drug use."
     ],
     "Prevention": [
@@ -2800,8 +2726,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Coccidia in Cats": {
+"Coccidia in Cats": {
     "Description": [
       "Intestinal protozoan infection (Cystoisospora felis, rivolta) causing diarrhoea and poor weight gain in kittens."
     ],
@@ -2818,13 +2743,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Faecal flotation identifying small oocysts; centrifugal technique improves detection."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat all littermates, sanitise litter boxes daily with steam, and prevent reinfection."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Diarrhoea typically resolves within 3–5 days of treatment."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kittens <12 weeks, crowded conditions, poor sanitation."
     ],
     "Prevention": [
@@ -2832,7 +2757,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Congestive Heart Failure in Cats": {
+"Congestive Heart Failure in Cats": {
     "Description": [
       "Clinical syndrome of pulmonary edema or pleural effusion that develops when heart disease (most commonly hypertrophic cardiomyopathy) prevents adequate forward blood flow."
     ],
@@ -2849,13 +2774,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Thoracic radiographs (alveolar pattern or effusion), echocardiography confirming underlying heart disease, NT-proBNP elevation."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Seek emergency care if open-mouth breathing, administer diuretics as prescribed, monitor resting respiratory rate (<30 breaths/min ideal)."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Fluid resolves within 12–24 h on diuretics; long-term survival ranges months to a few years depending on cause."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Middle-aged to senior cats with HCM, hyperthyroidism, or systemic hypertension."
     ],
     "Prevention": [
@@ -2863,8 +2788,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Demodectic Mange in Cats": {
+"Demodectic Mange in Cats": {
     "Description": [
       "Overgrowth of Demodex cati or Demodex gatoi mites causing patchy alopecia, crusting, and pruritus (D. gatoi is contagious and itchy; D. cati often occurs with immunosuppression)."
     ],
@@ -2881,13 +2805,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Deep or superficial skin scrapings, acetate-tape prep, response to acaricidal therapy."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat all in-contact cats if D. gatoi, improve nutrition, retest retrovirus status, repeat scrapings until two consecutive negatives."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Lesions resolve in 4–6 weeks; pruritus subsides within days of treatment."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Shelters or catteries (D. gatoi), systemic illness or steroids (D. cati)."
     ],
     "Prevention": [
@@ -2895,8 +2819,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Dental Issues in Cats": {
+"Dental Issues in Cats": {
     "Description": [
       "Collective term for periodontal disease, tooth resorption, calculus build-up, and fractured teeth causing pain, difficulty eating, and systemic inflammation."
     ],
@@ -2913,13 +2836,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Visual exam, periodontal probing, full-mouth dental radiographs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule annual COHAT, initiate home dental care, offer wet food temporarily after extractions."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Mouth pain usually improves within 48 h post-procedure; gums heal 2–3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Purebred cats (tooth resorption), brachycephalics, high-carb diets, lack of brushing."
     ],
     "Prevention": [
@@ -2927,8 +2850,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Diabetes in Cats": {
+"Diabetes in Cats": {
     "Description": [
       "Type 2-like diabetes mellitus with insulin resistance and beta-cell exhaustion leading to persistent hyperglycemia, polyuria-polydipsia, weight loss, and plantigrade stance."
     ],
@@ -2945,13 +2867,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Persistent fasting hyperglycemia, glucosuria, serum fructosamine; stress hyperglycemia ruled out with repeated testing."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin insulin, switch diet to <10 % carbs, schedule glucose curves, and educate owner on hypoglycemia signs."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Polyuria resolves within days; insulin dose stabilizes over 4–8 weeks; 20–30 % may achieve remission in 3–6 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Overweight indoor cats >7 y, Burmese breed, chronic prednisolone use."
     ],
     "Prevention": [
@@ -2959,8 +2881,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Ehrlichiosis in Cats": {
+"Ehrlichiosis in Cats": {
     "Description": [
       "Tick-borne rickettsial infection (Ehrlichia canis, E. ewingii) that may cause fever, lethargy, lymphadenopathy, and thrombocytopenia—far less common than in dogs."
     ],
@@ -2977,13 +2898,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR of whole blood, IFA serology, low platelets on CBC."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start doxycycline pending PCR, ensure tick prevention, re-check CBC post-therapy."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs improve in 2–3 days; platelet count normalises in 2–4 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor cats in tropical/subtropical climates with heavy tick exposure."
     ],
     "Prevention": [
@@ -2991,8 +2912,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Epilepsy in Cats": {
+"Epilepsy in Cats": {
     "Description": [
       "Recurrent unprovoked seizures originating from the forebrain; may be idiopathic or secondary to structural disease (tumor, encephalitis)."
     ],
@@ -3009,13 +2929,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Minimum database, MRI/CSF for cats <1 y or >7 y at onset; seizure diary."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin anti-epileptic drug if ≥2 seizures in 6 months, educate owner on safety during episodes, maintain consistent dosing."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Seizure frequency typically decreases within 2–4 weeks of reaching therapeutic blood levels."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Burmese, Siamese, and mixed breeds; prior head trauma."
     ],
     "Prevention": [
@@ -3023,8 +2943,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Feline Distemper (Panleukopenia)": {
+"Feline Distemper (Panleukopenia)": {
     "Description": [
       "Highly contagious parvoviral disease causing severe leukopenia, vomiting, bloody diarrhoea, and high kitten mortality."
     ],
@@ -3041,13 +2960,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Positive CPV ELISA on faeces, marked neutropenia, PCR confirmation."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate in bio-secure ward, disinfect with 1:30 bleach, vaccinate all in-contact cats, supportively treat."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "If survival beyond 5 days, prognosis good; shedding may last 6 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Unvaccinated kittens 3–6 months, shelter outbreaks."
     ],
     "Prevention": [
@@ -3055,8 +2974,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Feline Herpesvirus 1 (FHV-1) Infection": {
+"Feline Herpesvirus 1 (FHV-1) Infection": {
     "Description": [
       "Upper-respiratory and ocular infection causing sneezing, conjunctivitis, corneal ulcers, and lifelong latency with stress-related recrudescence."
     ],
@@ -3073,13 +2991,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "PCR of conjunctival/nasal swabs, typical clinical signs and response to antivirals."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Isolate affected cats, reduce stress, clean eyes/nose, complete antiviral course."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Acute signs resolve in 7–14 days; latent carriers may flare periodically."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kittens in shelters, multi-cat households, stress."
     ],
     "Prevention": [
@@ -3087,8 +3005,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Feline Hypertrophic Cardiomyopathy (HCM) in Cats": {
+"Feline Hypertrophic Cardiomyopathy (HCM) in Cats": {
     "Description": [
       "Genetic myocardial disease where left-ventricular walls thicken, reducing chamber size and predisposing to heart failure and arterial thrombo-embolism."
     ],
@@ -3105,13 +3022,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Echocardiography showing ≥6 mm LV wall thickness, gallop rhythm, NT-proBNP assay."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule periodic echoes, monitor resting breaths, adjust meds at onset of CHF, screen siblings for HCM."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Asymptomatic stage may last years; CHF median survival 6–18 months."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Maine Coon, Ragdoll, Sphynx breeds; male cats."
     ],
     "Prevention": [
@@ -3119,8 +3036,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Giardia in Cats": {
+"Giardia in Cats": {
     "Description": [
       "Protozoal flagellate infection causing malodorous, soft or watery diarrhoea, often intermittent."
     ],
@@ -3137,13 +3053,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Faecal zinc-sulfate flotation, DFA test, or SNAP Giardia antigen test."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat all symptomatic cats, clean litter boxes daily with scalding water, disinfect floors, and dry thoroughly."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Stool normalises in 3–7 days; retest faeces after therapy."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kittens, catteries, outdoor water sources."
     ],
     "Prevention": [
@@ -3151,8 +3067,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Gingivitis in Cats": {
+"Gingivitis in Cats": {
     "Description": [
       "Inflammation of gingival margins due to plaque accumulation or immune-mediated response (calicivirus-associated stomatitis)."
     ],
@@ -3169,13 +3084,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Oral exam showing erythematous gingiva; dental radiographs for resorption."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule COHAT, institute home care, consider extractions if unresponsive to medical management."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Mild gingivitis improves within a week post-cleaning; stomatitis requires months and may relapse."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Purebred cats, FCV carriers, lack of dental hygiene."
     ],
     "Prevention": [
@@ -3183,8 +3098,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Heartworm Disease in Cats": {
+"Heartworm Disease in Cats": {
     "Description": [
       "Parasite Dirofilaria immitis infection producing Heartworm-Associated Respiratory Disease (HARD) or sudden death; cats are atypical hosts with few adult worms."
     ],
@@ -3201,13 +3115,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Combination of antigen (often negative) and antibody tests, thoracic radiographs/echo showing pulmonary artery changes."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start monthly prevention even after infection, give corticosteroids for inflammation, monitor with thoracic imaging."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pulmonary inflammation may persist months; risk of sudden death remains until worms die (2–3 y)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor cats in canine heartworm-endemic areas, lack of prevention."
     ],
     "Prevention": [
@@ -3215,8 +3129,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hip Dysplasia in Cats": {
+"Hip Dysplasia in Cats": {
     "Description": [
       "Malformation or laxity of the coxofemoral joint causing arthritis, difficulty jumping, and reluctance to exercise."
     ],
@@ -3233,13 +3146,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Hip radiographs (OFA) showing subluxation/degenerative changes, Ortolani test under sedation."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Maintain lean body weight, provide ramps/steps, start analgesia and joint diet."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Pain reduction within 1–2 weeks of meds; post-surgical recovery 6–8 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Maine Coon, Devon Rex; overweight cats."
     ],
     "Prevention": [
@@ -3247,8 +3160,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Hookworms in Cats": {
+"Hookworms in Cats": {
     "Description": [
       "Intestinal nematodes (Ancylostoma tubaeforme) feeding on blood, causing anaemia, black tarry stool, and poor growth in kittens."
     ],
@@ -3265,13 +3177,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Faecal flotation revealing thin-shelled ova; faecal antigen tests detect pre-patent infections."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Treat all household cats, clean litter daily, keep kittens indoors until multiple negative faecals."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement within 48 h; repeat deworming clears infection in 2–3 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor access, sandy soil, predation of rodents."
     ],
     "Prevention": [
@@ -3279,7 +3191,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-  "Kidney Disease in Cats": {
+"Kidney Disease in Cats": {
     "Description": [
       "Progressive loss of kidney function (chronic kidney disease) resulting in reduced ability to concentrate urine, azotemia, and gradual weight loss."
     ],
@@ -3296,13 +3208,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Serum creatinine/SDMA elevation, urine specific-gravity <1.035, UPC ratio >0.4, and ultrasound showing small irregular kidneys."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Transition to renal diet over 7 days, monitor hydration, schedule rechecks every 3–6 months, and administer fluids if weight or appetite declines."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Irreversible but progression can be slowed—cats often enjoy good quality of life months to years with proper management."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Cats ≥10 years old, Persians with PKD gene, chronic NSAID or gentamicin exposure."
     ],
     "Prevention": [
@@ -3310,8 +3222,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Kidney Failure in Cats": {
+"Kidney Failure in Cats": {
     "Description": [
       "End-stage of chronic kidney disease or acute toxic/ischemic injury leading to uremic crisis, profound azotemia, vomiting, dehydration, and ulcerative stomatitis."
     ],
@@ -3328,13 +3239,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Creatinine >5 mg/dL, BUN dramatically elevated, metabolic acidosis, isosthenuric urine, and imaging for obstruction."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Seek emergency care, begin aggressive fluid therapy, discuss prognosis and palliative options, continue home SQ fluids after discharge."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Acute injury may partially recover in 1–2 weeks; end-stage CKD carries guarded prognosis (weeks → months)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Access to lilies/antifreeze, untreated CKD, ureteral stones in middle-aged cats."
     ],
     "Prevention": [
@@ -3342,8 +3253,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Kidney Infections in Cats": {
+"Kidney Infections in Cats": {
     "Description": [
       "Bacterial pyelonephritis causing fever, flank pain, polyuria-polydipsia, and possible septicemia."
     ],
@@ -3360,13 +3270,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Urine culture (may be dilute), ultrasound showing pyelectasia, CBC with neutrophilia, and fever response."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Begin empirical antibiotic pending culture, re-culture 1 week after completion, treat underlying obstruction if present."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs improve within 3–5 days; full course 4–6 weeks to eradicate bacteria."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Female cats, chronic kidney disease, diabetes mellitus."
     ],
     "Prevention": [
@@ -3374,8 +3284,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Kidney Stones in Cats": {
+"Kidney Stones in Cats": {
     "Description": [
       "Nephroliths or ureteroliths (calcium oxalate, struvite) forming in renal pelvis or ureter, causing hematuria, pain, or post-renal azotemia if obstructive."
     ],
@@ -3392,13 +3301,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Abdominal ultrasound, non-contrast CT, radiographs, and stone analysis after removal."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Hospitalize obstructed cats for fluids and decompression, start prescription diet, monitor imaging every 3–6 months."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Post-SUB/stent recovery 1–2 weeks; diet dissolution of struvite 2–6 weeks."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Middle-aged male cats, high-calcium diets, chronic UTIs."
     ],
     "Prevention": [
@@ -3406,8 +3315,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Luxating Patellas in Cats": {
+"Luxating Patellas in Cats": {
     "Description": [
       "Dislocation of the kneecap (usually medial) causing intermittent skipping gait and pain, most common in young purebred cats."
     ],
@@ -3424,13 +3332,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Palpation reveals patellar instability graded I–IV; radiographs confirm alignment."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Consult orthopedist for grading, schedule surgery if symptomatic, encourage controlled exercise post-op."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Surgical recovery 6–8 weeks; conservative management lifelong."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Devon Rex, Abyssinian, overweight cats."
     ],
     "Prevention": [
@@ -3438,8 +3346,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Periodontal Disease in Cats": {
+"Periodontal Disease in Cats": {
     "Description": [
       "Inflammation and infection of periodontal tissues due to plaque biofilm, progressing to bone loss and tooth loss."
     ],
@@ -3456,13 +3363,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Periodontal probing under anesthesia, dental radiographs showing bone loss."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule COHAT yearly, institute home dental care, provide dental diets/chews."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Gums improve within a week; advanced bone loss irreversible."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Brachycephalics, small jaws, wet diets, lack of brushing."
     ],
     "Prevention": [
@@ -3470,8 +3377,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Rabies in Cats": {
+"Rabies in Cats": {
     "Description": [
       "Fatal viral encephalitis caused by rabies virus; once clinical signs appear (behavior change, paralysis, seizures) death ensues within days."
     ],
@@ -3488,13 +3394,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "dFA test on brain tissue post-mortem; ante-mortem diagnosis unreliable."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Report suspected cases to authorities, isolate animal, avoid human exposure, follow post-exposure prophylaxis guidelines."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical course 2–10 days to death."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Outdoor unvaccinated cats, endemic wildlife reservoirs."
     ],
     "Prevention": [
@@ -3502,8 +3408,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Roundworms in Cats": {
+"Roundworms in Cats": {
     "Description": [
       "Large intestinal nematodes (Toxocara cati, Toxascaris leonina) causing pot-bellied appearance, vomiting worms, and zoonotic visceral/ocular larva migrans."
     ],
@@ -3520,13 +3425,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Faecal flotation (thick-shelled ova), adult worms in vomit/stool."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Deworm kittens starting at 2 weeks, clean litter boxes daily, treat the queen, educate owners on zoonosis."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical improvement in 2–3 days; repeat treatments for 2–3 cycles."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Kittens, outdoor hunters, poor sanitation."
     ],
     "Prevention": [
@@ -3534,8 +3439,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Stomatitis in Cats": {
+"Stomatitis in Cats": {
     "Description": [
       "Severe, chronic inflammation of oral mucosa (feline chronic gingivostomatitis) causing drooling, halitosis, and pain when eating."
     ],
@@ -3552,13 +3456,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Oral exam showing fiery mucositis beyond gingiva, biopsy to rule out eosinophilic granuloma or SCC."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Plan staged extractions, provide opioid pain control, feed soft food post-op, monitor weight."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Majority improve within weeks of extractions; some require lifelong immunomodulation."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Purebred cats (Siamese, Abyssinian), FCV carriers, households with many cats."
     ],
     "Prevention": [
@@ -3566,8 +3470,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Tapeworms in Cats": {
+"Tapeworms in Cats": {
     "Description": [
       "Intestinal cestodes (Dipylidium caninum via fleas; Taenia taeniaeformis via rodents) causing mild digestive upset and mobile ‘rice-grain’ segments around anus."
     ],
@@ -3584,13 +3487,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Visualization of proglottids, fecal flotation sometimes reveals ova."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Administer praziquantel, start flea control for Dipylidium or limit hunting for Taenia."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Segments disappear within 24 h of treatment; reinfection common if flea control lapses."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Flea infestation, hunting rodents."
     ],
     "Prevention": [
@@ -3598,8 +3501,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Tooth Resorption in Cats": {
+"Tooth Resorption in Cats": {
     "Description": [
       "Progressive odontoclastic resorption of tooth structure often at the cemento-enamel junction, causing pain, gingival overgrowth, and crown amputation."
     ],
@@ -3616,13 +3518,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Intra-oral radiographs showing resorptive lesions; probing elicits pain (‘chattering’)."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Schedule full-mouth radiographs, extract affected teeth, institute regular dental check-ups."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Cats eat comfortably 3–5 days post extraction; monitor annually."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Middle-aged to senior cats, purebreds (Siamese, Abyssinian)."
     ],
     "Prevention": [
@@ -3630,8 +3532,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": false,
   },
-
-  "Toxoplasmosis in Cats": {
+"Toxoplasmosis in Cats": {
     "Description": [
       "Systemic infection by Toxoplasma gondii often asymptomatic, but can cause pneumonia, ocular uveitis, or neurologic signs in immunosuppressed cats."
     ],
@@ -3648,13 +3549,13 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "IgM >1:64 suggests recent infection; PCR of BAL/CSF, ocular fluid, or tissue; thoracic radiographs."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Start clindamycin promptly, switch to cooked diets, practise litter hygiene (scooping daily, flush or trash)."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Clinical signs improve in a week; full course prevents relapse."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Raw meat diets, hunting, immunosuppression (FeLV/FIV)."
     ],
     "Prevention": [
@@ -3662,8 +3563,7 @@ final Map<String, dynamic> illnessInformation = {
     ],
     "Contagious": true,
   },
-
-  "Vestibular Disease in Cats": {
+"Vestibular Disease in Cats": {
     "Description": [
       "Acute dysfunction of peripheral or central vestibular system causing head tilt, nystagmus, ataxia, and nausea; most common form is idiopathic peripheral vestibular disease."
     ],
@@ -3680,18 +3580,18 @@ final Map<String, dynamic> illnessInformation = {
     "Diagnosis": [
       "Neurologic exam (paradoxical signs for central), otoscopy/CT for ear disease, MRI for central lesions."
     ],
-    "WhatToDo": [
+    "What To Do": [
       "Keep cat confined to prevent falls, provide easy access to food/litter, stop ototoxic drugs, re-evaluate after 2 weeks."
     ],
-    "RecoveryTime": [
+    "Recovery Time": [
       "Idiopathic cases improve markedly within 48–72 h and resolve in 2–3 weeks (head tilt may persist)."
     ],
-    "RiskFactors": [
+    "Risk Factors": [
       "Senior cats (idiopathic), chronic ear infections, prior nasopharyngeal polyps."
     ],
     "Prevention": [
       "Prompt treatment of ear infections, avoid high-dose metronidazole."
     ],
     "Contagious": false,
-  },
+  }
 };
