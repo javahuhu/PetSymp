@@ -10,7 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:image_picker/image_picker.dart'; // Import this
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 enum ShapeType {
   circle,
   square,
@@ -285,6 +286,7 @@ class _AnimatedShapesBackgroundState extends State<AnimatedShapesBackground>
     }
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1049,8 +1051,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ],
           ),
           onPetDetailsUpdated: () {
-            // Refresh the screen when pet details are updated
             setState(() {});
+          
           },
           child: Padding(
             padding: EdgeInsets.all(16.w),
@@ -1789,11 +1791,31 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
     }
   }
 
+   Future<String?> _uploadImageToCloudinary(XFile imageFile) async {
+    final url =
+        Uri.parse('https://api.cloudinary.com/v1_1/dntn2fqjo/image/upload');
+    final request = http.MultipartRequest('POST', url)
+      ..fields['upload_preset'] = 'Petsymp'
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    final response = await request.send();
+    final res = await http.Response.fromStream(response);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      return data['secure_url'];
+    } else {
+      print('Upload failed: ${res.body}');
+      return null;
+    }
+  }
+
+
   // Add method to show edit dialog
 
   void _showEditDialog(BuildContext context) {
     XFile? selectedImage; // 📌 Local file reference for new image
     final picker = ImagePicker();
+    bool _isImagePicking = false; // Place this in your class
+
 
     showDialog<void>(
       context: context,
@@ -1829,9 +1851,11 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                     // 📷 Profile picture part
                     GestureDetector(
                       onTap: () async {
-                        await Future.delayed(const Duration(
-                            milliseconds: 100)); // 👈 Add this line here
+                      if (_isImagePicking) return; 
+                      _isImagePicking = true;
 
+                      try {
+                        await Future.delayed(Duration(milliseconds: 100)); 
                         final XFile? image = await picker.pickImage(
                           source: ImageSource.gallery,
                           imageQuality: 75,
@@ -1842,7 +1866,13 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                             selectedImage = image;
                           });
                         }
-                      },
+                      } catch (e) {
+                        print("Image picker error: $e");
+                      } finally {
+                        _isImagePicking = false;
+                      }
+                    },
+
                       child: CircleAvatar(
                         radius: 50.r,
                         backgroundColor: Colors.grey[300],
@@ -1953,10 +1983,19 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                       // 📤 If new image selected, upload it first
                       String? newImageUrl;
                       if (selectedImage != null) {
-                        // --- (You need to upload this to Firebase Storage here) ---
-                        // newImageUrl = await uploadToFirebase(selectedImage!.path);
-                        newImageUrl = selectedImage!.path; // For now just local
+                      newImageUrl = await _uploadImageToCloudinary(selectedImage!);
+                      if (newImageUrl == null) {
+                        Navigator.of(context).pop(); // close loading
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Image upload failed."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
                       }
+                    }
+
 
                       // Then update pet details including photo
                       await _updatePetDetails(
@@ -1979,6 +2018,12 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                       if (widget.onPetDetailsUpdated != null) {
                         widget.onPetDetailsUpdated!();
                       }
+
+                      if (newImageUrl != null) {
+                      setState(() {
+                        widget.petData['petImage'] = newImageUrl;
+                      });
+                    }
                     } catch (e) {
                       Navigator.of(context).pop(); // close loading
                       ScaffoldMessenger.of(context).showSnackBar(
