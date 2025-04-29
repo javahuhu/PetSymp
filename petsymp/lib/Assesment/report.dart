@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math' as math;
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -13,30 +14,29 @@ class ReportScreen extends StatefulWidget {
   ReportScreenState createState() => ReportScreenState();
 }
 
-class ReportScreenState extends State<ReportScreen> {
+class ReportScreenState extends State<ReportScreen> with SingleTickerProviderStateMixin{
+  static const int _bubbleCount = 8; // number of static bubbles
+  late List<Bubble> _bubbles;
+
   bool _isAnimated = false;
   bool _isLoading = false;
   String ownerName = 'Loading...';
-
   final List<bool> _buttonVisible = [false, false, false, false, false, false];
 
   @override
   void initState() {
     super.initState();
-    fetchOwnerName(); // ← Fetch owner from Firestore
+    // Generate static bubbles
+    _bubbles = List.generate(_bubbleCount, (_) => Bubble());
 
-    // Your animation sequence
+    fetchOwnerName();
+
+    // Animation for title and buttons
     Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() {
-        _isAnimated = true;
-      });
+      setState(() => _isAnimated = true);
       for (int i = 0; i < _buttonVisible.length; i++) {
         Future.delayed(Duration(milliseconds: 300 * i), () {
-          if (mounted) {
-            setState(() {
-              _buttonVisible[i] = true;
-            });
-          }
+          if (mounted) setState(() => _buttonVisible[i] = true);
         });
       }
     });
@@ -45,35 +45,24 @@ class ReportScreenState extends State<ReportScreen> {
   Future<void> fetchOwnerName() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
-        String userId = user.uid;
-
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('Users')
-            .doc(userId)
+            .doc(user.uid)
             .get();
-
         if (userDoc.exists && userDoc.data() != null) {
           final data = userDoc.data() as Map<String, dynamic>;
-
-          setState(() {
-            ownerName = data['Username'] ?? 'Pet Owner';
-          });
+          setState(() => ownerName = data['Username'] ?? 'Pet Owner');
         } else {
-          setState(() {
-            ownerName = 'User Not Found';
-          });
+          setState(() => ownerName = 'User Not Found');
         }
       } else {
-        setState(() {
-          ownerName = 'Not Logged In';
-        });
+        setState(() => ownerName = 'Not Logged In');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching owner name: ${e.toString()}")),
+          SnackBar(content: Text('Error fetching owner name: $e')),
         );
       }
     }
@@ -81,143 +70,163 @@ class ReportScreenState extends State<ReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final PetName = Provider.of<UserData>(context).userName;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final petName = Provider.of<UserData>(context).userName;
 
     return PopScope(
-        canPop: false,
-        child: Scaffold(
-          backgroundColor: const Color(0xFFE8F2F5),
-          body: Stack(
-            children: [
-              Stack(
-                children: [
-                  AnimatedPositioned(
-                    duration: const Duration(seconds: 1),
-                    curve: Curves.easeInOut,
-                    top: _isAnimated ? screenHeight * 0.13 : -100,
-                    left: screenWidth * 0.1,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: screenWidth * 0.15,
-                          height: screenWidth * 0.15,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset(
-                            'assets/paw.png',
-                            fit: BoxFit.contain,
-                          ),
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE8F2F5),
+        body: Stack(
+          children: [
+            // Static bubbles background
+            ..._bubbles.map((bubble) {
+              final size = bubble.size * screenWidth * 0.3; // larger bubbles
+              return Positioned(
+                left: bubble.position.dx * screenWidth,
+                top: bubble.position.dy * screenHeight,
+                child: Opacity(
+                  opacity: 0.5 * bubble.opacity,
+                  child: Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const RadialGradient(
+                        colors: [
+                          Color.fromRGBO(82, 170, 164, 0.8),
+                          Color.fromRGBO(82, 170, 164, 0.2),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.teal.withOpacity(0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
                         ),
-                        SizedBox(width: screenWidth * 0.05),
                       ],
                     ),
                   ),
-                  // Title Section
-                  Positioned(
-                    top: screenHeight * 0.22,
-                    left: screenWidth * 0.12,
-                    right: screenWidth * 0.02,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          (ownerName != 'Loading...' && PetName.isNotEmpty)
-                              ? "Thank you, $ownerName. I have put together a report of $PetName 's possible complications."
-                              : "Loading report...",
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(29, 29, 44, 1.0),
-                          ),
-                        ),
-                        const SizedBox(height: 50),
-                      ],
-                    ),
-                  ),
-                  // Animated Buttons
+                ),
+              );
+            }).toList(),
 
-                  buildAnimatedButton(screenHeight * 1.03, screenWidth, 0.87,
-                      "Continue", const NewSummaryScreen(), 1),
-                ],
-              ),
-            ],
-          ),
-        ));
+            // Main content stack
+            Stack(
+              children: [
+                // Paw icon animation
+                AnimatedPositioned(
+                  duration: const Duration(seconds: 1),
+                  curve: Curves.easeInOut,
+                  top: _isAnimated ? screenHeight * 0.13 : -100,
+                  left: screenWidth * 0.1,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: screenWidth * 0.15,
+                        height: screenWidth * 0.15,
+                        decoration: const BoxDecoration(shape: BoxShape.circle),
+                        child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                      ),
+                      SizedBox(width: screenWidth * 0.05),
+                    ],
+                  ),
+                ),
+
+                // Title section
+                Positioned(
+                  top: screenHeight * 0.22,
+                  left: screenWidth * 0.12,
+                  right: screenWidth * 0.02,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (ownerName != 'Loading...' && petName.isNotEmpty)
+                            ? "Thank you, $ownerName. I have put together a report of $petName's possible complications."
+                            : "Loading report...",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
+                      ),
+                      const SizedBox(height: 50),
+                    ],
+                  ),
+                ),
+
+                // Animated Continue button
+                buildAnimatedButton(
+                  screenHeight * 1.03, screenWidth, 0.87,
+                  "Continue",
+                  const NewSummaryScreen(),
+                  1,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  // Method to create an animated button
-  Widget buildAnimatedButton(double screenHeight, double screenWidth,
-      double topPosition, String label, Widget destination, int index) {
+  // Animated button builder
+  Widget buildAnimatedButton(
+    double screenHeight,
+    double screenWidth,
+    double topFactor,
+    String label,
+    Widget destination,
+    int index,
+  ) {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 800),
       curve: Curves.easeInOut,
-      top: _buttonVisible[index] ? screenHeight * topPosition : screenHeight,
+      top: _buttonVisible[index] ? screenHeight * topFactor : screenHeight,
       right: screenWidth * 0.02,
       child: ElevatedButton(
         onPressed: _isLoading
             ? null
             : () async {
-                setState(() {
-                  _isLoading = true;
-                });
-
+                setState(() => _isLoading = true);
                 try {
                   await Future.delayed(const Duration(seconds: 3));
-
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => destination),
+                    MaterialPageRoute(builder: (_) => destination),
                   );
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                    'Something went wrong: $e',
-                  )));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Something went wrong: $e')),
+                  );
                 } finally {
                   if (mounted) setState(() => _isLoading = false);
                 }
               },
         style: ButtonStyle(
-          // Dynamic background color based on button state
-          backgroundColor: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.pressed)) {
-                return const Color.fromARGB(
-                    255, 0, 0, 0); // Background color when pressed
-              }
-              return Colors.transparent; // Default background color
-            },
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.pressed)) {
+              return const Color.fromARGB(255, 0, 0, 0);
+            }
+            return Colors.transparent;
+          }),
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.pressed)) {
+              return const Color.fromARGB(255, 255, 255, 255);
+            }
+            return const Color.fromRGBO(29, 29, 44, 1.0);
+          }),
+          shadowColor: MaterialStateProperty.all(Colors.transparent),
+          side: MaterialStateProperty.all(
+            const BorderSide(color: Color.fromRGBO(82, 170, 164, 1), width: 2),
           ),
-          // Dynamic text color based on button state
-          foregroundColor: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.pressed)) {
-                return const Color.fromARGB(
-                    255, 255, 255, 255); // Text color when pressed
-              }
-              return const Color.fromRGBO(
-                  29, 29, 44, 1.0); // Default text color
-            },
+          shape: MaterialStateProperty.all(
+            const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
           ),
-          shadowColor: WidgetStateProperty.all(Colors.transparent),
-          side: WidgetStateProperty.all(
-            const BorderSide(
-              color: Color.fromRGBO(82, 170, 164, 1),
-              width: 2.0,
-            ),
-          ),
-          shape: WidgetStateProperty.all(
-            const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-            ),
-          ),
-          fixedSize: WidgetStateProperty.all(
-            const Size(155, 55),
-          ),
+          fixedSize: MaterialStateProperty.all(const Size(155, 55)),
         ),
         child: _isLoading
             ? SizedBox(
@@ -230,12 +239,21 @@ class ReportScreenState extends State<ReportScreen> {
               )
             : Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
       ),
     );
   }
+}
+
+// Simple Bubble class for static placement
+class Bubble {
+  final Offset position;
+  final double size;
+  final double opacity;
+
+  Bubble()
+      : position = Offset(math.Random().nextDouble(), math.Random().nextDouble()),
+        size = 0.5 + math.Random().nextDouble() * 0.5, // relative size (50–100%)
+        opacity = 0.3 + math.Random().nextDouble() * 0.5; // 30–80% opacity
 }
