@@ -2070,17 +2070,17 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
         updatedDetails = List.from(widget.petData['petDetails']);
 
         // Update age (index 1)
-        if (updatedDetails.length > 1) {
-          updatedDetails[1] = {
-            ...updatedDetails[1] as Map<String, dynamic>,
+        if (updatedDetails.length > 2) {
+          updatedDetails[2] = {
+            ...updatedDetails[2] as Map<String, dynamic>,
             'value': newAge
           };
         }
 
         // Update size (index 2)
-        if (updatedDetails.length > 2) {
-          updatedDetails[2] = {
-            ...updatedDetails[2] as Map<String, dynamic>,
+        if (updatedDetails.length > 3) {
+          updatedDetails[3] = {
+            ...updatedDetails[3] as Map<String, dynamic>,
             'value': newSize
           };
         }
@@ -2098,9 +2098,11 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
       });
 
       // Update local state to reflect changes
-      setState(() {
-        widget.petData['petDetails'] = updatedDetails;
-      });
+         setState(() {
+      widget.petData['petDetails'] = updatedDetails;
+      if (newImagePath != null) {
+        widget.petData['petImage'] = newImagePath;
+      }});
     } catch (e) {
       print("Error updating pet details: $e");
       rethrow;
