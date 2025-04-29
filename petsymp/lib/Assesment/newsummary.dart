@@ -150,7 +150,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                 final screenSize = MediaQuery.of(context).size;
                 return Stack(
                   children: _bubbles.map((bubble) {
-                    final size = bubble.size * screenSize.width * 0.2;
+                    final size = bubble.size * screenSize.width * 0.1;
                     return Positioned(
                       left: (bubble.position.dx * screenSize.width) +
                           (math.sin((_bubblesController.value * bubble.speed + bubble.offset) * math.pi * 5) * bubble.wobble * screenSize.width * 0.5),
