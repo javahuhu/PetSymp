@@ -99,16 +99,16 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
     final Map<String, dynamic>? details = illnessInformation[widget.diagnosisData['illness']];
  
     
-    final List<String> infoKeys = [
+     final List<String> infoKeys = [
       "Description",
       "Severity",
       "Treatment",
       "Causes",
       "Transmission",
       "Diagnosis",
-      "WhatToDo",
-      "RecoveryTime",
-      "RiskFactors",
+      "What To Do",
+      "Recovery Time",
+      "Risk Factors",
       "Prevention",
       "Contagious",
     ];
@@ -148,33 +148,20 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
         children: [
         Padding(
           padding: EdgeInsets.only(
-            top: 20.h,
+            top: 30.h,
             left: 8.w,
             right: 8.w,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_sharp,
-                  size: 30,
-                  color: Color(0xFFE8F2F5),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              SizedBox(width: screenWidth * 0.097),
-              Text(
-                "Illness Information",
-                style: TextStyle(
-                  fontSize: 25.sp,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Oswald',
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-            ],
-          ),
+          child:   Center(child:
+                  Text(
+                    "Illness Information",
+                    style: TextStyle(
+                      fontSize: 25.sp,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Oswald',
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                    ),
+                  )),
         ),
 
             Padding(
