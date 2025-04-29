@@ -487,7 +487,7 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                             if (_showSuggestions)
                               Container(
                                 width: screenWidth * 0.8,
-                                constraints: const BoxConstraints(maxHeight: 300),
+                                constraints: const BoxConstraints(maxHeight: 170),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
@@ -502,6 +502,7 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: _suggestedSymptoms.length,
+                                  padding: EdgeInsets.zero,
                                   itemBuilder: (context, index) {
                                     return ListTile(
                                       title: Text(_suggestedSymptoms[index]),
