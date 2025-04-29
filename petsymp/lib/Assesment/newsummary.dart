@@ -14,7 +14,8 @@ import 'dart:convert';
 import 'package:petsymp/Connection/dynamicconnections.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:intl/intl.dart';
-
+import 'dart:math' as math;
+import 'dart:ui';
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
 
@@ -22,18 +23,33 @@ class NewSummaryScreen extends StatefulWidget {
   NewSummaryScreenState createState() => NewSummaryScreenState();
 }
 
-class NewSummaryScreenState extends State<NewSummaryScreen> {
+class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerProviderStateMixin{
+    List<DateTime> dateRange = [];
   bool _isNavigating = false;
-  List<DateTime> dateRange = [];
+  late AnimationController _bubblesController;
+  late List<Bubble> _bubbles;
 
   @override
   void initState() {
     super.initState();
+    // Initialize bubble animation
+    _bubblesController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 50),
+    )..repeat();
+    _bubbles = List.generate(50, (_) => Bubble());
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userData = Provider.of<UserData>(context, listen: false);
       await userData.fetchDiagnosis();
       await _generateSymptomDetails(userData);
     });
+  }
+
+  @override
+  void dispose() {
+    _bubblesController.dispose();
+    super.dispose();
   }
 
   Future<void> _generateSymptomDetails(UserData userData) async {
@@ -128,7 +144,56 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
         backgroundColor: const Color(0xFFE8F2F5),
         body: Stack(
           children: [
-            // Main scrollable content
+               AnimatedBuilder(
+              animation: _bubblesController,
+              builder: (context, child) {
+                final screenSize = MediaQuery.of(context).size;
+                return Stack(
+                  children: _bubbles.map((bubble) {
+                    final size = bubble.size * screenSize.width * 0.2;
+                    return Positioned(
+                      left: (bubble.position.dx * screenSize.width) +
+                          (math.sin((_bubblesController.value * bubble.speed + bubble.offset) * math.pi * 5) * bubble.wobble * screenSize.width * 0.5),
+                      top: (bubble.position.dy * screenSize.height) +
+                          (_bubblesController.value * bubble.speed * screenSize.height * 1) % screenSize.height,
+                      child: Opacity(
+                        opacity: 1 * bubble.opacity,
+                        child: Container(
+                          width: size,
+                          height: size,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const RadialGradient(
+                              colors: [
+                                Color.fromRGBO(81, 190, 181, 0.8),
+                                Color.fromRGBO(83, 224, 215, 0.2),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.teal.withOpacity(0.2),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+
+             ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+          child: Container(
+            color: Colors.transparent,
+          ),
+        ),
+      ),
+
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,15 +348,15 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
 
                   Padding(
                     padding:
-                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
+                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
                     child: Center(
                       child: SizedBox(
-                        width: 325.w,
+                        width: 330.w,
                         child: Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25.r),
                           ),
-                          elevation: 3,
+                          elevation: 15,
                           child: Column(
                             children: [
                               // Top 1
@@ -359,7 +424,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                             children: [
                                               Padding(
                                                 padding: EdgeInsets.only(
-                                                    left: 10.w, top: 15.h),
+                                                    top: 15.h),
                                                 child: Text(
                                                   topDiagnoses[0]['illness'] ??
                                                       '',
@@ -367,14 +432,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                   overflow:
                                                       TextOverflow.visible,
                                                   style: TextStyle(
-                                                    fontSize: 22.sp,
+                                                    fontSize: 20.sp,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                               ),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                    EdgeInsets.only(left: 3.w, top: 10.h),
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment
@@ -551,7 +616,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                             children: [
                                               Padding(
                                                 padding: EdgeInsets.only(
-                                                    left: 10.w, top: 15.h),
+                                                    top: 15.h),
                                                 child: Text(
                                                   topDiagnoses[1]['illness'] ??
                                                       '',
@@ -559,14 +624,14 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                   overflow:
                                                       TextOverflow.visible,
                                                   style: TextStyle(
-                                                    fontSize: 22.sp,
+                                                    fontSize: 20.sp,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                               ),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                    EdgeInsets.only(left: 3.w, top: 10.h),
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment
@@ -742,7 +807,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                             children: [
                                               Padding(
                                                 padding: EdgeInsets.only(
-                                                    left: 10.w, top: 15.h),
+                                                     top: 15.h),
                                                 child: Text(
                                                   topDiagnoses[2]['illness'] ??
                                                       '',
@@ -750,7 +815,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                                   overflow:
                                                       TextOverflow.visible,
                                                   style: TextStyle(
-                                                    fontSize: 22.sp,
+                                                    fontSize: 20.sp,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black,
                                                   ),
@@ -758,7 +823,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                               ),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(left: 10.w, top: 10.h),
+                                                    EdgeInsets.only(left: 3.w, top: 10.h),
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment
@@ -913,11 +978,12 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(name,
+                                      Padding(padding: EdgeInsets.only(left: 23.w), 
+                                      child: Text(name,
                                           style: TextStyle(
                                               fontSize: 16.sp,
                                               fontWeight: FontWeight.bold),
-                                          overflow: TextOverflow.ellipsis),
+                                          overflow: TextOverflow.ellipsis)),
                                       SizedBox(height: 8.h),
                                       Expanded(
                                         child: BarChartSample2(
@@ -928,8 +994,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
                                         ),
                                       ),
                                       SizedBox(height: 8.h),
-                                      Text("Top ${idx + 1}",
-                                          style: TextStyle(fontSize: 12.sp)),
+                                      Padding(padding: EdgeInsets.only(left: 10.w),
+                                      child: Text("Top ${idx + 1}",
+                                          style: TextStyle(fontSize: 12.sp))),
                                     ],
                                   ),
                                 ),
@@ -1361,4 +1428,29 @@ class NewSummaryScreenState extends State<NewSummaryScreen> {
       ),
     );
   }
+  
 }
+
+// Bubble class for background animation
+class Bubble {
+  Offset position;
+  double size;
+  double speed;
+  double wobble;
+  double opacity;
+  double offset;
+
+  Bubble()
+      : position = Offset(
+          math.Random().nextDouble(),
+          math.Random().nextDouble(),
+        ),
+        size = 0.5 + math.Random().nextDouble() * 0.9,
+        speed = 0.1 + math.Random().nextDouble() * 0.3,
+        wobble = 0.5 + math.Random().nextDouble() * 1.5,
+        opacity = 0.3 + math.Random().nextDouble() * 0.7,
+        offset = math.Random().nextDouble();
+}
+
+
+
