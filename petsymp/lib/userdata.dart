@@ -234,15 +234,15 @@ void removePendingSymptom(String symptom) {
     List<String> impactDaysChoices = [];
     List<String> impactSymptomChoices = [];
 
-    if (symptomData.containsKey("impactDays") && symptomData["impactDays"] != null) {
-      var v = symptomData["impactDays"];
+    if (symptomData.containsKey("impactChoices1") && symptomData["impactChoices1"] != null) {
+      var v = symptomData["impactChoices1"];
       impactDaysChoices = v is List
           ? List<String>.from(v)
           : List<String>.from((v as Map).keys);
     }
 
-    if (symptomData.containsKey("impactSymptom") && symptomData["impactSymptom"] != null) {
-      var v = symptomData["impactSymptom"];
+    if (symptomData.containsKey("impactChoices2") && symptomData["impactChoices2"] != null) {
+      var v = symptomData["impactChoices2"];
       impactSymptomChoices = v is List
           ? List<String>.from(v)
           : List<String>.from((v as Map).keys);
