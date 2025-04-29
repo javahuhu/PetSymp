@@ -185,14 +185,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
               },
             ),
 
-             ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-          child: Container(
-            color: Colors.transparent,
-          ),
-        ),
-      ),
+            
 
             SingleChildScrollView(
               child: Column(
