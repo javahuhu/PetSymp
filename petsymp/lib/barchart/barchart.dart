@@ -1190,7 +1190,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_fc"]!.toStringAsFixed(2)}%",
+                                                              "${scores["confidence_fc"]}",
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
@@ -1217,7 +1217,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_gb"]!.toStringAsFixed(2)}%",
+                                                              "${scores["confidence_gb"]}",
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
@@ -1246,7 +1246,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_ab"]!.toStringAsFixed(2)}%",
+                                                              "${scores["confidence_ab"]}",
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
