@@ -7,46 +7,45 @@ final Map<String, dynamic> symptomQuestions = {
       "How long has your pet had coughing?",
       "What type of coughing is it? (Dry, Wet, or Honking)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["dry", "wet", "honking"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["dry", "wet", "honking"],
   },
   "fever": {
     "questions": [
       "How long has your pet had fever?"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": [],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": [],
   },
   "lethargy": {
     "questions": [
       "How long has your pet had lethargy?",
       "What type of lethargy is it? (Intermittent or Constant)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["intermittent", "constant"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["intermittent", "constant"],
   },
   "sneezing": {
     "questions": [
       "How long has your pet had sneezing?",
       "What type of sneezing is it? (Occasional or Frequent)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["occasional", "frequent"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["occasional", "frequent"],
   },
   "diarrhea": {
     "questions": [
       "How long has your pet had diarrhea?",
       "What type of diarrhea is it? (Watery or Bloody)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["watery", "bloody"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["watery", "bloody"],
   },
   "nasal discharge": {
     "questions": [
       "What type of nasal discharge is it? (Mucus or Bloody)"
     ],
-    "impactDays": [],
-    "impactSymptom": ["mucus", "bloody"],
+    "impactChoices1": ["mucus", "bloody"],
   },
   "seizures": {
     "questions": [
@@ -54,60 +53,58 @@ final Map<String, dynamic> symptomQuestions = {
       "What type of seizures is it? (Mild, Severe, or Cluster)"
     ],
     "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "severe", "cluster"],
+    "impactChoices1": ["mild", "severe", "cluster"],
   },
   "vomiting": {
     "questions": [
       "How long has your pet had vomiting?",
       "What type of vomiting is it? (Bloody, Foamy, Yellow, or Green)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["bloody", "foamy", "yellow", "green"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["bloody", "foamy", "yellow", "green"],
   },
   "weight loss": {
     "questions": [
       "How long has your pet had weight loss?"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": [],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": [],
   },
   "breathing difficulty": {
     "questions": [
       "How long has your pet had breathing difficulty?",
       "What type of breathing difficulty is it? (Mild, Severe, or Labored)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "severe", "labored"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["mild", "severe", "labored"],
   },
   "loss of appetite": {
     "questions": [
       "How long has your pet had loss of appetite?"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": [],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
   },
   "itching": {
     "questions": [
       "How long has your pet had itching?",
       "What type of itching is it? (Localized or Generalized)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["localized", "generalized"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["localized", "generalized"],
   },
   "ear discharge": {
     "questions": [
       "What type of ear discharge is it? (Brown or Bloody)"
     ],
-    "impactDays": [],
-    "impactSymptom": ["brown", "bloody"],
+    "impactChoices1": ["brown", "bloody"],
   },
   "pain": {
     "questions": [
       "How long has your pet had pain?",
       "What type of pain is it? (Sharp, Dull, or Localized)"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["sharp", "dull", "localized"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["sharp", "dull", "localized"],
   },
 
   "eye discharge": {
@@ -115,8 +112,8 @@ final Map<String, dynamic> symptomQuestions = {
       "How long has your pet had eye discharge?",
       "Is the eye discharge Watery or Mucous-like?"
     ],
-    "impactDays": ["1-2 days", "3-10 days"],
-    "impactSymptom": ["watery", "mucous-like"],
+    "impactChoices1": ["1-2 days", "3-10 days"],
+    "impactChoices2": ["watery", "mucous-like"],
   },
 
   "muscle twitching": {
@@ -124,8 +121,8 @@ final Map<String, dynamic> symptomQuestions = {
       "How long has your pet had muscle twitching?",
       "Is the muscle twitching Mild or Severe?"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
-    "impactSymptom": ["mild", "severe", "variable"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days"],
+    "impactChoices2": ["mild", "severe", "variable"],
   },
   
 
@@ -134,8 +131,8 @@ final Map<String, dynamic> symptomQuestions = {
       "How long has your pet had muscle paralysis?",
       "Is the muscle paralysis Ascending?"
     ],
-    "impactDays": ["1-2 days", "3-5 days", "6-10 days", "11+ days", "irreversible"],
-    "impactSymptom": ["ascending", "irreversible"],
+    "impactChoices1": ["1-2 days", "3-5 days", "6-10 days", "11+ days", "irreversible"],
+    "impactChoices2": ["ascending", "irreversible"],
   },
 
 
