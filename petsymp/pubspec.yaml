@@ -164,6 +164,7 @@ flutter:
       - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
       - assets/imgsymptomcatalog/abdominalpain.jpg
       - assets/imgsymptomcatalog/abdominalenlargment.jpg
+      - assets/noimagepet.jpg
 
 
   fonts:

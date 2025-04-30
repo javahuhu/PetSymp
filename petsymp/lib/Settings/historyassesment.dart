@@ -437,7 +437,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                         child: CircleAvatar(
                           backgroundImage: petImage.isNotEmpty && petImage.startsWith("http")
                               ? NetworkImage(petImage)
-                              : const AssetImage("assets/goldenpet.png") as ImageProvider,
+                              : const AssetImage("assets/noimagepet.jpg") as ImageProvider,
                           backgroundColor: Colors.grey[300],
                         ),
                       ),

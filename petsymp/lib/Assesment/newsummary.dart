@@ -16,6 +16,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
 import 'dart:ui';
+
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
 
@@ -23,8 +24,9 @@ class NewSummaryScreen extends StatefulWidget {
   NewSummaryScreenState createState() => NewSummaryScreenState();
 }
 
-class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerProviderStateMixin{
-    List<DateTime> dateRange = [];
+class NewSummaryScreenState extends State<NewSummaryScreen>
+    with SingleTickerProviderStateMixin {
+  List<DateTime> dateRange = [];
   bool _isNavigating = false;
   late AnimationController _bubblesController;
   late List<Bubble> _bubbles;
@@ -94,6 +96,155 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
 
     userData.setSymptomDetails(allDetails);
   }
+void _showDisclaimerThenProceed(
+  BuildContext context,
+  UserData userData,
+  List<Map<String, dynamic>> diagnoses,
+  List<Map<String, dynamic>> petDetails,
+  String allSymptoms,
+) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Disclaimer"),
+        content: SingleChildScrollView(
+          child: Text(
+            "PetSymp is here to help you better understand your pet's health by guiding you through symptoms and showing possible conditions your pet might be experiencing. However, this app does not replace a visit to the veterinarian.\n\n"
+            "The results and suggestions provided are for guidance only. They are not meant to be a final diagnosis or a substitute for professional care.\n\n"
+            "If your pet seems unwell, in pain, or if you're unsure about what to do, please consult a licensed veterinarian immediately. Always trust your instincts and put your pet’s well-being first.\n\n"
+            "By using PetSymp, you agree that we are not responsible for any decisions you make based on the app’s results.",
+            style: TextStyle(
+              fontSize: 17.sp,
+              fontFamily: 'Inter',
+              color: const Color.fromARGB(255, 0, 0, 0),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () async {
+              // ✅ Capture safe references BEFORE any async or pop
+              final navigator = Navigator.of(context);
+              final scaffold = ScaffoldMessenger.of(context);
+              final userDataProvider = Provider.of<UserData>(context, listen: false);
+
+              // Close disclaimer dialog
+              navigator.pop();
+
+              // Show loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => const Center(child: CircularProgressIndicator()),
+              );
+
+              try {
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                await _generateSymptomDetails(userDataProvider);
+
+                if (uid != null) {
+                  final historyCol = FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(uid)
+                      .collection('History');
+
+                  final existing = await historyCol
+                      .where('petName', isEqualTo: userDataProvider.userName)
+                      .where('petType', isEqualTo: userDataProvider.selectedPetType)
+                      .limit(1)
+                      .get();
+
+                  final softmaxList = List<double>.generate(
+                    3,
+                    (i) => (diagnoses.length > i &&
+                            diagnoses[i].containsKey('confidence_softmax'))
+                        ? (diagnoses[i]['confidence_softmax'] as num).toDouble()
+                        : 0.0,
+                  );
+
+                  final metricsWithCm = <String, Map<String, dynamic>>{};
+                  for (var d in diagnoses) {
+                    final illness = d['illness'] as String;
+                    try {
+                      final url = Uri.parse(AppConfig.getMetricsWithCmURL(
+                          userDataProvider.selectedPetType, illness));
+                      final resp = await http.get(url);
+                      if (resp.statusCode == 200) {
+                        final data = jsonDecode(resp.body) as Map<String, dynamic>;
+                        final cmRaw = data['confusion_matrix'] as Map<String, dynamic>;
+                        final confMatrix = {
+                          'TP': cmRaw['TP'] as int,
+                          'FP': cmRaw['FP'] as int,
+                          'FN': cmRaw['FN'] as int,
+                          'TN': cmRaw['TN'] as int,
+                        };
+                        final mRaw = data['metrics'] as Map<String, dynamic>;
+                        final metrics = {
+                          'accuracy': (mRaw['Accuracy'] as num).toDouble(),
+                          'precision': (mRaw['Precision'] as num).toDouble(),
+                          'recall': (mRaw['Recall'] as num).toDouble(),
+                          'specificity': (mRaw['Specificity'] as num).toDouble(),
+                          'f1Score': (mRaw['F1 Score'] as num).toDouble(),
+                        };
+                        metricsWithCm[illness] = {
+                          'metrics': metrics,
+                          'confusion_matrix': confMatrix,
+                        };
+                      }
+                    } catch (e) {
+                      print("⚠️ Failed to fetch metrics+CM for $illness: $e");
+                    }
+                  }
+
+                  final assessmentEntry = {
+                    'date': Timestamp.now(),
+                    'diagnosisResults': diagnoses,
+                    'allSymptoms': allSymptoms,
+                    'symptomDetails': userDataProvider.symptomDetails,
+                    'Metrics/Confusion': metricsWithCm,
+                    'softmax': softmaxList,
+                  };
+
+                  if (existing.docs.isNotEmpty) {
+                    await existing.docs.first.reference.update({
+                      'assessments': FieldValue.arrayUnion([assessmentEntry]),
+                      'date': Timestamp.now(),
+                    });
+                  } else {
+                    await historyCol.add({
+                      'date': Timestamp.now(),
+                      'petType': userDataProvider.selectedPetType,
+                      'petName': userDataProvider.userName,
+                      'petDetails': petDetails,
+                      'petImage': userDataProvider.petImage ?? 'assets/sampleimage.jpg',
+                      'assessments': [assessmentEntry],
+                      'AllIllnesses': diagnoses.length,
+                    });
+                  }
+
+                  userDataProvider.clearData();
+                }
+
+                navigator.pop(); // close loading
+                navigator.pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => const HomePageScreen(showSuccessDialog: true),
+                  ),
+                );
+              } catch (e) {
+                navigator.pop(); // close loading
+                scaffold.showSnackBar(SnackBar(content: Text('Error: $e')));
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -138,13 +289,29 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
       {"icon": "☣️", "label": "Symptoms", "value": allSymptoms},
     ];
 
+    final ageRaw0 = topDiagnoses[0]['age_specificity'] ?? 'Unknown';
+    final sizeRaw0 = topDiagnoses[0]['size_specificity'] ?? 'Unknown';
+    final ageRaw1 = topDiagnoses[1]['age_specificity'] ?? 'Unknown';
+    final sizeRaw1 = topDiagnoses[1]['size_specificity'] ?? 'Unknown';
+    final ageRaw2 = topDiagnoses[2]['age_specificity'] ?? 'Unknown';
+    final sizeRaw2 = topDiagnoses[2]['size_specificity'] ?? 'Unknown';
+
+    final ageLabel0 = ageRaw0.toLowerCase() == 'any' ? 'Any Age' : ageRaw0;
+    final sizeLabel0 = sizeRaw0.toLowerCase() == 'any' ? 'Any Size' : sizeRaw0;
+
+    final ageLabel1 = ageRaw1.toLowerCase() == 'any' ? 'Any Age' : ageRaw1;
+    final sizeLabel1 = sizeRaw1.toLowerCase() == 'any' ? 'Any Size' : sizeRaw1;
+
+    final ageLabel2 = ageRaw2.toLowerCase() == 'any' ? 'Any Age' : ageRaw2;
+    final sizeLabel2 = sizeRaw2.toLowerCase() == 'any' ? 'Any Size' : sizeRaw2;
+
     return PopScope(
       canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFFE8F2F5),
         body: Stack(
           children: [
-               AnimatedBuilder(
+            AnimatedBuilder(
               animation: _bubblesController,
               builder: (context, child) {
                 final screenSize = MediaQuery.of(context).size;
@@ -153,9 +320,19 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                     final size = bubble.size * screenSize.width * 0.1;
                     return Positioned(
                       left: (bubble.position.dx * screenSize.width) +
-                          (math.sin((_bubblesController.value * bubble.speed + bubble.offset) * math.pi * 5) * bubble.wobble * screenSize.width * 0.5),
+                          (math.sin((_bubblesController.value * bubble.speed +
+                                      bubble.offset) *
+                                  math.pi *
+                                  5) *
+                              bubble.wobble *
+                              screenSize.width *
+                              0.5),
                       top: (bubble.position.dy * screenSize.height) +
-                          (_bubblesController.value * bubble.speed * screenSize.height * 1) % screenSize.height,
+                          (_bubblesController.value *
+                                  bubble.speed *
+                                  screenSize.height *
+                                  1) %
+                              screenSize.height,
                       child: Opacity(
                         opacity: 1 * bubble.opacity,
                         child: Container(
@@ -184,8 +361,6 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                 );
               },
             ),
-
-            
 
             SingleChildScrollView(
               child: Column(
@@ -268,7 +443,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                                           fit: BoxFit.cover)
                                       : Image.asset(userData.petImage!,
                                           fit: BoxFit.cover))
-                                  : Image.asset('assets/sampleimage.jpg',
+                                  : Image.asset('assets/noimagepet.jpg',
                                       fit: BoxFit.cover),
                             ),
                           ),
@@ -276,7 +451,6 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                       ],
                     ),
                   ),
-
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 0.h),
                     child: Stack(
@@ -338,674 +512,1092 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                       ],
                     ),
                   ),
-
                   Padding(
                     padding:
-                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
+                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
                     child: Center(
                       child: SizedBox(
-                        width: 330.w,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.r),
-                          ),
-                          elevation: 15,
-                          child: Column(
-                            children: [
-                              // Top 1
-                              if (topDiagnoses.isNotEmpty)
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 20.h, left: 5.w),
-                                  child: SizedBox(
-                                    width: 350.w,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 110.w,
-                                          height: 110.w,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              SizedBox(
-                                                width: 90.w,
-                                                height: 90.w,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: 1.0,
-                                                  backgroundColor: Colors.grey,
-                                                  color:
-                                                      const Color(0xFF52AAA4),
-                                                  strokeWidth: 8.w,
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 50.w,
-                                                width: 50.w,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                      blurRadius: 10,
-                                                      spreadRadius: 5,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Text(
-                                                  "1",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: 15.h),
-                                                child: Text(
-                                                  topDiagnoses[0]['illness'] ??
-                                                      '',
-                                                  maxLines: 4,
-                                                  overflow:
-                                                      TextOverflow.visible,
-                                                  style: TextStyle(
-                                                    fontSize: 20.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 3.w, top: 10.h),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center, // ✅ Important!
-                                                  children: [
-                                                    Text(
-                                                      "Top 1",
-                                                      style: TextStyle(
-                                                        fontSize: 15.sp,
-                                                        color: const Color(
-                                                            0xFFA9A9A9),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        width: 10
-                                                            .w), // ✅ Add spacing between "Top 1" and type
-                                                    if (topDiagnoses[0]
-                                                            ['type'] !=
-                                                        null)
-                                                      Container(
-                                                        width: 100.w,
-                                                        height: 25
-                                                            .h, // ❗ Make height smaller so text fits nicely
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    10.w),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          
-                                                          border: Border.all(
-                                                            color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                            width: 1,
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      50.r),
-                                                          color:const Color.fromARGB(126, 82, 170, 164)
-                                                        
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            topDiagnoses[0]
-                                                                ['type'],
-                                                            style: TextStyle(
-                                                              fontSize: 13
-                                                                  .sp, // ❗ Slightly smaller text
-                                                              color: const Color.fromARGB(255, 0, 0, 0),
+                        width: 380.w,
+                        child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.teal,
+                                width: 4.0,
+                              ),
+                              borderRadius: BorderRadius.circular(25.r),
+                            ),
+                            child: Card(
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25.r),
+                              ),
+                              elevation: 15,
+                              shadowColor:
+                                  const Color(0xFF52AAA4).withOpacity(0.3),
+                              child: Column(
+                                children: [
+                                  // Top 1
+                                  if (topDiagnoses.isNotEmpty)
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 20.h),
+                                      child: SizedBox(
+                                        width: 350.w,
+                                        child: Column(
+                                          children: [
+                                            // Row containing circular progress and illness name
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20.w),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  // Circular progress indicator with number
+                                                  Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: SizedBox(
+                                                            width: 70.w,
+                                                            height: 70.w,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              value: 1.0,
+                                                              backgroundColor:
+                                                                  Colors.grey
+                                                                      .shade200,
+                                                              color: const Color(
+                                                                  0xFF52AAA4),
+                                                              strokeWidth: 10.w,
                                                             ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 0.h, left: 190.w),
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[0]
-                                                ['illness']),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.w, vertical: 8.h),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    backgroundColor: Colors.transparent,
-                                  ).copyWith(
-                                    overlayColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    shadowColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    elevation: MaterialStateProperty.all(0),
-                                  ),
-                                  child: Text(
-                                    'See More',
-                                    style: TextStyle(
-                                      color: const Color(0xFF1D1D2C),
-                                      fontSize: 18.sp,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Divider(
-                                color: Colors.black.withOpacity(0.2),
-                                thickness: 2,
-                                indent: 20.w,
-                                endIndent: 20.w,
-                              ),
+                                                          )),
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: Container(
+                                                            height: 50.w,
+                                                            width: 50.w,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50.r),
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                colors: [
+                                                                  const Color(
+                                                                      0xFF52AAA4),
+                                                                  const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                                ],
+                                                                begin: Alignment
+                                                                    .topLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.25),
+                                                                  blurRadius:
+                                                                      10,
+                                                                  spreadRadius:
+                                                                      5,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Text(
+                                                              "1",
+                                                              style: TextStyle(
+                                                                fontSize: 15.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
 
-                              // Top 2
-                              if (topDiagnoses.length > 1)
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 15.h, left: 5.w),
-                                  child: SizedBox(
-                                    width: 350.w,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 110.w,
-                                          height: 110.w,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              SizedBox(
-                                                width: 90.w,
-                                                height: 90.w,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: 1.0,
-                                                  backgroundColor: Colors.grey,
-                                                  color:
-                                                      const Color(0xFF52AAA4),
-                                                  strokeWidth: 8.w,
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 50.w,
-                                                width: 50.w,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                      blurRadius: 10,
-                                                      spreadRadius: 5,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Text(
-                                                  "2",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: 15.h),
-                                                child: Text(
-                                                  topDiagnoses[1]['illness'] ??
-                                                      '',
-                                                  maxLines: 4,
-                                                  overflow:
-                                                      TextOverflow.visible,
-                                                  style: TextStyle(
-                                                    fontSize: 20.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 3.w, top: 10.h),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center, // ✅ Important!
-                                                  children: [
-                                                    Text(
-                                                      "Top 2",
-                                                      style: TextStyle(
-                                                        fontSize: 15.sp,
-                                                        color: const Color(
-                                                            0xFFA9A9A9),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        width: 10
-                                                            .w), // 
-                                                    if (topDiagnoses[1]
-                                                            ['type'] !=
-                                                        null)
-                                                      Container(
-                                                        width: 100.w,
-                                                        height: 25.h,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    10.w),
-                                                        decoration:
-                                                              BoxDecoration(
-                                                          
-                                                          border: Border.all(
-                                                            color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                            width: 1,
-                                                          ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      50.r),
-                                                          color:const Color.fromARGB(126, 82, 170, 164)
-                                                        
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            topDiagnoses[1]
-                                                                ['type'],
-                                                            style: TextStyle(
-                                                              fontSize: 13
-                                                                  .sp, // ❗ Slightly smaller text
-                                                              color: const Color.fromARGB(255, 0, 0, 0),
-                                                            ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
+                                                  // Illness name left-aligned
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 15.w),
+                                                      child: Text(
+                                                        topDiagnoses[0]
+                                                                ['illness'] ??
+                                                            '',
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 20.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 0.3,
                                                         ),
                                                       ),
-                                                  ],
-                                                ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 0.h, left: 190.w),
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[1]
-                                                ['illness']),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.w, vertical: 8.h),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    backgroundColor: Colors.transparent,
-                                  ).copyWith(
-                                    overlayColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    shadowColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    elevation: MaterialStateProperty.all(0),
-                                  ),
-                                  child: Text(
-                                    'See More',
-                                    style: TextStyle(
-                                      color: const Color(0xFF1D1D2C),
-                                      fontSize: 18.sp,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Divider(
-                                color: Colors.black.withOpacity(0.2),
-                                thickness: 2,
-                                indent: 20.w,
-                                endIndent: 20.w,
-                              ),
+                                            ),
 
-                              // Top 3
-                              if (topDiagnoses.length > 2)
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 15.h, left: 5.w),
-                                  child: SizedBox(
-                                    width: 350.w,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 110.w,
-                                          height: 110.w,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              SizedBox(
-                                                width: 90.w,
-                                                height: 90.w,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: 1.0,
-                                                  backgroundColor: Colors.grey,
-                                                  color:
-                                                      const Color(0xFF52AAA4),
-                                                  strokeWidth: 8.w,
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 50.w,
-                                                width: 50.w,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                      blurRadius: 10,
-                                                      spreadRadius: 5,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Text(
-                                                  "3",
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                     top: 15.h),
-                                                child: Text(
-                                                  topDiagnoses[2]['illness'] ??
-                                                      '',
-                                                  maxLines: 4,
-                                                  overflow:
-                                                      TextOverflow.visible,
-                                                  style: TextStyle(
-                                                    fontSize: 20.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 3.w, top: 10.h),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center, // ✅ Important!
-                                                  children: [
-                                                    Text(
-                                                      "Top 3",
-                                                      style: TextStyle(
-                                                        fontSize: 15.sp,
-                                                        color: const Color(
-                                                            0xFFA9A9A9),
+                                            // Tags row (kept in original position)
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 20.h),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (topDiagnoses[0]
+                                                          ['age_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                        width: 10
-                                                            .w), 
-                                                    if (topDiagnoses[2]
-                                                            ['type'] !=
-                                                        null)
-                                                      Container(
-                                                        width: 100.w,
-                                                        height: 25
-                                                            .h, // ❗ Make height smaller so text fits nicely
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    10.w),
-                                                        decoration:
-                                                              BoxDecoration(
-                                                          
-                                                          border: Border.all(
+                                                      child: Center(
+                                                        child: Text(
+                                                          ageLabel0,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
                                                             color: const Color(
-                                                              0xFF52AAA4)
-                                                          .withOpacity(0.25),
-                                                            width: 1,
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
                                                           ),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      50.r),
-                                                          color:const Color.fromARGB(126, 82, 170, 164)
-                                                        
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            topDiagnoses[2]
-                                                                ['type'],
-                                                            style: TextStyle(
-                                                              fontSize: 13
-                                                                  .sp, 
-                                                              color: const Color.fromARGB(255, 0, 0, 0),
-                                                            ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
                                                       ),
-                                                  ],
-                                                ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[0][
+                                                          'size_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          sizeLabel0,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[0]['type'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 80.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          topDiagnoses[0]
+                                                              ['type'],
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 0.h, left: 190.w),
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => IllnessdetailsScreen(
-                                            illnessName: topDiagnoses[2]
-                                                ['illness']),
                                       ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.w, vertical: 8.h),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    backgroundColor: Colors.transparent,
-                                  ).copyWith(
-                                    overlayColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    shadowColor: MaterialStateProperty.all(
-                                        Colors.transparent),
-                                    elevation: MaterialStateProperty.all(0),
-                                  ),
-                                  child: Text(
-                                    'See More',
-                                    style: TextStyle(
-                                      color: const Color(0xFF1D1D2C),
-                                      fontSize: 18.sp,
+                                    ),
+
+                                  // See more button
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 50.h, left: 211.w),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                IllnessdetailsScreen(
+                                                    illnessName: topDiagnoses[0]
+                                                        ['illness']),
+                                          ),
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w, vertical: 8.h),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        backgroundColor: Colors.transparent,
+                                      ).copyWith(
+                                        overlayColor: MaterialStateProperty.all(
+                                            Colors.transparent),
+                                        shadowColor: MaterialStateProperty.all(
+                                            Colors.transparent),
+                                        elevation: MaterialStateProperty.all(0),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'See More',
+                                            style: TextStyle(
+                                              color: const Color(0xFF52AAA4),
+                                              fontSize: 18.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 14.sp,
+                                            color: const Color(0xFF52AAA4),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
+
+                                  Divider(
+                                    color: Colors.black.withOpacity(0.1),
+                                    thickness: 1.5,
+                                    indent: 20.w,
+                                    endIndent: 20.w,
+                                  ),
+
+                                  // Top 2
+                                  if (topDiagnoses.length > 1)
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 15.h),
+                                      child: SizedBox(
+                                        width: 350.w,
+                                        child: Column(
+                                          children: [
+                                            // Row containing circular progress and illness name
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20.w),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  // Circular progress indicator with number
+                                                  Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: SizedBox(
+                                                            width: 70.w,
+                                                            height: 70.w,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              value: 1.0,
+                                                              backgroundColor:
+                                                                  Colors.grey
+                                                                      .shade200,
+                                                              color: const Color(
+                                                                  0xFF52AAA4),
+                                                              strokeWidth: 10.w,
+                                                            ),
+                                                          )),
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: Container(
+                                                            height: 50.w,
+                                                            width: 50.w,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50.r),
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                colors: [
+                                                                  const Color(
+                                                                      0xFF52AAA4),
+                                                                  const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                                ],
+                                                                begin: Alignment
+                                                                    .topLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.25),
+                                                                  blurRadius:
+                                                                      10,
+                                                                  spreadRadius:
+                                                                      5,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Text(
+                                                              "2",
+                                                              style: TextStyle(
+                                                                fontSize: 15.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+
+                                                  // Illness name left-aligned
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 15.w),
+                                                      child: Text(
+                                                        topDiagnoses[1]
+                                                                ['illness'] ??
+                                                            '',
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 20.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 0.3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // Tags row (kept in original position)
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 20.h),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (topDiagnoses[1]
+                                                          ['age_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          ageLabel1,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[1][
+                                                          'size_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          sizeLabel1,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[1]['type'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          topDiagnoses[1]
+                                                              ['type'],
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                  // See more button
+                                  if (topDiagnoses.length > 1)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 50.h, left: 211.w),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  IllnessdetailsScreen(
+                                                      illnessName:
+                                                          topDiagnoses[1]
+                                                              ['illness']),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.w, vertical: 8.h),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          backgroundColor: Colors.transparent,
+                                        ).copyWith(
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          shadowColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          elevation:
+                                              MaterialStateProperty.all(0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'See More',
+                                              style: TextStyle(
+                                                color: const Color(0xFF52AAA4),
+                                                fontSize: 18.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 14.sp,
+                                              color: const Color(0xFF52AAA4),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                  if (topDiagnoses.length > 1)
+                                    Divider(
+                                      color: Colors.black.withOpacity(0.1),
+                                      thickness: 1.5,
+                                      indent: 20.w,
+                                      endIndent: 20.w,
+                                    ),
+
+                                  // Top 3
+                                  if (topDiagnoses.length > 2)
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 15.h),
+                                      child: SizedBox(
+                                        width: 350.w,
+                                        child: Column(
+                                          children: [
+                                            // Row containing circular progress and illness name
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20.w),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  // Circular progress indicator with number
+                                                  Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: SizedBox(
+                                                            width: 70.w,
+                                                            height: 70.w,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              value: 1.0,
+                                                              backgroundColor:
+                                                                  Colors.grey
+                                                                      .shade200,
+                                                              color: const Color(
+                                                                  0xFF52AAA4),
+                                                              strokeWidth: 10.w,
+                                                            ),
+                                                          )),
+                                                      Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 9.w),
+                                                          child: Container(
+                                                            height: 50.w,
+                                                            width: 50.w,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50.r),
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                colors: [
+                                                                  const Color(
+                                                                      0xFF52AAA4),
+                                                                  const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                                ],
+                                                                begin: Alignment
+                                                                    .topLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: const Color(
+                                                                          0xFF52AAA4)
+                                                                      .withOpacity(
+                                                                          0.25),
+                                                                  blurRadius:
+                                                                      10,
+                                                                  spreadRadius:
+                                                                      5,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Text(
+                                                              "3",
+                                                              style: TextStyle(
+                                                                fontSize: 15.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+
+                                                  // Illness name left-aligned
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 15.w),
+                                                      child: Text(
+                                                        topDiagnoses[2]
+                                                                ['illness'] ??
+                                                            '',
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 20.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 0.3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // Tags row (kept in original position)
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 20.h),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (topDiagnoses[2]
+                                                          ['age_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          ageLabel2,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[2][
+                                                          'size_specificity'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 90.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          sizeLabel2,
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 10.w),
+                                                  if (topDiagnoses[2]['type'] !=
+                                                      null)
+                                                    Container(
+                                                      width: 100.w,
+                                                      height: 25.h,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.w),
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFF52AAA4)
+                                                              .withOpacity(0.5),
+                                                          width: 2,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50.r),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          topDiagnoses[2]
+                                                              ['type'],
+                                                          style: TextStyle(
+                                                            fontSize: 13.sp,
+                                                            color: const Color(
+                                                                0xFF52AAA4),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                  // See more button
+                                  if (topDiagnoses.length > 2)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 50.h, left: 211.w),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  IllnessdetailsScreen(
+                                                      illnessName:
+                                                          topDiagnoses[2]
+                                                              ['illness']),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.w, vertical: 8.h),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          backgroundColor: Colors.transparent,
+                                        ).copyWith(
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          shadowColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          elevation:
+                                              MaterialStateProperty.all(0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'See More',
+                                              style: TextStyle(
+                                                color: const Color(0xFF52AAA4),
+                                                fontSize: 18.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 14.sp,
+                                              color: const Color(0xFF52AAA4),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                  SizedBox(height: 15.h),
+                                ],
                               ),
-                              SizedBox(height: 15.h),
-                            ],
-                          ),
-                        ),
+                            )),
                       ),
                     ),
                   ),
-
-                  // Swiper section - now placed after the top 3 illness card
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15.h),
-                    child: SizedBox(
-                      height: 400.h,
-                      child: Consumer<UserData>(
-                        builder: (_, __, ___) {
-                          final top10 = diagnoses.take(10).toList();
-                          while (top10.length < 10) {
-                            top10.add({
-                              'illness': '',
-                              'confidence_fc': 0.0,
-                              'confidence_gb': 0.0,
-                              'confidence_ab': 0.0,
-                            });
-                          }
-                          return Swiper(
-                            itemCount: top10.length,
-                            viewportFraction: 0.8,
-                            scale: 0.9,
-                            pagination: SwiperPagination(
-                              builder: DotSwiperPaginationBuilder(
-                                color: Colors.black.withOpacity(0.2),
-                                activeColor: Colors.purple,
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 20.w),
+                 child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(36, 36, 55, 1), 
+                        borderRadius: BorderRadius.circular(
+                            12.0), // Optional rounded corners
+                      ),
+                      child: Theme(
+                          data: Theme.of(context).copyWith(
+                            dividerColor: Colors.transparent,
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                          ),
+                          child: ExpansionTile(
+                            tilePadding:const  EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 8.0),
+                            childrenPadding: EdgeInsets.all(12.0),
+                            title:  Text(
+                              "Top 10 Diagnoses (Chart View)",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.sp,
+                                fontFamily: 'Oswald',
+                                color: const Color.fromARGB(255, 231, 231, 231),
                               ),
                             ),
-                            itemBuilder: (_, idx) {
-                              final d = top10[idx];
-                              final name = d['illness'] as String;
-                              final fc = (d['confidence_fc'] as num).toDouble();
-                              final gb = (d['confidence_gb'] as num).toDouble();
-                              final ab = (d['confidence_ab'] as num).toDouble();
-                              return Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25.r)),
-                                elevation: 4,
-                                child: Padding(
-                                  padding: EdgeInsets.all(6.w),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(padding: EdgeInsets.only(left: 23.w), 
-                                      child: Text(name,
-                                          style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.bold),
-                                          overflow: TextOverflow.ellipsis)),
-                                      SizedBox(height: 8.h),
-                                      Expanded(
-                                        child: BarChartSample2(
-                                          illnessLabels: [name],
-                                          fcScores: [fc],
-                                          gbScores: [gb],
-                                          abScores: [ab],
-                                        ),
-                                      ),
-                                      SizedBox(height: 8.h),
-                                      Padding(padding: EdgeInsets.only(left: 10.w),
-                                      child: Text("Top ${idx + 1}",
-                                          style: TextStyle(fontSize: 12.sp))),
-                                    ],
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 15.h),
+                                child: SizedBox(
+                                  height: 400.h,
+                                  child: Consumer<UserData>(
+                                    builder: (_, __, ___) {
+                                      final top10 = diagnoses.take(10).toList();
+                                      while (top10.length < 10) {
+                                        top10.add({
+                                          'illness': '',
+                                          'confidence_fc': 0.0,
+                                          'confidence_gb': 0.0,
+                                          'confidence_ab': 0.0,
+                                        });
+                                      }
+
+                                      return Swiper(
+                                        itemCount: top10.length,
+                                        itemWidth: 300.w,
+                                        layout: SwiperLayout.STACK,
+                                        itemBuilder: (_, idx) {
+                                          final d = top10[idx];
+                                          final name = d['illness'] as String;
+                                          final fc = (d['confidence_fc'] as num)
+                                              .toDouble();
+                                          final gb = (d['confidence_gb'] as num)
+                                              .toDouble();
+                                          final ab = (d['confidence_ab'] as num)
+                                              .toDouble();
+
+                                          return Card(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        25.r)),
+                                            elevation: 4,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(6.w),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 23.w),
+                                                    child: Text(
+                                                      name,
+                                                      style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 8.h),
+                                                  Expanded(
+                                                    child: BarChartSample2(
+                                                      illnessLabels: [name],
+                                                      fcScores: [fc],
+                                                      gbScores: [gb],
+                                                      abScores: [ab],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 8.h),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 10.w),
+                                                    child: Text(
+                                                      "Top ${idx + 1}",
+                                                      style: TextStyle(
+                                                          fontSize: 12.sp),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                              ),
+                            ],
+                          )))),
 
-                  // Illness comparison section - now moved after the swiper
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Card(
+
+                          Padding(padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                 child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(36, 36, 55, 1), 
+                        borderRadius: BorderRadius.circular(
+                            10.r), // Optional rounded corners
+                      ),
+                      child: Theme(
+                          data: Theme.of(context).copyWith(
+                            dividerColor: Colors.transparent,
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                          ),
+                          child: ExpansionTile(
+                            tilePadding:const  EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 8.0),
+                            childrenPadding: EdgeInsets.all(12.0),
+                            title:  Text(
+                              "Top 1 and Top 2 Comparison",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.sp,
+                                fontFamily: 'Oswald',
+                                color: const Color.fromARGB(255, 231, 231, 231),
+                              ),
+                            ),
+                            children: [
+                
+                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.r)),
@@ -1151,7 +1743,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                         ),
                       ),
                     ),
-                  ),
+                ])))),
 
                   Padding(
                     padding:
@@ -1161,123 +1753,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
                       child: SizedBox(
                         width: 130.w,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (_) => const Center(
-                                  child: CircularProgressIndicator()),
-                            );
-                            try {
-                              final uid =
-                                  FirebaseAuth.instance.currentUser?.uid;
-                              await _generateSymptomDetails(userData);
-                              if (uid != null) {
-                                final historyCol = FirebaseFirestore.instance
-                                    .collection('Users')
-                                    .doc(uid)
-                                    .collection('History');
-                                final existing = await historyCol
-                                    .where('petName',
-                                        isEqualTo: userData.userName)
-                                    .where('petType',
-                                        isEqualTo: userData.selectedPetType)
-                                    .limit(1)
-                                    .get();
-                                final softmaxList = List<double>.generate(
-                                    3,
-                                    (i) => (diagnoses.length > i &&
-                                            diagnoses[i].containsKey(
-                                                'confidence_softmax'))
-                                        ? (diagnoses[i]['confidence_softmax']
-                                                as num)
-                                            .toDouble()
-                                        : 0.0);
-                                final metricsWithCm =
-                                    <String, Map<String, dynamic>>{};
-                                for (var d in diagnoses) {
-                                  final illness = d['illness'] as String;
-                                  try {
-                                    final url = Uri.parse(
-                                        AppConfig.getMetricsWithCmURL(
-                                            userData.selectedPetType, illness));
-                                    final resp = await http.get(url);
-                                    if (resp.statusCode == 200) {
-                                      final data = jsonDecode(resp.body)
-                                          as Map<String, dynamic>;
-                                      final cmRaw = data['confusion_matrix']
-                                          as Map<String, dynamic>;
-                                      final confMatrix = {
-                                        'TP': cmRaw['TP'] as int,
-                                        'FP': cmRaw['FP'] as int,
-                                        'FN': cmRaw['FN'] as int,
-                                        'TN': cmRaw['TN'] as int,
-                                      };
-                                      final mRaw = data['metrics']
-                                          as Map<String, dynamic>;
-                                      final metrics = {
-                                        'accuracy': (mRaw['Accuracy'] as num)
-                                            .toDouble(),
-                                        'precision': (mRaw['Precision'] as num)
-                                            .toDouble(),
-                                        'recall':
-                                            (mRaw['Recall'] as num).toDouble(),
-                                        'specificity':
-                                            (mRaw['Specificity'] as num)
-                                                .toDouble(),
-                                        'f1Score': (mRaw['F1 Score'] as num)
-                                            .toDouble(),
-                                      };
-                                      metricsWithCm[illness] = {
-                                        'metrics': metrics,
-                                        'confusion_matrix': confMatrix,
-                                      };
-                                    }
-                                  } catch (e) {
-                                    print(
-                                        "⚠️ Failed to fetch metrics+CM for $illness: $e");
-                                  }
-                                }
-                                final assessmentEntry = {
-                                  'date': Timestamp.now(),
-                                  'diagnosisResults': diagnoses,
-                                  'allSymptoms': allSymptoms,
-                                  'symptomDetails': userData.symptomDetails,
-                                  'Metrics/Confusion': metricsWithCm,
-                                  'softmax': softmaxList,
-                                };
-                                if (existing.docs.isNotEmpty) {
-                                  await existing.docs.first.reference.update({
-                                    'assessments': FieldValue.arrayUnion(
-                                        [assessmentEntry]),
-                                    'date': Timestamp.now(),
-                                  });
-                                } else {
-                                  await historyCol.add({
-                                    'date': Timestamp.now(),
-                                    'petType': userData.selectedPetType,
-                                    'petName': userData.userName,
-                                    'petDetails': petDetails,
-                                    'petImage': userData.petImage ??
-                                        'assets/sampleimage.jpg',
-                                    'assessments': [assessmentEntry],
-                                    'AllIllnesses': diagnoses.length,
-                                  });
-                                }
-                                Provider.of<UserData>(context, listen: false)
-                                    .clearData();
-                              }
-                              Navigator.pop(context);
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const HomePageScreen(
-                                          showSuccessDialog: true)));
-                            } catch (e) {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error: $e')));
-                            }
+                          onPressed: () {
+                            _showDisclaimerThenProceed(context, userData,
+                                diagnoses, petDetails, allSymptoms);
                           },
                           style: ButtonStyle(
                             // Dynamic background color based on button state
@@ -1421,7 +1899,6 @@ class NewSummaryScreenState extends State<NewSummaryScreen> with SingleTickerPro
       ),
     );
   }
-  
 }
 
 // Bubble class for background animation
@@ -1444,6 +1921,3 @@ class Bubble {
         opacity = 0.3 + math.Random().nextDouble() * 0.7,
         offset = math.Random().nextDouble();
 }
-
-
-

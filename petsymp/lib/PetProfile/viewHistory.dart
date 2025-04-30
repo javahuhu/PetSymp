@@ -478,230 +478,234 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
       ),
     );
   }
+Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
+  final primary = topDiagnoses[0];
+  final secondary = topDiagnoses.length > 1 ? topDiagnoses[1] : null;
+  final tertiary = topDiagnoses.length > 2 ? topDiagnoses[2] : null;
 
-  Widget _buildDiagnosisSection(List<Map<String, dynamic>> topDiagnoses) {
-    final primary = topDiagnoses[0];
-    final secondary = topDiagnoses.length > 1 ? topDiagnoses[1] : null;
-    final tertiary = topDiagnoses.length > 2 ? topDiagnoses[2] : null;
-    final firstType = topDiagnoses[0]['type'];
-    final secondType =
-        topDiagnoses.length > 1 ? topDiagnoses[1]['type'] : "Unknown";
-    final thirdType =
-        topDiagnoses.length > 2 ? topDiagnoses[2]['type'] : "Unknown";
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildDiagnosisItem(
+        primary,
+        isPrimary: true,
+        description: _extractDescription(primary),
+        rank: 1,
+      ),
+      if (secondary != null) ...[
+        SizedBox(height: 16.h),
+        _buildDiagnosisItem(
+          secondary,
+          description: _extractDescription(secondary),
+          rank: 2,
+        ),
+      ],
+      if (tertiary != null) ...[
+        SizedBox(height: 16.h),
+        _buildDiagnosisItem(
+          tertiary,
+          description: _extractDescription(tertiary),
+          rank: 3,
+        ),
+      ],
+    ],
+  );
+}
 
-    return Column(
+Widget _buildDiagnosisItem(
+  Map<String, dynamic> diagnosis, {
+  bool isPrimary = false,
+  required String description,
+  required int rank,
+}) {
+  final confidence = (diagnosis['confidence_ab'] as num?)?.toDouble() ?? 0.0;
+  final type = diagnosis['type'] ?? "Unknown";
+
+  final ageRaw = (diagnosis['age_specificity'] ?? "Unknown").toString();
+  final sizeRaw = (diagnosis['size_specificity'] ?? "Unknown").toString();
+
+  final ageLabel = ageRaw.toLowerCase() == 'any' ? 'Any Age' : ageRaw;
+  final sizeLabel = sizeRaw.toLowerCase() == 'any' ? 'Any Size' : sizeRaw;
+
+  return Container(
+    margin: EdgeInsets.only(bottom: 20.h),
+    padding: EdgeInsets.all(15.w),
+    decoration: BoxDecoration(
+      color: isPrimary ? const Color(0xFFEFF8F7) : const Color(0xFFF7F9FA),
+      borderRadius: BorderRadius.circular(15),
+      border: isPrimary
+          ? Border.all(color: const Color(0xFF52AAA4), width: 1.5)
+          : Border.all(color: const Color(0xFFEBF2F7), width: 1),
+    ),
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Primary
-        _buildDiagnosisItem(primary,
-            isPrimary: true,
-            description: _extractDescription(primary),
-            rank: 1,
-            type: firstType),
-
-        // Secondary
-        if (secondary != null) ...[
-          SizedBox(height: 16.h),
-          _buildDiagnosisItem(secondary,
-              description: _extractDescription(secondary),
-              rank: 2,
-              type: secondType),
-        ],
-
-        // Tertiary
-        if (tertiary != null) ...[
-          SizedBox(height: 16.h),
-          _buildDiagnosisItem(tertiary,
-              description: _extractDescription(tertiary),
-              rank: 3,
-              type: thirdType),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildDiagnosisItem(Map<String, dynamic> diagnosis,
-      {bool isPrimary = false,
-      required String description,
-      required int rank,
-      required String type}) {
-    final confidence = (diagnosis['confidence_ab'] as num?)?.toDouble() ?? 0.0;
-    return Container(
-      margin: EdgeInsets.only(bottom: 20.h),
-      padding: EdgeInsets.all(15.w),
-      decoration: BoxDecoration(
-        color: isPrimary ? const Color(0xFFEFF8F7) : const Color(0xFFF7F9FA),
-        borderRadius: BorderRadius.circular(15),
-        border: isPrimary
-            ? Border.all(color: const Color(0xFF52AAA4), width: 1.5)
-            : Border.all(color: const Color(0xFFEBF2F7), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 60.w,
-                height: 60.w,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 60.w,
-                        height: 60.w,
-                        child: CircularProgressIndicator(
-                          value: 100,
-                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
-                          color: const Color(0xFF52AAA4),
-                          strokeWidth: 8.w,
-                        ),
-                      ),
-                      Text(
-                        "$rank",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: isPrimary
-                              ? const Color(0xFF52AAA4)
-                              : const Color(0xFF3D4A5C),
-                        ),
-                      ),
-                    ],
+        Row(
+          children: [
+            Container(
+              width: 60.w,
+              height: 60.w,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 5,
+                    spreadRadius: 1,
                   ),
-                ),
+                ],
               ),
-              SizedBox(width: 15.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Text(
-                      diagnosis['illness'] ?? "Unknown",
-                      style: TextStyle(
-                        fontSize: isPrimary ? 18.sp : 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3D4A5C),
+                    SizedBox(
+                      width: 60.w,
+                      height: 60.w,
+                      child: CircularProgressIndicator(
+                        value: 100,
+                        backgroundColor: Colors.grey.withAlpha(50),
+                        color: const Color(0xFF52AAA4),
+                        strokeWidth: 8.w,
                       ),
                     ),
-                    Row(
-                      children: [
-                        if (isPrimary)
-                          Container(
-                            margin: EdgeInsets.only(top: 5.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8.w, vertical: 3.h),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF52AAA4),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              "Most Likely",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        if (isPrimary) SizedBox(width: 8.w),
-                        if (type.isNotEmpty)
-                          Container(
-                            margin: EdgeInsets.only(top: 5.h),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8.w, vertical: 3.h),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border:
-                                  Border.all(color: const Color(0xFF52AAA4)),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              type,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF52AAA4),
-                              ),
-                            ),
-                          ),
-                      ],
-                    )
+                    Text(
+                      "$rank",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isPrimary
+                            ? const Color(0xFF52AAA4)
+                            : const Color(0xFF3D4A5C),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: 15.h),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: const Color(0xFF6B7A8D),
             ),
-          ),
-          SizedBox(height: 15.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  final Map<String, dynamic> historyData = widget.historyData;
-                  final List<Map<String, dynamic>> diagnoses =
-                      List<Map<String, dynamic>>.from(
-                          historyData['diagnosisResults'] ?? []);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HistoryIllnessdetailsScreen(
-                        diagnosisData: diagnosis,
-                        totalIllnesses: diagnoses.length,
-                        allDiagnoses: diagnoses,
-                      ),
+            SizedBox(width: 15.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    diagnosis['illness'] ?? "Unknown",
+                    style: TextStyle(
+                      fontSize: isPrimary ? 18.sp : 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF3D4A5C),
                     ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.arrow_forward,
-                  color: Color(0xFF52AAA4),
-                  size: 18,
-                ),
-                label: Text(
-                  "See Details",
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF52AAA4),
                   ),
-                ),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  SizedBox(height: 4.h),
+                  Wrap(
+                    spacing: 6.w,
+                    runSpacing: 4.h,
+                    children: [
+                      if (isPrimary)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8.w, vertical: 3.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF52AAA4),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "Most Likely",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      if (type.isNotEmpty)
+                        _buildInfoChip(type),
+                      _buildInfoChip(ageLabel),
+                      _buildInfoChip(sizeLabel),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 15.h),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: const Color(0xFF6B7A8D),
+          ),
+        ),
+        SizedBox(height: 15.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton.icon(
+              onPressed: () {
+                final Map<String, dynamic> historyData = widget.historyData;
+                final List<Map<String, dynamic>> diagnoses =
+                    List<Map<String, dynamic>>.from(
+                        historyData['diagnosisResults'] ?? []);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryIllnessdetailsScreen(
+                      diagnosisData: diagnosis,
+                      totalIllnesses: diagnoses.length,
+                      allDiagnoses: diagnoses,
+                    ),
                   ),
+                );
+              },
+              icon: const Icon(
+                Icons.arrow_forward,
+                color: Color(0xFF52AAA4),
+                size: 18,
+              ),
+              label: Text(
+                "See Details",
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF52AAA4),
                 ),
               ),
-            ],
-          ),
-        ],
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildInfoChip(String label) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: const Color(0xFF52AAA4)),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.bold,
+        color: const Color(0xFF52AAA4),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildExpandableCard({
     required String title,

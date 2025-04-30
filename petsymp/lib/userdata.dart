@@ -263,11 +263,11 @@ void removePendingSymptom(String symptom) {
   final requestData = {
     "owner": _userName,
     "symptoms": uniqueSymptoms,
+    "pet_type": _selectedPetType.toLowerCase(),
     "pet_info": {
       "age":  _petAge.toString(),
       "breed": _breed,
       "size":  _petSize,
-      "pet_type": _selectedPetType.toLowerCase(), 
     },
     "user_answers": _symptomDurations,
     
