@@ -39,7 +39,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
       vsync: this,
       duration: const Duration(seconds: 50),
     )..repeat();
-    _bubbles = List.generate(50, (_) => Bubble());
+    _bubbles = List.generate(10, (_) => Bubble());
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userData = Provider.of<UserData>(context, listen: false);
@@ -96,7 +96,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
 
     userData.setSymptomDetails(allDetails);
   }
-void _showDisclaimerThenProceed(
+
+  void _showDisclaimerThenProceed(
   BuildContext context,
   UserData userData,
   List<Map<String, dynamic>> diagnoses,
@@ -107,142 +108,358 @@ void _showDisclaimerThenProceed(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Disclaimer"),
-        content: SingleChildScrollView(
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        elevation: 8,
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white,
+                Color(0xFFF5F9FA),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Medical icon at the top
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color(0xFF52AAA4).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.health_and_safety,
+                  color: Color(0xFF52AAA4),
+                  size: 40,
+                ),
+              ),
+              SizedBox(height: 16),
+              
+              // Title with medical styling
+              Text(
+                "Medical Disclaimer",
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter',
+                  color: Color(0xFF2D4059),
+                  letterSpacing: 0.5,
+                ),
+              ),
+              
+              Divider(
+                color: Color(0xFF52AAA4),
+                thickness: 1.5,
+                indent: 50,
+                endIndent: 50,
+              ),
+              SizedBox(height: 16),
+              
+              // Content in a scroll view with better formatting
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildDisclaimerSection(
+                        icon: Icons.pets,
+                        title: "Purpose",
+                        content: "PetSymp is designed to help you better understand your pet's health by guiding you through symptoms and showing possible conditions your pet might be experiencing.",
+                      ),
+                      _buildDisclaimerSection(
+                        icon: Icons.warning_amber,
+                        title: "Not a Replacement",
+                        content: "This app does not replace a visit to the veterinarian. The results and suggestions provided are for guidance only and not meant to be a final diagnosis.",
+                      ),
+                      _buildDisclaimerSection(
+                        icon: Icons.medical_services,
+                        title: "Seek Professional Care",
+                        content: "If your pet seems unwell, in pain, or if you're unsure about what to do, please consult a licensed veterinarian immediately.",
+                      ),
+                      _buildDisclaimerSection(
+                        icon: Icons.gavel,
+                        title: "Liability",
+                        content: "By using PetSymp, you agree that we are not responsible for any decisions you make based on the app's results.",
+                        isLast: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              SizedBox(height: 16),
+              
+              // Action buttons with better styling
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildActionButton(
+                    label: "DECLINE",
+                    onPressed: () => Navigator.pop(context, false),
+                    backgroundColor: Colors.white,
+                    textColor: Colors.redAccent,
+                    borderColor: Colors.redAccent,
+                  ),
+                  _buildActionButton(
+                    label: "I UNDERSTAND",
+                    onPressed: () async {
+                      // ✅ Capture safe references BEFORE any async or pop
+                      final navigator = Navigator.of(context);
+                      final scaffold = ScaffoldMessenger.of(context);
+                      final userDataProvider = Provider.of<UserData>(context, listen: false);
+
+                      // Close disclaimer dialog
+                      navigator.pop();
+
+                      // Show loading dialog with medical styling
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => Dialog(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF52AAA4)),
+                                  strokeWidth: 3,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  "Processing Health Data...",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: Color(0xFF2D4059),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+
+                      try {
+                        final uid = FirebaseAuth.instance.currentUser?.uid;
+                        await _generateSymptomDetails(userDataProvider);
+
+                        if (uid != null) {
+                          final historyCol = FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(uid)
+                              .collection('History');
+
+                          final existing = await historyCol
+                              .where('petName', isEqualTo: userDataProvider.userName)
+                              .where('petType', isEqualTo: userDataProvider.selectedPetType)
+                              .limit(1)
+                              .get();
+
+                          final softmaxList = List<double>.generate(
+                            3,
+                            (i) => (diagnoses.length > i &&
+                                    diagnoses[i].containsKey('confidence_softmax'))
+                                ? (diagnoses[i]['confidence_softmax'] as num).toDouble()
+                                : 0.0,
+                          );
+
+                          final metricsWithCm = <String, Map<String, dynamic>>{};
+                          for (var d in diagnoses) {
+                            final illness = d['illness'] as String;
+                            try {
+                              final url = Uri.parse(AppConfig.getMetricsWithCmURL(
+                                  userDataProvider.selectedPetType, illness));
+                              final resp = await http.get(url);
+                              if (resp.statusCode == 200) {
+                                final data = jsonDecode(resp.body) as Map<String, dynamic>;
+                                final cmRaw = data['confusion_matrix'] as Map<String, dynamic>;
+                                final confMatrix = {
+                                  'TP': cmRaw['TP'] as int,
+                                  'FP': cmRaw['FP'] as int,
+                                  'FN': cmRaw['FN'] as int,
+                                  'TN': cmRaw['TN'] as int,
+                                };
+                                final mRaw = data['metrics'] as Map<String, dynamic>;
+                                final metrics = {
+                                  'accuracy': (mRaw['Accuracy'] as num).toDouble(),
+                                  'precision': (mRaw['Precision'] as num).toDouble(),
+                                  'recall': (mRaw['Recall'] as num).toDouble(),
+                                  'specificity': (mRaw['Specificity'] as num).toDouble(),
+                                  'f1Score': (mRaw['F1 Score'] as num).toDouble(),
+                                };
+                                metricsWithCm[illness] = {
+                                  'metrics': metrics,
+                                  'confusion_matrix': confMatrix,
+                                };
+                              }
+                            } catch (e) {
+                              print("⚠️ Failed to fetch metrics+CM for $illness: $e");
+                            }
+                          }
+
+                          final assessmentEntry = {
+                            'date': Timestamp.now(),
+                            'diagnosisResults': diagnoses,
+                            'allSymptoms': allSymptoms,
+                            'symptomDetails': userDataProvider.symptomDetails,
+                            'Metrics/Confusion': metricsWithCm,
+                            'softmax': softmaxList,
+                          };
+
+                          if (existing.docs.isNotEmpty) {
+                            await existing.docs.first.reference.update({
+                              'assessments': FieldValue.arrayUnion([assessmentEntry]),
+                              'date': Timestamp.now(),
+                            });
+                          } else {
+                            await historyCol.add({
+                              'date': Timestamp.now(),
+                              'petType': userDataProvider.selectedPetType,
+                              'petName': userDataProvider.userName,
+                              'petDetails': petDetails,
+                              'petImage': userDataProvider.petImage ?? 'assets/sampleimage.jpg',
+                              'assessments': [assessmentEntry],
+                              'AllIllnesses': diagnoses.length,
+                            });
+                          }
+
+                          userDataProvider.clearData();
+                        }
+
+                        navigator.pop(); // close loading
+                        navigator.pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const HomePageScreen(showSuccessDialog: true),
+                          ),
+                        );
+                      } catch (e) {
+                        navigator.pop(); // close loading
+                        scaffold.showSnackBar(
+                          SnackBar(
+                            content: Text('Error: $e'),
+                            backgroundColor: Colors.redAccent,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    backgroundColor: Color(0xFF52AAA4),
+                    textColor: Colors.white,
+                    borderColor: Color(0xFF52AAA4),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Helper widget for disclaimer sections
+Widget _buildDisclaimerSection({
+  required IconData icon,
+  required String title,
+  required String content,
+  bool isLast = false,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: Color(0xFF52AAA4),
+              size: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+                color: Color(0xFF2D4059),
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 28.0, top: 6.0),
           child: Text(
-            "PetSymp is here to help you better understand your pet's health by guiding you through symptoms and showing possible conditions your pet might be experiencing. However, this app does not replace a visit to the veterinarian.\n\n"
-            "The results and suggestions provided are for guidance only. They are not meant to be a final diagnosis or a substitute for professional care.\n\n"
-            "If your pet seems unwell, in pain, or if you're unsure about what to do, please consult a licensed veterinarian immediately. Always trust your instincts and put your pet’s well-being first.\n\n"
-            "By using PetSymp, you agree that we are not responsible for any decisions you make based on the app’s results.",
+            content,
             style: TextStyle(
-              fontSize: 17.sp,
+              fontSize: 16.sp,
               fontFamily: 'Inter',
-              color: const Color.fromARGB(255, 0, 0, 0),
+              color: Color(0xFF505D68),
+              height: 1.4,
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () async {
-              // ✅ Capture safe references BEFORE any async or pop
-              final navigator = Navigator.of(context);
-              final scaffold = ScaffoldMessenger.of(context);
-              final userDataProvider = Provider.of<UserData>(context, listen: false);
-
-              // Close disclaimer dialog
-              navigator.pop();
-
-              // Show loading dialog
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => const Center(child: CircularProgressIndicator()),
-              );
-
-              try {
-                final uid = FirebaseAuth.instance.currentUser?.uid;
-                await _generateSymptomDetails(userDataProvider);
-
-                if (uid != null) {
-                  final historyCol = FirebaseFirestore.instance
-                      .collection('Users')
-                      .doc(uid)
-                      .collection('History');
-
-                  final existing = await historyCol
-                      .where('petName', isEqualTo: userDataProvider.userName)
-                      .where('petType', isEqualTo: userDataProvider.selectedPetType)
-                      .limit(1)
-                      .get();
-
-                  final softmaxList = List<double>.generate(
-                    3,
-                    (i) => (diagnoses.length > i &&
-                            diagnoses[i].containsKey('confidence_softmax'))
-                        ? (diagnoses[i]['confidence_softmax'] as num).toDouble()
-                        : 0.0,
-                  );
-
-                  final metricsWithCm = <String, Map<String, dynamic>>{};
-                  for (var d in diagnoses) {
-                    final illness = d['illness'] as String;
-                    try {
-                      final url = Uri.parse(AppConfig.getMetricsWithCmURL(
-                          userDataProvider.selectedPetType, illness));
-                      final resp = await http.get(url);
-                      if (resp.statusCode == 200) {
-                        final data = jsonDecode(resp.body) as Map<String, dynamic>;
-                        final cmRaw = data['confusion_matrix'] as Map<String, dynamic>;
-                        final confMatrix = {
-                          'TP': cmRaw['TP'] as int,
-                          'FP': cmRaw['FP'] as int,
-                          'FN': cmRaw['FN'] as int,
-                          'TN': cmRaw['TN'] as int,
-                        };
-                        final mRaw = data['metrics'] as Map<String, dynamic>;
-                        final metrics = {
-                          'accuracy': (mRaw['Accuracy'] as num).toDouble(),
-                          'precision': (mRaw['Precision'] as num).toDouble(),
-                          'recall': (mRaw['Recall'] as num).toDouble(),
-                          'specificity': (mRaw['Specificity'] as num).toDouble(),
-                          'f1Score': (mRaw['F1 Score'] as num).toDouble(),
-                        };
-                        metricsWithCm[illness] = {
-                          'metrics': metrics,
-                          'confusion_matrix': confMatrix,
-                        };
-                      }
-                    } catch (e) {
-                      print("⚠️ Failed to fetch metrics+CM for $illness: $e");
-                    }
-                  }
-
-                  final assessmentEntry = {
-                    'date': Timestamp.now(),
-                    'diagnosisResults': diagnoses,
-                    'allSymptoms': allSymptoms,
-                    'symptomDetails': userDataProvider.symptomDetails,
-                    'Metrics/Confusion': metricsWithCm,
-                    'softmax': softmaxList,
-                  };
-
-                  if (existing.docs.isNotEmpty) {
-                    await existing.docs.first.reference.update({
-                      'assessments': FieldValue.arrayUnion([assessmentEntry]),
-                      'date': Timestamp.now(),
-                    });
-                  } else {
-                    await historyCol.add({
-                      'date': Timestamp.now(),
-                      'petType': userDataProvider.selectedPetType,
-                      'petName': userDataProvider.userName,
-                      'petDetails': petDetails,
-                      'petImage': userDataProvider.petImage ?? 'assets/sampleimage.jpg',
-                      'assessments': [assessmentEntry],
-                      'AllIllnesses': diagnoses.length,
-                    });
-                  }
-
-                  userDataProvider.clearData();
-                }
-
-                navigator.pop(); // close loading
-                navigator.pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => const HomePageScreen(showSuccessDialog: true),
-                  ),
-                );
-              } catch (e) {
-                navigator.pop(); // close loading
-                scaffold.showSnackBar(SnackBar(content: Text('Error: $e')));
-              }
-            },
+        if (!isLast)
+          const Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Divider(
+              color: Color(0xFFE0E0E0),
+              thickness: 1,
+            ),
           ),
-        ],
-      );
-    },
+      ],
+    ),
+  );
+}
+
+// Helper widget for action buttons
+Widget _buildActionButton({
+  required String label,
+  required VoidCallback onPressed,
+  required Color backgroundColor,
+  required Color textColor,
+  required Color borderColor,
+}) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      foregroundColor: textColor,
+      backgroundColor: backgroundColor,
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+        side: BorderSide(color: borderColor, width: 1.5),
+      ),
+      elevation: 0,
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.0,
+      ),
+    ),
   );
 }
 
@@ -342,7 +559,7 @@ void _showDisclaimerThenProceed(
                             shape: BoxShape.circle,
                             gradient: const RadialGradient(
                               colors: [
-                                Color.fromRGBO(81, 190, 181, 0.8),
+                                const Color.fromRGBO(36, 36, 55, 1),
                                 Color.fromRGBO(83, 224, 215, 0.2),
                               ],
                             ),
@@ -512,953 +729,98 @@ void _showDisclaimerThenProceed(
                       ],
                     ),
                   ),
+                  
                   Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
-                    child: Center(
-                      child: SizedBox(
-                        width: 380.w,
-                        child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.teal,
-                                width: 4.0,
-                              ),
-                              borderRadius: BorderRadius.circular(25.r),
-                            ),
-                            child: Card(
-                              margin: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25.r),
-                              ),
-                              elevation: 15,
-                              shadowColor:
-                                  const Color(0xFF52AAA4).withOpacity(0.3),
-                              child: Column(
-                                children: [
-                                  // Top 1
-                                  if (topDiagnoses.isNotEmpty)
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 20.h),
-                                      child: SizedBox(
-                                        width: 350.w,
-                                        child: Column(
-                                          children: [
-                                            // Row containing circular progress and illness name
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 20.w),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  // Circular progress indicator with number
-                                                  Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: SizedBox(
-                                                            width: 70.w,
-                                                            height: 70.w,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              value: 1.0,
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              color: const Color(
-                                                                  0xFF52AAA4),
-                                                              strokeWidth: 10.w,
-                                                            ),
-                                                          )),
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: Container(
-                                                            height: 50.w,
-                                                            width: 50.w,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50.r),
-                                                              gradient:
-                                                                  LinearGradient(
-                                                                colors: [
-                                                                  const Color(
-                                                                      0xFF52AAA4),
-                                                                  const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.8),
-                                                                ],
-                                                                begin: Alignment
-                                                                    .topLeft,
-                                                                end: Alignment
-                                                                    .bottomRight,
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.25),
-                                                                  blurRadius:
-                                                                      10,
-                                                                  spreadRadius:
-                                                                      5,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Text(
-                                                              "1",
-                                                              style: TextStyle(
-                                                                fontSize: 15.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          )),
-                                                    ],
-                                                  ),
-
-                                                  // Illness name left-aligned
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 15.w),
-                                                      child: Text(
-                                                        topDiagnoses[0]
-                                                                ['illness'] ??
-                                                            '',
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 20.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          letterSpacing: 0.3,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-
-                                            // Tags row (kept in original position)
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 20.h),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  if (topDiagnoses[0]
-                                                          ['age_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          ageLabel0,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[0][
-                                                          'size_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          sizeLabel0,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[0]['type'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 80.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          topDiagnoses[0]
-                                                              ['type'],
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  // See more button
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 50.h, left: 211.w),
-                                    child: TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) =>
-                                                IllnessdetailsScreen(
-                                                    illnessName: topDiagnoses[0]
-                                                        ['illness']),
-                                          ),
-                                        );
-                                      },
-                                      style: TextButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 16.w, vertical: 8.h),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        backgroundColor: Colors.transparent,
-                                      ).copyWith(
-                                        overlayColor: MaterialStateProperty.all(
-                                            Colors.transparent),
-                                        shadowColor: MaterialStateProperty.all(
-                                            Colors.transparent),
-                                        elevation: MaterialStateProperty.all(0),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'See More',
-                                            style: TextStyle(
-                                              color: const Color(0xFF52AAA4),
-                                              fontSize: 18.sp,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 14.sp,
-                                            color: const Color(0xFF52AAA4),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-
-                                  Divider(
-                                    color: Colors.black.withOpacity(0.1),
-                                    thickness: 1.5,
-                                    indent: 20.w,
-                                    endIndent: 20.w,
-                                  ),
-
-                                  // Top 2
-                                  if (topDiagnoses.length > 1)
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 15.h),
-                                      child: SizedBox(
-                                        width: 350.w,
-                                        child: Column(
-                                          children: [
-                                            // Row containing circular progress and illness name
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 20.w),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  // Circular progress indicator with number
-                                                  Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: SizedBox(
-                                                            width: 70.w,
-                                                            height: 70.w,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              value: 1.0,
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              color: const Color(
-                                                                  0xFF52AAA4),
-                                                              strokeWidth: 10.w,
-                                                            ),
-                                                          )),
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: Container(
-                                                            height: 50.w,
-                                                            width: 50.w,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50.r),
-                                                              gradient:
-                                                                  LinearGradient(
-                                                                colors: [
-                                                                  const Color(
-                                                                      0xFF52AAA4),
-                                                                  const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.8),
-                                                                ],
-                                                                begin: Alignment
-                                                                    .topLeft,
-                                                                end: Alignment
-                                                                    .bottomRight,
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.25),
-                                                                  blurRadius:
-                                                                      10,
-                                                                  spreadRadius:
-                                                                      5,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Text(
-                                                              "2",
-                                                              style: TextStyle(
-                                                                fontSize: 15.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          )),
-                                                    ],
-                                                  ),
-
-                                                  // Illness name left-aligned
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 15.w),
-                                                      child: Text(
-                                                        topDiagnoses[1]
-                                                                ['illness'] ??
-                                                            '',
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 20.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          letterSpacing: 0.3,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-
-                                            // Tags row (kept in original position)
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 20.h),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  if (topDiagnoses[1]
-                                                          ['age_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          ageLabel1,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[1][
-                                                          'size_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          sizeLabel1,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[1]['type'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          topDiagnoses[1]
-                                                              ['type'],
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  // See more button
-                                  if (topDiagnoses.length > 1)
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 50.h, left: 211.w),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  IllnessdetailsScreen(
-                                                      illnessName:
-                                                          topDiagnoses[1]
-                                                              ['illness']),
-                                            ),
-                                          );
-                                        },
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w, vertical: 8.h),
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          backgroundColor: Colors.transparent,
-                                        ).copyWith(
-                                          overlayColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent),
-                                          shadowColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent),
-                                          elevation:
-                                              MaterialStateProperty.all(0),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'See More',
-                                              style: TextStyle(
-                                                color: const Color(0xFF52AAA4),
-                                                fontSize: 18.sp,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward_ios,
-                                              size: 14.sp,
-                                              color: const Color(0xFF52AAA4),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  if (topDiagnoses.length > 1)
-                                    Divider(
-                                      color: Colors.black.withOpacity(0.1),
-                                      thickness: 1.5,
-                                      indent: 20.w,
-                                      endIndent: 20.w,
-                                    ),
-
-                                  // Top 3
-                                  if (topDiagnoses.length > 2)
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 15.h),
-                                      child: SizedBox(
-                                        width: 350.w,
-                                        child: Column(
-                                          children: [
-                                            // Row containing circular progress and illness name
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 20.w),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  // Circular progress indicator with number
-                                                  Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: SizedBox(
-                                                            width: 70.w,
-                                                            height: 70.w,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              value: 1.0,
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              color: const Color(
-                                                                  0xFF52AAA4),
-                                                              strokeWidth: 10.w,
-                                                            ),
-                                                          )),
-                                                      Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 9.w),
-                                                          child: Container(
-                                                            height: 50.w,
-                                                            width: 50.w,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50.r),
-                                                              gradient:
-                                                                  LinearGradient(
-                                                                colors: [
-                                                                  const Color(
-                                                                      0xFF52AAA4),
-                                                                  const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.8),
-                                                                ],
-                                                                begin: Alignment
-                                                                    .topLeft,
-                                                                end: Alignment
-                                                                    .bottomRight,
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(
-                                                                          0xFF52AAA4)
-                                                                      .withOpacity(
-                                                                          0.25),
-                                                                  blurRadius:
-                                                                      10,
-                                                                  spreadRadius:
-                                                                      5,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Text(
-                                                              "3",
-                                                              style: TextStyle(
-                                                                fontSize: 15.sp,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          )),
-                                                    ],
-                                                  ),
-
-                                                  // Illness name left-aligned
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 15.w),
-                                                      child: Text(
-                                                        topDiagnoses[2]
-                                                                ['illness'] ??
-                                                            '',
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 20.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          letterSpacing: 0.3,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-
-                                            // Tags row (kept in original position)
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 20.h),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  if (topDiagnoses[2]
-                                                          ['age_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          ageLabel2,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[2][
-                                                          'size_specificity'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 90.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          sizeLabel2,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  SizedBox(width: 10.w),
-                                                  if (topDiagnoses[2]['type'] !=
-                                                      null)
-                                                    Container(
-                                                      width: 100.w,
-                                                      height: 25.h,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10.w),
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                                  0xFF52AAA4)
-                                                              .withOpacity(0.5),
-                                                          width: 2,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50.r),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          topDiagnoses[2]
-                                                              ['type'],
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            color: const Color(
-                                                                0xFF52AAA4),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  // See more button
-                                  if (topDiagnoses.length > 2)
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 50.h, left: 211.w),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  IllnessdetailsScreen(
-                                                      illnessName:
-                                                          topDiagnoses[2]
-                                                              ['illness']),
-                                            ),
-                                          );
-                                        },
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w, vertical: 8.h),
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          backgroundColor: Colors.transparent,
-                                        ).copyWith(
-                                          overlayColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent),
-                                          shadowColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent),
-                                          elevation:
-                                              MaterialStateProperty.all(0),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'See More',
-                                              style: TextStyle(
-                                                color: const Color(0xFF52AAA4),
-                                                fontSize: 18.sp,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward_ios,
-                                              size: 14.sp,
-                                              color: const Color(0xFF52AAA4),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  SizedBox(height: 15.h),
-                                ],
-                              ),
-                            )),
-                      ),
+  padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
+  child: Center(
+    child: SizedBox(
+      width: 380.w,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.teal,
+            width: 4.0,
+          ),
+          borderRadius: BorderRadius.circular(25.r),
+        ),
+        child: Card(
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.r),
+          ),
+          elevation: 15,
+          shadowColor: const Color(0xFF52AAA4).withOpacity(0.3),
+          child: topDiagnoses.isEmpty
+              ? Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30.h),
+                  child: Text(
+                    "No available diagnosis.",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w500,
                     ),
+                    textAlign: TextAlign.center,
                   ),
+                )
+              : Column(
+                  children: [
+                   // TOP 1 – Always shown if available
+                    if (topDiagnoses.isNotEmpty && (topDiagnoses[0]['illness'] ?? '').isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: _buildDiagnosisCard(context, topDiagnoses[0], "1", ageLabel0, sizeLabel0),
+                      ),
+                      _buildSeeMoreButton(context, topDiagnoses[0]['illness']),
+                      Divider(
+                        color: Colors.black.withOpacity(0.1),
+                        thickness: 1.5,
+                        indent: 20.w,
+                        endIndent: 20.w,
+                      ),
+                    ],
+
+                    // TOP 2 – Only shown if illness exists
+                    if (topDiagnoses.length > 1 && (topDiagnoses[1]['illness'] ?? '').isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.only(top: 15.h),
+                        child: _buildDiagnosisCard(context, topDiagnoses[1], "2", ageLabel1, sizeLabel1),
+                      ),
+                      _buildSeeMoreButton(context, topDiagnoses[1]['illness']),
+                      Divider(
+                        color: Colors.black.withOpacity(0.1),
+                        thickness: 1.5,
+                        indent: 20.w,
+                        endIndent: 20.w,
+                      ),
+                    ],
+
+                    // TOP 3 – Only shown if illness exists
+                    if (topDiagnoses.length > 2 && (topDiagnoses[2]['illness'] ?? '').isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.only(top: 15.h),
+                        child: _buildDiagnosisCard(context, topDiagnoses[2], "3", ageLabel2, sizeLabel2),
+                      ),
+                      _buildSeeMoreButton(context, topDiagnoses[2]['illness']),
+                    ],
+
+                    SizedBox(height: 15.h),
+                  ],
+                ),
+        ),
+      ),
+    ),
+  ),
+),
+
                   Padding(padding: EdgeInsets.symmetric(horizontal: 20.w),
                  child: Container(
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(36, 36, 55, 1), 
+                        color: const Color.fromRGBO(82, 170, 164, 1),
                         borderRadius: BorderRadius.circular(
-                            12.0), // Optional rounded corners
+                            15.r), 
+                             
+                          
                       ),
                       child: Theme(
                           data: Theme.of(context).copyWith(
@@ -1468,7 +830,7 @@ void _showDisclaimerThenProceed(
                           ),
                           child: ExpansionTile(
                             tilePadding:const  EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 8.0),
+                                horizontal: 20.0, vertical: 0.0),
                             childrenPadding: EdgeInsets.all(12.0),
                             title:  Text(
                               "Top 10 Diagnoses (Chart View)",
@@ -1476,7 +838,7 @@ void _showDisclaimerThenProceed(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18.sp,
                                 fontFamily: 'Oswald',
-                                color: const Color.fromARGB(255, 231, 231, 231),
+                                color: const Color.fromARGB(255, 245, 243, 243),
                               ),
                             ),
                             children: [
@@ -1514,8 +876,8 @@ void _showDisclaimerThenProceed(
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
-                                                        25.r)),
-                                            elevation: 4,
+                                                        20.r)),
+                                            elevation: 6,
                                             child: Padding(
                                               padding: EdgeInsets.all(6.w),
                                               child: Column(
@@ -1572,9 +934,10 @@ void _showDisclaimerThenProceed(
                           Padding(padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                  child: Container(
                       decoration: BoxDecoration(
-                        color: const Color.fromRGBO(36, 36, 55, 1), 
+                        color: const Color.fromRGBO(82, 170, 164, 1), 
                         borderRadius: BorderRadius.circular(
-                            10.r), // Optional rounded corners
+                            15.r),
+                            
                       ),
                       child: Theme(
                           data: Theme.of(context).copyWith(
@@ -1584,21 +947,21 @@ void _showDisclaimerThenProceed(
                           ),
                           child: ExpansionTile(
                             tilePadding:const  EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 8.0),
-                            childrenPadding: EdgeInsets.all(12.0),
+                                horizontal: 20.0, vertical: 0.0),
+                            childrenPadding:const EdgeInsets.all(12.0),
                             title:  Text(
                               "Top 1 and Top 2 Comparison",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18.sp,
                                 fontFamily: 'Oswald',
-                                color: const Color.fromARGB(255, 231, 231, 231),
+                                color: const Color.fromARGB(255, 245, 243, 243),
                               ),
                             ),
                             children: [
                 
                      Card(
-                      elevation: 2,
+                      elevation: 6,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.r)),
                       child: Padding(
@@ -1673,7 +1036,7 @@ void _showDisclaimerThenProceed(
                                         Expanded(
                                           child: Padding(
                                             padding: EdgeInsets.all(10.w),
-                                            child: Text("Metrics",
+                                            child:const Text("Metrics",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     fontWeight:
@@ -1691,7 +1054,7 @@ void _showDisclaimerThenProceed(
                                             padding: EdgeInsets.all(5.w),
                                             child: Text("${ill1['illness']}",
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(
+                                                style:const TextStyle(
                                                     fontWeight:
                                                         FontWeight.bold)),
                                           ),
@@ -1707,7 +1070,7 @@ void _showDisclaimerThenProceed(
                                             child: Text(
                                                 "${ill2?['illness'] ?? '—'}",
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontWeight:
                                                         FontWeight.bold)),
                                           ),
@@ -1830,6 +1193,150 @@ void _showDisclaimerThenProceed(
       ),
     );
   }
+
+
+  Widget _buildDiagnosisCard(BuildContext context, Map<String, dynamic> diagnosis, String rank, String ageLabel, String sizeLabel) {
+  return SizedBox(
+    width: 350.w,
+    child: Column(
+      children: [
+        // Main row
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 70.w,
+                    height: 70.w,
+                    child: CircularProgressIndicator(
+                      value: 1.0,
+                      backgroundColor: Colors.grey.shade200,
+                      color: const Color(0xFF52AAA4),
+                      strokeWidth: 10.w,
+                    ),
+                  ),
+                  Container(
+                    height: 50.w,
+                    width: 50.w,
+                    alignment: Alignment.center,
+                    child: Text(
+                      rank,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF52AAA4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15.w),
+                  child: Text(
+                    diagnosis['illness'] ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Tags
+        Padding(
+          padding: EdgeInsets.only(top: 20.h, left: 5.w),
+          child: Row(
+            children: [
+              if (diagnosis['age_specificity'] != null)
+                _buildTag(ageLabel),
+              if (diagnosis['size_specificity'] != null)
+                _buildTag(sizeLabel),
+              if (diagnosis['type'] != null)
+                _buildTag(diagnosis['type'], width: 97.w),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildTag(String text, {double? width}) {
+  return Container(
+    width: width,
+    height: 25.h,
+    margin: EdgeInsets.only(right: 10.w),
+    padding: EdgeInsets.symmetric(horizontal: 10.w),
+    decoration: BoxDecoration(
+      border: Border.all(
+        color: const Color(0xFF52AAA4).withOpacity(0.5),
+        width: 2,
+      ),
+      borderRadius: BorderRadius.circular(50.r),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13.sp,
+          color: const Color(0xFF52AAA4),
+          fontWeight: FontWeight.w500,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    ),
+  );
+}
+
+Widget _buildSeeMoreButton(BuildContext context, String illnessName) {
+  return Padding(
+    padding: EdgeInsets.only(top: 50.h, left: 211.w),
+    child: TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => IllnessdetailsScreen(illnessName: illnessName),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        backgroundColor: Colors.transparent,
+      ).copyWith(
+        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        shadowColor: MaterialStateProperty.all(Colors.transparent),
+        elevation: MaterialStateProperty.all(0),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'See More',
+            style: TextStyle(
+              color: const Color(0xFF52AAA4),
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios, size: 14.sp, color: const Color(0xFF52AAA4)),
+        ],
+      ),
+    ),
+  );
+}
+
 
   Widget _legendDot(Color color, String label) {
     return Row(

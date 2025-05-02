@@ -57,6 +57,17 @@ void initState() {
     });
   }
 
+
+  String _capitalizeEachWord(String text) {
+  return text
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? word[0].toUpperCase() + word.substring(1)
+          : '')
+      .join(' ');
+}
+
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -65,7 +76,7 @@ void initState() {
     final petType = userData.selectedPetType;
 
     final Map<String,dynamic> petSymptoms = {
-      ...symptomQuestions,
+      // ...symptomQuestions,
       if(petType == 'Dog') ...symptomQuestionsDog,
       if(petType == 'Cat') ...symptomQuestionsCat,
     };
@@ -190,7 +201,7 @@ void initState() {
               // Scrollable list of symptom cards.
               Expanded(
                 child: ListView.builder(
-                  padding: EdgeInsets.fromLTRB(screenWidth * 0.05, 5.h, screenWidth * 0.05, 80.h),
+                  padding: EdgeInsets.fromLTRB(screenWidth * 0.07, 5.h, screenWidth * 0.07, 80.h),
                   itemCount: symptomList.length,
                   itemBuilder: (context, index) {
                     final symptom = symptomList[index];
@@ -249,7 +260,7 @@ void initState() {
         children: [
           // Symptom title.
           Text(
-            title[0].toUpperCase() + title.substring(1),
+             _capitalizeEachWord(title),
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -276,8 +287,8 @@ void initState() {
                   userData.updateQuestions();
 
                   if (userData.questions.isEmpty) {
-                    // 🔵 No follow-up → instantly add to pending + go to next screen
-                    userData.addPendingSymptom(title);
+                    
+                    userData.addPendingSymptom(title, source: 'auto');
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const AnothersympScreen()),

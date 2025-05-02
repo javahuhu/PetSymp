@@ -10,6 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
 import '../SymptomQuestions/symptomsquestions.dart';
 import '../SymptomQuestions/NLPSymptom.dart';
+import 'anothersymptoms.dart';
+import 'package:petsymp/searchdescription.dart';
 
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -109,7 +111,7 @@ void initState() {
 
 
     final Map<String, dynamic> petSymptoms = {
-      ...symptomQuestions,
+      // ...symptomQuestions,
       if (petType == "Dog") ...symptomQuestionsDog,
       if (petType == "Cat") ...symptomQuestionsCat,
     };
@@ -137,24 +139,85 @@ void initState() {
       });
   }
 
-  void navigateToNextPage() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final userData = Provider.of<UserData>(context, listen: false);
-      final inputText = _symptomController.text.trim().toLowerCase();
 
-      final resolvedSymptom = resolveNlpSymptom(inputText);
-      userData.setAnotherSymptom(inputText);
+  
+  String resolveCanonicalSymptom(String input, Map<String, dynamic> symptomMap, Map<String, String> descriptionMap) {
+  final query = input.trim().toLowerCase();
 
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>  AnothersearchsymptomsScreen(symptoms: [resolvedSymptom]),
-        ),
-      );
+  // Step 1: Match against actual symptom keys (strict match)
+  if (symptomMap.containsKey(query)) {
+    return query;
+  }
 
-      
+
+    final fallback = symptomDescriptions.entries.firstWhere(
+    (entry) => entry.value.toLowerCase().contains(query),
+    orElse: () => const MapEntry("", ""),
+  );
+  return fallback.key.isNotEmpty ? fallback.key : query;
+}
+
+
+String resolveFinalSymptom({
+  required String userInput,
+  required Map<String, dynamic> symptomMap,
+  required Map<String, String> descriptionMap,
+  required Map<String, String> nlpMap,
+}) {
+  final query = userInput.trim().toLowerCase();
+
+  // 1. Exact key match
+  if (symptomMap.containsKey(query)) {
+    return query;
+  }
+
+  // 2. NLP match
+  for (final entry in nlpMap.entries) {
+    if (query.contains(entry.key) && symptomMap.containsKey(entry.value)) {
+      return entry.value;
     }
   }
+
+  // 3. Description fallback
+  final descMatch = descriptionMap.entries.firstWhere(
+    (entry) => entry.value.toLowerCase().contains(query),
+    orElse: () => const MapEntry("", ""),
+  );
+  return descMatch.key.isNotEmpty ? descMatch.key : query;
+}
+
+
+
+
+  void navigateToNextPage() async {
+  if (_formKey.currentState?.validate() ?? false) {
+    final userData = Provider.of<UserData>(context, listen: false);
+    final inputText = _symptomController.text.trim();
+
+    final petType = userData.selectedPetType;
+    final Map<String, dynamic> symptomMap = {
+      if (petType == 'Dog') ...symptomQuestionsDog,
+      if (petType == 'Cat') ...symptomQuestionsCat,
+    };
+
+    final resolvedSymptom = resolveFinalSymptom(
+      userInput: inputText,
+      symptomMap: symptomMap,
+      descriptionMap: symptomDescriptions,
+      nlpMap: symptomNLPMap,
+    );
+
+    userData.setAnotherSymptom(resolvedSymptom);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnothersearchsymptomsScreen(symptoms: [resolvedSymptom]),
+      ),
+    );
+  }
+}
+
 
   void _navigateToSymptomCatalog() {
     if (_isNavigating) return;
@@ -166,6 +229,16 @@ void initState() {
       _isNavigating = false;
     });
   }
+
+   String _capitalizeEachWord(String text) {
+  return text
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? word[0].toUpperCase() + word.substring(1)
+          : '')
+      .join(' ');
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +255,7 @@ void initState() {
           });
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false, 
           backgroundColor: Colors.transparent,
           body: Container(
             decoration: const BoxDecoration(
@@ -335,7 +409,11 @@ void initState() {
                   left: screenWidth * 0.01,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AnothersympScreen()),
+                );
+
                     },
 
                     icon:  Icon(
@@ -458,7 +536,7 @@ void initState() {
                                         Provider.of<UserData>(context, listen: false);
                                     final petType = userData.selectedPetType;
                                      final Map<String, dynamic> petSymptoms = {
-                                      ...symptomQuestions,
+                                      // ...symptomQuestions,
                                       if (petType == "Dog") ...symptomQuestionsDog,
                                       if (petType == "Cat") ...symptomQuestionsCat,
                                     };
@@ -496,20 +574,23 @@ void initState() {
                                     padding: EdgeInsets.zero,
                                     itemBuilder: (context, index) {
                                       return ListTile(
-                                        title: Text(_suggestedSymptoms[index]),
+                                        title: Text(_capitalizeEachWord(_suggestedSymptoms[index])),
                                         onTap: () {
-                                          _symptomController.text =
-                                              _suggestedSymptoms[index];
-                                          _symptomController.selection =
-                                              TextSelection.fromPosition(
-                                            TextPosition(
-                                                offset: _symptomController.text.length),
-                                          );
-                                          setState(() {
-                                            _showSuggestions = false;
-                                          });
-                                          FocusScope.of(context).unfocus();
-                                        },
+                                        final selected = _suggestedSymptoms[index];
+                                        final capitalized = _capitalizeEachWord(selected);  // 👈 Apply capitalization
+
+                                        _symptomController.text = capitalized;
+                                        _symptomController.selection = TextSelection.fromPosition(
+                                          TextPosition(offset: capitalized.length),
+                                        );
+
+                                        setState(() {
+                                          _showSuggestions = false;
+                                        });
+
+                                        FocusScope.of(context).unfocus(); // Optional: dismiss keyboard
+                                      }
+
                                       );
                                     },
                                   ),

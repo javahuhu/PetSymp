@@ -13,26 +13,27 @@ class AnothersympScreen extends StatefulWidget {
   AnothersympScreenState createState() => AnothersympScreenState();
 }
 
-class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerProviderStateMixin {
+class AnothersympScreenState extends State<AnothersympScreen>
+    with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
   final List<bool> _buttonVisible = [false, false];
   late AnimationController _bubblesController;
   late List<Bubble> _bubbles;
   final ScrollController _scrollController = ScrollController();
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize bubble animation controller
     _bubblesController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
-    
+
     // Create random bubbles
     _bubbles = List.generate(12, (index) => Bubble());
-    
+
     // Initialize main UI animation
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
@@ -48,7 +49,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
       }
     });
   }
-  
+
   @override
   void dispose() {
     _bubblesController.dispose();
@@ -56,12 +57,20 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
     super.dispose();
   }
 
+String _capitalizeEachWord(String text) {
+  return text.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1);
+  }).join(' ');
+}
+
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final userData = Provider.of<UserData>(context);
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
@@ -74,10 +83,20 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                 children: _bubbles.map((bubble) {
                   final size = bubble.size * screenWidth * 0.15;
                   return Positioned(
-                    left: (bubble.position.dx * screenWidth) + 
-                           (math.sin((_bubblesController.value * bubble.speed + bubble.offset) * math.pi * 2) * bubble.wobble * screenWidth * 0.05),
-                    top: (bubble.position.dy * screenHeight) + 
-                         (_bubblesController.value * bubble.speed * screenHeight * 0.3) % screenHeight,
+                    left: (bubble.position.dx * screenWidth) +
+                        (math.sin((_bubblesController.value * bubble.speed +
+                                    bubble.offset) *
+                                math.pi *
+                                2) *
+                            bubble.wobble *
+                            screenWidth *
+                            0.05),
+                    top: (bubble.position.dy * screenHeight) +
+                        (_bubblesController.value *
+                                bubble.speed *
+                                screenHeight *
+                                0.3) %
+                            screenHeight,
                     child: Opacity(
                       opacity: 0.4 * bubble.opacity,
                       child: Container(
@@ -106,7 +125,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
               );
             },
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
@@ -115,32 +134,54 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                   alignment: Alignment.topLeft,
                   child: IconButton(
                     onPressed: () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
+                      final userData =
+                          Provider.of<UserData>(context, listen: false);
+
+                      final pending = userData.pendingSymptoms;
+
+                      for (int i = pending.length - 1; i >= 0; i--) {
+                        final symptom = pending[i];
+                        if (userData.isAutoAdded(symptom) &&
+                            i == pending.length - 1) {
+                          userData.removePendingSymptom(symptom);
+                          break;
+                        }
                       }
+
+                      Navigator.pop(context);
                     },
-                    icon: const Icon(Icons.arrow_back, size: 28, color: Colors.black),
-                    padding: const EdgeInsets.all(16),
-                  ),
-                ),
-                
-                // Paw Icon centered
-                Padding(
-                  padding: EdgeInsets.only(right: 225.w),
-                  child: 
-                AnimatedOpacity(
-                  duration: const Duration(seconds: 1),
-                  opacity: _isAnimated ? 1.0 : 0.0,
-                  child: Center(
-                    child: Container(
-                      width: screenWidth * 0.15,
-                      height: screenWidth * 0.15,
-                      margin: const EdgeInsets.only(top: 8, bottom: 16),
-                      child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                    icon: Icon(
+                      Icons.arrow_back_ios_new,
+                      color: const Color.fromRGBO(61, 47, 40, 1),
+                      size: 26.sp,
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(Colors.transparent),
+                      elevation: WidgetStateProperty.all(0),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                   ),
-                )),
-                
+                ),
+
+                // Paw Icon centered
+                Padding(
+                    padding: EdgeInsets.only(right: 290.w),
+                    child: AnimatedOpacity(
+                      duration: const Duration(seconds: 1),
+                      opacity: _isAnimated ? 1.0 : 0.0,
+                      child: Center(
+                        child: Container(
+                          width: screenWidth * 0.15,
+                          height: screenWidth * 0.15,
+                          margin: const EdgeInsets.only(top: 8, bottom: 16),
+                          child: Image.asset('assets/paw.png',
+                              fit: BoxFit.contain),
+                        ),
+                      ),
+                    )),
+
                 // Question and Subtitle
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 5, 20, 10),
@@ -167,9 +208,10 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                     ],
                   ),
                 ),
-                
+
                 // Symptoms Display (if any)
-                if (userData.finalizedSymptoms.isNotEmpty || userData.pendingSymptoms.isNotEmpty)
+                if (userData.finalizedSymptoms.isNotEmpty ||
+                    userData.pendingSymptoms.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                     child: Column(
@@ -186,7 +228,8 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                         const SizedBox(height: 8),
                         Container(
                           constraints: BoxConstraints(
-                            maxHeight: screenHeight * 0.3, // Set a maximum height
+                            maxHeight:
+                                screenHeight * 0.3, // Set a maximum height
                           ),
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -208,8 +251,10 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                               spacing: 8,
                               runSpacing: 8,
                               children: [
-                                ...userData.finalizedSymptoms.map((symptom) => _buildSymptomBubble(symptom, true)),
-                                ...userData.pendingSymptoms.map((symptom) => _buildSymptomBubble(symptom, false)),
+                                ...userData.finalizedSymptoms.map((symptom) =>
+                                    _buildSymptomBubble(symptom, true)),
+                                ...userData.pendingSymptoms.map((symptom) =>
+                                    _buildSymptomBubble(symptom, false)),
                               ],
                             ),
                           ),
@@ -217,8 +262,10 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                       ],
                     ),
                   ),
-                
-                SizedBox(height: 50.h,),
+
+                SizedBox(
+                  height: 50.h,
+                ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                   child: Column(
@@ -235,28 +282,31 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                             onPressed: () {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const MentionsympScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const MentionsympScreen()),
                               );
                             },
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                              backgroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.pressed)) {
                                   return const Color.fromRGBO(82, 170, 164, 1);
                                 }
                                 return Colors.white.withOpacity(0.9);
                               }),
-                              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                              foregroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.pressed)) {
                                   return Colors.white;
                                 }
                                 return const Color.fromRGBO(29, 29, 44, 1.0);
                               }),
-                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                              shadowColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                               side: MaterialStateProperty.all(
                                 const BorderSide(
-                                  color: Color.fromRGBO(82, 170, 164, 0.8),
-                                  width: 2.0
-                                ),
+                                    color: Color.fromRGBO(82, 170, 164, 0.8),
+                                    width: 2.0),
                               ),
                               shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
@@ -273,7 +323,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                                 Text(
                                   "Yes, Add Another",
                                   style: TextStyle(
-                                    fontSize: 16.0, 
+                                    fontSize: 16.0,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 0.2,
                                   ),
@@ -283,7 +333,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                           ),
                         ),
                       ),
-                      
+
                       // No, Get Diagnosis Button
                       AnimatedOpacity(
                         duration: const Duration(milliseconds: 800),
@@ -304,16 +354,20 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                                       "Once you proceed, you won't be able to go back and edit previous answers."),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
                                       child: const Text("Cancel"),
                                     ),
                                     ElevatedButton(
-                                      onPressed: () => Navigator.pop(context, true),
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
+                                        backgroundColor: const Color.fromRGBO(
+                                            82, 170, 164, 1),
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text("Confirm"),
@@ -324,40 +378,45 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
 
                               if (confirm != true) return;
 
-                              final userData = Provider.of<UserData>(context, listen: false);
+                              final userData =
+                                  Provider.of<UserData>(context, listen: false);
 
                               // Finalize all pending symptoms
-                              for (final sym in userData.pendingSymptoms.toList()) {
+                              for (final sym
+                                  in userData.pendingSymptoms.toList()) {
                                 userData.finalizeSymptom(sym);
                               }
 
                               // Send to backend after finalizing
                               await userData.fetchDiagnosis();
-                              
+
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const ReportScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const ReportScreen()),
                               );
                             },
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                              backgroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.pressed)) {
                                   return const Color.fromRGBO(82, 170, 164, 1);
                                 }
                                 return const Color.fromRGBO(82, 170, 164, 0.1);
                               }),
-                              foregroundColor: WidgetStateProperty.resolveWith((states) {
+                              foregroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.pressed)) {
                                   return Colors.white;
                                 }
                                 return const Color.fromRGBO(29, 29, 44, 1.0);
                               }),
-                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                              shadowColor:
+                                  MaterialStateProperty.all(Colors.transparent),
                               side: MaterialStateProperty.all(
                                 const BorderSide(
-                                  color: Color.fromRGBO(82, 170, 164, 1),
-                                  width: 2.0
-                                ),
+                                    color: Color.fromRGBO(82, 170, 164, 1),
+                                    width: 2.0),
                               ),
                               shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
@@ -374,7 +433,7 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
                                 Text(
                                   "No, Get Diagnosis",
                                   style: TextStyle(
-                                    fontSize: 16.0, 
+                                    fontSize: 16.0,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 0.2,
                                   ),
@@ -400,14 +459,14 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isFinalized 
-          ? const Color.fromRGBO(82, 170, 164, 0.2) 
-          : const Color.fromRGBO(255, 215, 64, 0.2),
+        color: isFinalized
+            ? const Color.fromRGBO(82, 170, 164, 0.2)
+            : const Color.fromRGBO(255, 215, 64, 0.2),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isFinalized 
-            ? const Color.fromRGBO(82, 170, 164, 1.0) 
-            : const Color.fromRGBO(255, 193, 7, 1.0),
+          color: isFinalized
+              ? const Color.fromRGBO(82, 170, 164, 1.0)
+              : const Color.fromRGBO(255, 193, 7, 1.0),
           width: 1.5,
         ),
       ),
@@ -417,19 +476,19 @@ class AnothersympScreenState extends State<AnothersympScreen> with SingleTickerP
           Icon(
             isFinalized ? Icons.check_circle : Icons.pending,
             size: 16,
-            color: isFinalized 
-              ? const Color.fromRGBO(82, 170, 164, 1.0) 
-              : const Color.fromRGBO(255, 152, 0, 1.0),
+            color: isFinalized
+                ? const Color.fromRGBO(82, 170, 164, 1.0)
+                : const Color.fromRGBO(255, 152, 0, 1.0),
           ),
           const SizedBox(width: 6),
           Text(
-            symptom,
+             _capitalizeEachWord(symptom),
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: isFinalized 
-                ? const Color.fromRGBO(29, 29, 44, 1.0) 
-                : const Color.fromRGBO(29, 29, 44, 0.8),
+              color: isFinalized
+                  ? const Color.fromRGBO(29, 29, 44, 1.0)
+                  : const Color.fromRGBO(29, 29, 44, 0.8),
             ),
           ),
         ],

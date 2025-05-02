@@ -181,7 +181,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       
                       // Extra Large size
                       _buildSizeInfoRow(
-                        "Extra Large",
+                        "Giant",
                         "Over 100 pounds (45+ kg)",
                         "Examples: Great Dane, Saint Bernard, Newfoundland, Mastiff",
                         "extralargepet.png",
@@ -423,22 +423,6 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
               ),
             ),
             
-            // Original UI elements below - unchanged
-            Positioned(
-              top: screenHeight * 0.03,
-              left: screenWidth * 0.01,
-              child: ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back_sharp,
-                color: Color.fromRGBO(61, 47, 40, 1),
-                size: 40.0,),
-                label: const Text(''),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-            ),
             
             // AnimatedPositioned for Paw Image
             AnimatedPositioned(
@@ -534,6 +518,13 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                         if (value == null || value.isEmpty) {
                           return 'Please enter size of the pet';
                         }
+
+                       const validSizes = ["Small", "Medium", "Large", "Giant"];
+                        if (!validSizes.contains(value)) {
+                          return 'Small, Medium, Large, or Giant Only';
+                        }
+
+
                         return null;
                       },
                     ),

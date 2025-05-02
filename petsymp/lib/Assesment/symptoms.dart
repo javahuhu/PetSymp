@@ -10,7 +10,7 @@ import '../userdata.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../SymptomQuestions/symptomsquestions.dart';
 import 'package:animate_do/animate_do.dart';
-
+import 'package:petsymp/searchdescription.dart';
 class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -106,7 +106,7 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
 
 
     final Map<String, dynamic> petSymptoms = {
-      ...symptomQuestions,
+      // ...symptomQuestions,
       if(petType == 'Dog') ...symptomQuestionsDog,
       if(petType == 'Cat') ...symptomQuestionsCat
     };
@@ -136,12 +136,72 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
 
   }
 
-  void navigateToNextPage() async {
+
+  String resolveCanonicalSymptom(String input, Map<String, dynamic> symptomMap, Map<String, String> descriptionMap) {
+  final query = input.trim().toLowerCase();
+
+  // Step 1: Match against actual symptom keys (strict match)
+  if (symptomMap.containsKey(query)) {
+    return query;
+  }
+
+
+    final fallback = symptomDescriptions.entries.firstWhere(
+    (entry) => entry.value.toLowerCase().contains(query),
+    orElse: () => const MapEntry("", ""),
+  );
+  return fallback.key.isNotEmpty ? fallback.key : query;
+}
+
+
+String resolveFinalSymptom({
+  required String userInput,
+  required Map<String, dynamic> symptomMap,
+  required Map<String, String> descriptionMap,
+  required Map<String, String> nlpMap,
+}) {
+  final query = userInput.trim().toLowerCase();
+
+  // 1. Exact key match
+  if (symptomMap.containsKey(query)) {
+    return query;
+  }
+
+  // 2. NLP match
+  for (final entry in nlpMap.entries) {
+    if (query.contains(entry.key) && symptomMap.containsKey(entry.value)) {
+      return entry.value;
+    }
+  }
+
+  // 3. Description fallback
+  final descMatch = descriptionMap.entries.firstWhere(
+    (entry) => entry.value.toLowerCase().contains(query),
+    orElse: () => const MapEntry("", ""),
+  );
+  return descMatch.key.isNotEmpty ? descMatch.key : query;
+}
+
+
+
+void navigateToNextPage() async {
   if (_formKey.currentState?.validate() ?? false) {
     final userData = Provider.of<UserData>(context, listen: false);
-    final inputText = _symptomsController.text.trim().toLowerCase();
-    
-    final resolvedSymptom = resolveNlpSymptom(inputText);
+    final inputText = _symptomsController.text.trim();
+
+    final petType = userData.selectedPetType;
+    final Map<String, dynamic> symptomMap = {
+      if (petType == 'Dog') ...symptomQuestionsDog,
+      if (petType == 'Cat') ...symptomQuestionsCat,
+    };
+
+    final resolvedSymptom = resolveFinalSymptom(
+      userInput: inputText,
+      symptomMap: symptomMap,
+      descriptionMap: symptomDescriptions,
+      nlpMap: symptomNLPMap,
+    );
+
     userData.setAnotherSymptom(resolvedSymptom);
 
     await Navigator.push(
@@ -150,9 +210,9 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
         builder: (context) => SearchsymptomsScreen(symptoms: [resolvedSymptom]),
       ),
     );
-
   }
 }
+
 
   void _navigateToSymptomCatalog() {
     if (_isNavigating) return;
@@ -165,6 +225,17 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
       _isNavigating = false;
     });
   }
+
+
+   String _capitalizeEachWord(String text) {
+  return text
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? word[0].toUpperCase() + word.substring(1)
+          : '')
+      .join(' ');
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +252,7 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
         });
       },
       child: Scaffold(
+         resizeToAvoidBottomInset: false, 
         backgroundColor: Colors.transparent, // Make transparent to show gradient
         body: Container(
           // Enhanced background with gradient like in BreedScreen
@@ -457,6 +529,12 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter the symptom of the pet';
                                   }
+
+                                  final isValid = RegExp(r'^[a-zA-Z\s-]+$').hasMatch(value);
+                                    if (!isValid) {
+                                      return 'Only letters are allowed';
+                                    }
+                                  
                                   // Only check for commas or plus signs
                                   if (value.contains(',') || value.contains('+')) {
                                     return 'Please enter only one symptom at a time';
@@ -469,7 +547,7 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                                   // Check if it's in the list of predefined symptoms
                                   final petType = userData.selectedPetType;
                                   final Map<String, dynamic> petSymptoms = {
-                                    ...symptomQuestions,
+                                    // ...symptomQuestions,
                                     if (petType == "Cat") ...symptomQuestionsCat,
                                     if (petType == "Dog") ...symptomQuestionsDog,
                                   };
@@ -505,21 +583,18 @@ class SymptomsScreenState extends State<SymptomsScreen> with SingleTickerProvide
                                   padding: EdgeInsets.zero,
                                   itemBuilder: (context, index) {
                                     return ListTile(
-                                      title: Text(_suggestedSymptoms[index]),
+                                      title:  Text(_capitalizeEachWord(_suggestedSymptoms[index])),
                                       onTap: () {
-                                        // Set the selected symptom in the text field
-                                        _symptomsController.text = _suggestedSymptoms[index];
-                                        // Move cursor to the end
-                                        _symptomsController.selection = TextSelection.fromPosition(
-                                          TextPosition(offset: _symptomsController.text.length),
-                                        );
-                                        // Hide suggestions after selection
-                                        setState(() {
-                                          _showSuggestions = false;
-                                        });
-                                        // Unfocus to hide keyboard
-                                        FocusScope.of(context).unfocus();
-                                      },
+                                    _symptomsController.text = _capitalizeEachWord(_suggestedSymptoms[index]);
+                                    _symptomsController.selection = TextSelection.fromPosition(
+                                      TextPosition(offset: _symptomsController.text.length),
+                                    );
+                                    setState(() {
+                                      _showSuggestions = false;
+                                    });
+                                    FocusScope.of(context).unfocus();
+                                  },
+
                                     );
                                   },
                                 ),

@@ -242,22 +242,7 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
               ),
             ),
             
-            // Back button
-            Positioned(
-              top: screenHeight * 0.03,
-              left: screenWidth * 0.01,
-              child: ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back_sharp,
-                color: Color.fromRGBO(61, 47, 40, 1),
-                size: 40.0,),
-                label: const Text(''),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-            ),
+            
             
             // AnimatedPositioned for Paw Image
             AnimatedPositioned(
@@ -364,6 +349,7 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                             if (value.trim().length > 20) {
                               return 'Please enter less than 20 characters';
                             }
+
 
                             if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
                               return 'Only letters and spaces are allowed';

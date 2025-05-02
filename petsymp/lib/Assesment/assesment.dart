@@ -266,6 +266,13 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your username';
                               }
+
+                              
+                              final isValid = RegExp(r'^[a-zA-Z\s-]+$').hasMatch(value);
+                                if (!isValid) {
+                                  return 'Only letters and spaces are allowed';
+                                }
+
                               if (value.length > 20) {
                                 return "Username must contain at least 20 letters Only";
                               }

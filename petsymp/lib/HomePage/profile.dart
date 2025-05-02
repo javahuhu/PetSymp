@@ -721,8 +721,7 @@ class ProfilescreenState extends State<Profilescreen> {
                     _buildProfileField("img1", "Username", _nicknameController, editable: true),
                     _buildProfileField("img2", "Email", _emailController, editable: true),
                     _buildProfileField("img3", "Pet Name", _petName, editable: true),
-                    _buildProfileField("img4", "Support", _titleController2, editable: false),
-                    _buildProfileField("img5", "Terms & Conditions", _titleController3, editable: false),
+                    
                   ],
                 ),
               ),
@@ -832,8 +831,8 @@ class ProfilescreenState extends State<Profilescreen> {
               Container(
                 width: 40.w,
                 height: 40.w,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(82, 170, 164, 0.2),
+                decoration:const BoxDecoration(
+                  color: Color.fromRGBO(82, 170, 164, 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(

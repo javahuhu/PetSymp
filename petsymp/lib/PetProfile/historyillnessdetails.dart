@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/barchart/anotherbarchart.dart';
-import '../symptomsdescriptions.dart'; 
+import '../illnessdescriptions.dart'; 
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/akar_icons.dart';
 
@@ -19,9 +19,9 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
   bool _isNavigating = false;
 
 
-
-  void _showThresholdIllnessesDialog() {
+void _showThresholdIllnessesDialog() {
   const double threshold = 0.02;
+
   final filtered = widget.allDiagnoses.where((ill) {
     final prob = (ill['confidence_softmax'] as num? ?? 0).toDouble();
     return prob >= threshold;
@@ -32,64 +32,141 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
     builder: (_) => AlertDialog(
       title: const Text(
         'Possible Illnesses',
-        style:  TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: double.maxFinite,
         child: filtered.isEmpty
-          ? const Text('No illnesses meet that threshold.')
-          : ListView.builder(
-              shrinkWrap: true,
-              itemCount: filtered.length,
-              itemBuilder: (_, i) {
-                final ill = filtered[i];
-                final name = ill['illness'] as String? ?? 'Unknown';
-                final prob = (ill['confidence_softmax'] as num).toDouble();
-                return ListTile(
-                  title: Text(name),
-                  subtitle: Text('${(prob * 100).toStringAsFixed(1)}%'),
-                );
-              },
-            ),
+            ? const Text('No illnesses meet that threshold.')
+            : ListView.builder(
+                shrinkWrap: true,
+                itemCount: filtered.length,
+                itemBuilder: (_, i) {
+                  final ill = filtered[i];
+                  final name = ill['illness'] as String? ?? 'Unknown';
+                  final prob =
+                      (ill['confidence_softmax'] as num?)?.toDouble() ?? 0.0;
+
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 10.h),
+                    padding: EdgeInsets.all(12.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.sp,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          "Probability: ${(prob * 100).toStringAsFixed(1)}%",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: const Color.fromARGB(
+                                              191, 41, 168, 210),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
       ],
     ),
   );
 }
 
-
   
   void _showAllIllnessesDialog() {
-    final diagnoses = widget.allDiagnoses;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('All Diagnosed Illnesses', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: diagnoses.length,
-            itemBuilder: (_, i) {
-              final ill = diagnoses[i];
-              final name = ill['illness'] as String? ?? 'Unknown';
-              final prob = (ill['confidence_softmax'] as num? ?? 0).toDouble();
-              return ListTile(
-                title: Text(name),
-                subtitle: Text('${(prob * 100).toStringAsFixed(1)}%'),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))
-        ],
+  final diagnoses = widget.allDiagnoses;
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text(
+        'All Diagnosed Illnesses',
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
-    );
-  }
-  
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: diagnoses.length,
+          itemBuilder: (_, i) {
+            final ill = diagnoses[i];
+            final name = ill['illness'] as String? ?? 'Unknown';
+            final prob = (ill['confidence_softmax'] as num? ?? 0).toDouble();
+
+            return Container(
+              margin: EdgeInsets.only(bottom: 10.h),
+              padding: EdgeInsets.all(12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5.r),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "Probability: ${(prob * 100).toStringAsFixed(1)}%",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color.fromARGB(191, 41, 168, 210),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        )
+      ],
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +304,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
          
           decoration: BoxDecoration(
             color: Colors.blueGrey,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(5.r),
             boxShadow: [
             BoxShadow(
               color: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.1), // Shadow color with opacity
@@ -273,7 +350,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
     height: 60.h,
     decoration: BoxDecoration(
       color: Colors.blueGrey,
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(5.r),
       boxShadow: [
         BoxShadow(
           color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.1),
@@ -298,7 +375,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
             SizedBox(width: 10.w),
             Expanded(
               child: Baseline(
-                baseline: 25.sp,
+                baseline: 18.sp,
                 baselineType: TextBaseline.alphabetic,
                 child: Text.rich(
                   TextSpan(
@@ -309,7 +386,7 @@ class HistoryIllnessdetailsScreenState extends State<HistoryIllnessdetailsScreen
                     children: [
                       TextSpan(
                         text: "Probability: ${(softmaxProb * 100).toStringAsFixed(2)}%",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold,),
                       ),
                       TextSpan(
                         text: " ( Top Ranked out of $totalIllnesses Illnesses )",

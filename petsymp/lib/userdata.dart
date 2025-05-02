@@ -109,8 +109,10 @@ class UserData with ChangeNotifier {
     _petImage = imageUrl;
     notifyListeners();
   }
+  
   void setSelectedPetType(String type) {
     _selectedPetType = type;
+     loadSymptomQuestions();
     notifyListeners();
   }
 
@@ -202,18 +204,30 @@ void removePendingSymptom(String symptom) {
   notifyListeners();
 }
 
-  final Map<String, dynamic> _symptomQuestions = symptomQuestions;
+  late Map<String, dynamic> _symptomQuestions;
   List<String> getPredefinedSymptoms() => _symptomQuestions.keys.toList();
   void setSymptomDetails(Map<String, List<Map<String, dynamic>>> details) {
     _symptomDetails = details;
     notifyListeners();
   }
 
+
+  void loadSymptomQuestions() {
+  if (_selectedPetType.toLowerCase() == 'dog') {
+    _symptomQuestions = symptomQuestionsDog;
+  } else if (_selectedPetType.toLowerCase() == 'cat') {
+    _symptomQuestions = symptomQuestionsCat;
+  } else {
+    _symptomQuestions = {}; // fallback
+  }
+}
+
+
   void updateQuestions() {
   final key = _selectedSymptom.toLowerCase();
   final petType = selectedPetType;
   final Map<String, dynamic> petSymptoms = {
-    ...symptomQuestions,
+    // ...symptomQuestions,
     if (petType == 'Dog') ...symptomQuestionsDog,
     if (petType == 'Cat') ...symptomQuestionsCat,
   };

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/barchart/anotherbarchart.dart';
 import '../userdata.dart';
 import 'package:provider/provider.dart';
-import '../symptomsdescriptions.dart'; // Contains your illnessInformation map.
+import '../illnessdescriptions.dart'; // Contains your illnessInformation map.
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/akar_icons.dart';
 
@@ -78,18 +78,16 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
                 left: 8.w,
                 right: 8.w,
               ),
-              child: 
-                  Center(child:
-                  Text(
-                    "Illness Information",
-                    style: TextStyle(
-                      fontSize: 25.sp,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Oswald',
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                    ),
-                  )),
-               
+              child: Center(
+                  child: Text(
+                "Illness Information",
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Oswald',
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                ),
+              )),
             ),
 
             Padding(
@@ -179,219 +177,289 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
               padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 50.h),
               child: Column(children: [
                 GestureDetector(
-                    onTap: () {
-                      final List<Map<String, dynamic>> allDiagnoses =
-                          Provider.of<UserData>(context, listen: false)
-                              .diagnosisResults;
-                      final List<Map<String, dynamic>> filteredDiagnoses =
-                          allDiagnoses
-                              .where((d) =>
-                                  ((d['confidence_softmax'] as num?)
-                                          ?.toDouble() ??
-                                      0.0) >=
-                                  0.02)
-                              .toList();
+                  onTap: () {
+                    final List<Map<String, dynamic>> allDiagnoses =
+                        Provider.of<UserData>(context, listen: false)
+                            .diagnosisResults;
 
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text(
-                              'Possible Illnesses',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: filteredDiagnoses.length,
-                                itemBuilder: (context, index) {
-                                  final diagnosis = filteredDiagnoses[index];
-                                  final illnessName =
-                                      diagnosis['illness'] ?? 'Unknown Illness';
-                                  final probability =
-                                      (diagnosis['confidence_softmax'] as num?)
-                                              ?.toDouble() ??
-                                          0.0;
+                    final List<Map<String, dynamic>> filteredDiagnoses =
+                        allDiagnoses
+                            .where((d) =>
+                                ((d['confidence_softmax'] as num?)
+                                        ?.toDouble() ??
+                                    0.0) >=
+                                0.02)
+                            .toList();
 
-                                  return ListTile(
-                                    title: Text(illnessName),
-                                    subtitle: Text(
-                                        "Probability: ${(probability * 100).toStringAsFixed(2)}%"),
-                                  );
-                                },
-                              ),
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'Possible Illnesses',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filteredDiagnoses.length,
+                              itemBuilder: (context, index) {
+                                final diagnosis = filteredDiagnoses[index];
+                                final illnessName =
+                                    diagnosis['illness'] ?? 'Unknown Illness';
+                                final probability =
+                                    (diagnosis['confidence_softmax'] as num?)
+                                            ?.toDouble() ??
+                                        0.0;
+
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 10.h),
+                                  padding: EdgeInsets.all(12.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5.r),
+                                    boxShadow:const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        illnessName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.sp,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        "Probability: ${(probability * 100).toStringAsFixed(2)}%",
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: const Color.fromARGB(
+                                              191, 41, 168, 210),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Close'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                        height: 60.h,
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey,
-                          borderRadius: BorderRadius.circular(10.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 255, 255, 255)
-                                  .withValues(
-                                      alpha: 0.1), // Shadow color with opacity
-                              blurRadius: 12, // Soften the shadow
-                              spreadRadius: 2, // Extend the shadow
-                              offset: Offset(0, 0), // Shadow position (x, y)
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
                             ),
                           ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      borderRadius: BorderRadius.circular(10.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 255, 255, 255)
+                              .withAlpha(25),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                          offset: Offset(0, 0),
                         ),
-                        child: Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.lightbulb_circle_outlined,
-                                      color: const Color.fromARGB(
-                                          255, 203, 211, 219),
-                                      size: 24.0.sp,
-                                    ),
-                                    SizedBox(width: 10.w),
-                                    Text.rich(
-                                      TextSpan(
-                                        style: TextStyle(
-                                          color: const Color.fromARGB(
-                                              255, 203, 211, 219),
-                                          fontSize: 15.sp,
-                                        ),
-                                        children: const [
-                                          TextSpan(
-                                              text: "Most Probable Diagnosis",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold)),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ))))),
+                      ],
+                    ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.lightbulb_circle_outlined,
+                              color: const Color.fromARGB(255, 203, 211, 219),
+                              size: 24.0.sp,
+                            ),
+                            SizedBox(width: 10.w),
+                            Text.rich(
+                              TextSpan(
+                                style: TextStyle(
+                                  color:
+                                      const Color.fromARGB(255, 203, 211, 219),
+                                  fontSize: 15.sp,
+                                ),
+                                children: const [
+                                  TextSpan(
+                                    text: "Most Probable Diagnosis",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 30.h,
                 ),
                 GestureDetector(
-                    onTap: () {
-                      final List<Map<String, dynamic>> allDiagnoses =
-                          Provider.of<UserData>(context, listen: false)
-                              .diagnosisResults;
+                  onTap: () {
+                    final List<Map<String, dynamic>> allDiagnoses =
+                        Provider.of<UserData>(context, listen: false)
+                            .diagnosisResults;
 
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text(
-                              'All Diagnosed Illnesses',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: allDiagnoses.length,
-                                itemBuilder: (context, index) {
-                                  final diagnosis = allDiagnoses[index];
-                                  final illnessName =
-                                      diagnosis['illness'] ?? 'Unknown Illness';
-                                  final probability =
-                                      (diagnosis['confidence_softmax'] as num?)
-                                              ?.toDouble() ??
-                                          0.0;
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'All Diagnosed Illnesses',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: allDiagnoses.length,
+                              itemBuilder: (context, index) {
+                                final diagnosis = allDiagnoses[index];
+                                final illnessName =
+                                    diagnosis['illness'] ?? 'Unknown Illness';
+                                final probability =
+                                    (diagnosis['confidence_softmax'] as num?)
+                                            ?.toDouble() ??
+                                        0.0;
 
-                                  return ListTile(
-                                    title: Text(illnessName),
-                                    subtitle: Text(
-                                        "Probability: ${(probability * 100).toStringAsFixed(2)}%"),
-                                  );
-                                },
-                              ),
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 10.h),
+                                  padding: EdgeInsets.all(12.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5.r),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        illnessName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.sp,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        "Probability: ${(probability * 100).toStringAsFixed(2)}%",
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: const Color.fromARGB(
+                                              191, 41, 168, 210),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Close'),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      borderRadius: BorderRadius.circular(10.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 255, 255, 255)
+                              .withAlpha(25),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                          offset: Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Iconify(
+                              AkarIcons.statistic_up,
+                              size: 24.0.sp,
+                              color: const Color.fromARGB(255, 203, 211, 219),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: Baseline(
+                                baseline: 25.sp,
+                                baselineType: TextBaseline.alphabetic,
+                                child: Text.rich(
+                                  TextSpan(
+                                    style: TextStyle(
+                                      color: const Color.fromARGB(
+                                          255, 203, 211, 219),
+                                      fontSize: 15.sp,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                            "Probability: ${(softmaxProb * 100).toStringAsFixed(2)}%",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            " ( Top Ranked out of $totalIllnesses Illnesses )",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                ),
                               ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                        height: 60.h,
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey,
-                          borderRadius: BorderRadius.circular(10.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 255, 255, 255)
-                                  .withValues(
-                                      alpha: 0.1), // Shadow color with opacity
-                              blurRadius: 12, // Soften the shadow
-                              spreadRadius: 2, // Extend the shadow
-                              offset: Offset(0, 0), // Shadow position (x, y)
                             ),
                           ],
                         ),
-                        child: Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Iconify(
-                                      AkarIcons.statistic_up,
-                                      size: 24.0.sp,
-                                      color: const Color.fromARGB(
-                                          255, 203, 211, 219),
-                                    ),
-                                    SizedBox(width: 10.w),
-                                    Expanded(
-                                      child: Baseline(
-                                        baseline: 25.sp,
-                                        baselineType: TextBaseline.alphabetic,
-                                        child: Text.rich(
-                                          TextSpan(
-                                            style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 203, 211, 219),
-                                              fontSize: 15.sp,
-                                            ),
-                                            children: [
-                                              TextSpan(
-                                                text:
-                                                    "Probability: ${(softmaxProb * 100).toStringAsFixed(2)}%",
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              TextSpan(
-                                                text:
-                                                    " ( Top Ranked out of $totalIllnesses Illnesses )",
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          softWrap: true,
-                                          overflow: TextOverflow.visible,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ))))),
+                      ),
+                    ),
+                  ),
+                )
               ]),
             ),
 

@@ -62,6 +62,17 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     });
   }
 
+
+    String _capitalizeEachWord(String text) {
+  return text
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? word[0].toUpperCase() + word.substring(1)
+          : '')
+      .join(' ');
+}
+
+
   @override
   Widget build(BuildContext context) {
     // Screen dimensions.
@@ -71,7 +82,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     final petType = userData.selectedPetType;
 
     final Map<String, dynamic> petSymptoms = {
-      ...symptomQuestions,
+      // ...symptomQuestions,
       if(petType == 'Dog') ...symptomQuestionsDog,
       if(petType == 'Cat') ...symptomQuestionsCat,
     };
@@ -388,7 +399,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
-                          "Symptoms: ${candidateSymptom[0].toUpperCase()}${candidateSymptom.substring(1)}",
+                          "Symptoms: ${_capitalizeEachWord(candidateSymptom)}",
                           style: TextStyle(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
@@ -401,7 +412,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                   // Selectable symptom list.
                   Expanded(
                     child: ListView.builder(
-                      padding: EdgeInsets.fromLTRB(screenWidth * 0.05, 5.h, screenWidth * 0.05, 80.h),
+                      padding: EdgeInsets.fromLTRB(screenWidth * 0.07, 5.h, screenWidth * 0.07, 80.h),
                       itemCount: symptomList.length,
                       itemBuilder: (context, index) {
                         final symptom = symptomList[index];
@@ -471,7 +482,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
         children: [
           // Symptom title.
           Text(
-            title[0].toUpperCase() + title.substring(1),
+            _capitalizeEachWord(title),
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -499,7 +510,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
 
                   if (userData.questions.isEmpty) {
                     // 🔵 No follow-up → instantly add to pending + go to next screen
-                    userData.addPendingSymptom(title);
+                    userData.addPendingSymptom(title, source: 'auto');
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const AnothersympScreen()),

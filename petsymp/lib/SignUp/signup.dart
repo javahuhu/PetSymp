@@ -177,7 +177,7 @@ class SignupScreenState extends State<SignupScreen> {
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFE8F2F5),
       body: Stack(
         children: [
@@ -225,241 +225,234 @@ class SignupScreenState extends State<SignupScreen> {
           // Rounded container for input fields and button
           Positioned(
             bottom: 0,
+            left: 0,
+            right: 0,
+             
             child: Container(
-              width: 1.0.sw,
-              height: 0.65.sh,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(29, 29, 44, 1.0),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40.r),
-                  topRight: Radius.circular(40.r),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: 46.h, // Add more space at the top
-                  left: 8.w,
-                  right: 8.w,
-                ),
+  height: 528.h, // Fixed scrollable height
+  decoration: BoxDecoration(
+    color: const Color.fromRGBO(29, 29, 44, 1.0),
+    borderRadius: BorderRadius.only(
+      topLeft: Radius.circular(40.r),
+      topRight: Radius.circular(40.r),
+    ),
+  ),
+  child: SafeArea(
+    top: false,
+    child: SingleChildScrollView(
+      padding: EdgeInsets.only(
+        top: 46.h,
+        left: 8.w,
+        right: 8.w,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 0.h,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: 450.h,
+          maxHeight: 450.h,
+        ),
+        child: IntrinsicHeight(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Form(
+                key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          // Username Input
-                          SizedBox(
-                            width: 0.8
-                                .sw, // Adjust width dynamically (85% of screen width)
-                            child: TextFormField(
-                              controller: _usernameController,
-                              autofillHints: const [AutofillHints.name],
-                              inputFormatters: [
-                                FirstLetterUpperCaseTextFormatter(),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'[0-9]')),
-                              ],
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor:
-                                    const Color.fromARGB(255, 255, 255, 255),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      10.r), // Scaled radius
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromARGB(255, 255, 255,
-                                        255), // Border color when not focused
-                                    width: 2.0, // Thickness when not focused
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(82, 170, 164,
-                                        1), // Border color when focused
-                                    width: 3.0, // Thickness when focused
-                                  ),
-                                ),
-                                hintText: 'Username',
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 15.h,
-                                  horizontal: 15.w,
-                                ),
-                                suffixIcon: _usernameController.text.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () {
-                                          _usernameController
-                                              .clear(); // Clear the input
-                                          setState(
-                                              () {}); // Trigger a rebuild to hide the icon
-                                        },
-                                      )
-                                    : null,
-                              ),
-                              onChanged: (value) {
-                                setState(
-                                    () {}); // Trigger a rebuild to show/hide the clear icon
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your username';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-
-                          SizedBox(height: 15.h),
-
-                          // Email Input
-                          SizedBox(
-                            width: 0.8.sw, // Adjust width dynamically
-                            child: TextFormField(
-                              controller: _emailController,
-                              autofillHints: const [AutofillHints.email],
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor:
-                                    const Color.fromARGB(255, 255, 255, 255),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    width: 2.0,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: Color.fromRGBO(82, 170, 164, 1),
-                                    width: 3.0,
-                                  ),
-                                ),
-                                hintText: 'Email',
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 15.h,
-                                  horizontal: 15.w,
-                                ),
-                                suffixIcon: _emailController.text.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () {
-                                          _emailController.clear();
-                                          setState(() {});
-                                        },
-                                      )
-                                    : null,
-                              ),
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your email';
-                                }
-                                if (!value.contains('@') ||
-                                    !value.contains('.')) {
-                                  return 'Invalid Email';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-
-                          SizedBox(height: 15.h),
-
-                          // Password Input
-                          SizedBox(
-                            width: 0.8.sw, // Adjust width dynamically
-                            child: _buildPasswordField(
-                              controller: _passwordController,
-                              hintText: 'Password',
-                              isPasswordVisible: _isPasswordVisible,
-                              onVisibilityToggle: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your password';
-                                }
-                                if (value.length < 8) {
-                                  return 'Password must be at least 8 characters';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-
-                          SizedBox(height: 15.h),
-
-                          // Confirm Password Input
-                          SizedBox(
-                            width: 0.8.sw, // Adjust width dynamically
-                            child: _buildPasswordField(
-                              controller: _confirmPass,
-                              hintText: 'Confirm Password',
-                              isPasswordVisible: _isConfirmPasswordVisible,
-                              onVisibilityToggle: () {
-                                setState(() {
-                                  _isConfirmPasswordVisible =
-                                      !_isConfirmPasswordVisible;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please confirm your password';
-                                }
-                                if (value != _passwordController.text) {
-                                  return 'Passwords do not match';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
+                    // Username Field
+                    SizedBox(
+                      width: 0.8.sw,
+                      child: TextFormField(
+                        controller: _usernameController,
+                        autofillHints: const [AutofillHints.name],
+                        inputFormatters: [
+                          FirstLetterUpperCaseTextFormatter(),
+                          FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
                         ],
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide:
+                                const BorderSide(color: Colors.white, width: 2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(82, 170, 164, 1),
+                              width: 3,
+                            ),
+                          ),
+                          hintText: 'Username',
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 15.h, horizontal: 15.w),
+                          suffixIcon: _usernameController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _usernameController.clear();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your username';
+                          }
+                          return null;
+                        },
                       ),
                     ),
-                    SizedBox(height: 40.h),
-                     ElevatedButton(
-                            onPressed: _signUpUser,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromRGBO(82, 170, 164, 1),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              fixedSize: Size(0.8.sw, 0.069.sh),
+
+                    SizedBox(height: 15.h),
+
+                    // Email Field
+                    SizedBox(
+                      width: 0.8.sw,
+                      child: TextFormField(
+                        controller: _emailController,
+                        autofillHints: const [AutofillHints.email],
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide:
+                                const BorderSide(color: Colors.white, width: 2),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(82, 170, 164, 1),
+                              width: 3,
                             ),
-                            child: Text(
-                              "Sign Up",
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
+                          ),
+                          hintText: 'Email',
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 15.h, horizontal: 15.w),
+                          suffixIcon: _emailController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _emailController.clear();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!value.contains('@') || !value.contains('.')) {
+                            return 'Invalid Email';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 15.h),
+
+                    // Password Field
+                    SizedBox(
+                      width: 0.8.sw,
+                      child: _buildPasswordField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        isPasswordVisible: _isPasswordVisible,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          if (value.length < 8) {
+                            return 'Password must be at least 8 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 15.h),
+
+                    // Confirm Password Field
+                    SizedBox(
+                      width: 0.8.sw,
+                      child: _buildPasswordField(
+                        controller: _confirmPass,
+                        hintText: 'Confirm Password',
+                        isPasswordVisible: _isConfirmPasswordVisible,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm your password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
+
+              SizedBox(height: 40.h),
+
+              // Sign Up Button
+              ElevatedButton(
+                onPressed: _signUpUser,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  fixedSize: Size(0.8.sw, 0.069.sh),
+                ),
+                child: Text(
+                  "Sign Up",
+                  style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ),
+),
+
           ),
 
           Positioned(
-            top: lerpDouble(122.h, -690.h, keyboardHeight / screenHeight) ??
-                124.h, // Adjust height dynamically
+            top: 122.h,// Adjust height dynamically
             left: (1.sw - 0.85.sw) / 2, // Center horizontally
             child: Container(
               height: 0.2.sh, // Adjust height dynamically

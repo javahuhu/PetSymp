@@ -117,6 +117,15 @@ class _QoneScreenState extends State<QoneScreen>
     });
   }
 
+  String _capitalizeEachWord(String text) {
+  return text.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1);
+  }).join(' ');
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     final String questionText = (widget.questions.isNotEmpty &&
@@ -183,13 +192,14 @@ class _QoneScreenState extends State<QoneScreen>
                       padding:
                           EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                       child: Text(
-                        "About the ${widget.symptom}",
-                        style: TextStyle(
-                          fontSize: 25.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromRGBO(29, 29, 44, 1.0),
-                        ),
+                      "About the ${_capitalizeEachWord(widget.symptom)}",
+                      style: TextStyle(
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromRGBO(29, 29, 44, 1.0),
                       ),
+                    ),
+
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -277,13 +287,14 @@ class _QoneScreenState extends State<QoneScreen>
                                   EdgeInsets.symmetric(vertical: 12.h),
                                 ),
                               ),
-                              child: Text(
-                                currentChoices[index],
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              child:  Text(
+                              _capitalizeEachWord(currentChoices[index]),
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+
                             ),
                           ),
                         );

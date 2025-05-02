@@ -8,7 +8,7 @@ import '../userdata.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../barchart/barfirebasegraph.dart';
 import 'historyillnessdetails.dart';
-import 'package:petsymp/symptomsdescriptions.dart';
+import 'package:petsymp/illnessdescriptions.dart';
 
 class ViewhistoryScreen extends StatefulWidget {
   final Map<String, dynamic> historyData; // Data passed from the history card
