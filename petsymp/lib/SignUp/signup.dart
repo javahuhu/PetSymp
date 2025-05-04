@@ -56,73 +56,100 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _signUpUser() async {
-    try {
-      if (!_formKey.currentState!.validate()) return;
+  try {
+    if (!_formKey.currentState!.validate()) return;
 
-      setState(() => _isLoading = true); // 👈 Add this line when starting
+    setState(() => _isLoading = true);
 
-      // Username check
-      QuerySnapshot query = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("Username", isEqualTo: _usernameController.text.trim())
-          .get();
+    // 🔍 Check if username already exists in Firestore
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection("Users")
+        .where("Username", isEqualTo: _usernameController.text.trim())
+        .get();
 
-      if (query.docs.isNotEmpty) {
-        Fluttertoast.showToast(
-          msg: "Username is already used",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
-        setState(
-            () => _isLoading = false); // 👈 Stop loading if username exists
-        return;
-      }
+    if (query.docs.isNotEmpty) {
+      Fluttertoast.showToast(
+        msg: "Username is already used choose",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      setState(() => _isLoading = false);
+      return;
+    }
 
-      // Create user
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+   
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    if (userCredential.user != null) {
+      String userId = userCredential.user!.uid;
+
+      await FirebaseFirestore.instance.collection("Users").doc(userId).set({
+        "Username": _usernameController.text.trim(),
+        "Email": _emailController.text.trim(),
+        "CreatedTime": Timestamp.now(),
+      });
+
+      Fluttertoast.showToast(
+        msg: "Account Successfully Created",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
+        textColor: Colors.white,
       );
 
-      if (userCredential.user != null) {
-        String userId = userCredential.user!.uid;
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() => _isLoading = false);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
+      );
+    }
+  } on FirebaseAuthException catch (e) {
+    setState(() => _isLoading = false);
 
-        await FirebaseFirestore.instance.collection("Users").doc(userId).set({
-          "Username": _usernameController.text.trim(),
-          "Email": _emailController.text.trim(),
-          "CreatedTime": Timestamp.now(),
-        });
-
-        Fluttertoast.showToast(
-          msg: "Account Successfully Created",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          backgroundColor: const Color.fromRGBO(82, 170, 164, 1),
-          textColor: Colors.white,
-        );
-
-        await Future.delayed(const Duration(seconds: 1));
-        setState(() => _isLoading = false); // 👈 Stop loading before navigating
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginaccountScreen()),
-        );
-      }
-    } catch (e) {
-      print("Signup Error: $e");
+    if (e.code == 'email-already-in-use choose another email') {
       Fluttertoast.showToast(
-        msg: "Error: ${e.toString()}",
+        msg: "Email is already in use.",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
-      setState(() => _isLoading = false); // 👈 Stop loading on error
+    } else if (e.code == 'invalid-email') {
+      Fluttertoast.showToast(
+        msg: "Invalid email format.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Signup Error: ${e.message}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
+  } catch (e) {
+    setState(() => _isLoading = false);
+    Fluttertoast.showToast(
+      msg: "Unexpected error: ${e.toString()}",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+    );
   }
+}
+
 
   Widget _buildPasswordField({
     required TextEditingController controller,
@@ -198,13 +225,13 @@ class SignupScreenState extends State<SignupScreen> {
                 elevation: WidgetStateProperty.all(0),
                 shadowColor: WidgetStateProperty.all(Colors.transparent),
                 overlayColor: WidgetStateProperty.all(
-                    Colors.transparent), // 👈 removes ripple/splash
+                    Colors.transparent), 
               ),
             ),
           ),
-          //
+          
 
-          //Logo at the top
+          
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -222,14 +249,14 @@ class SignupScreenState extends State<SignupScreen> {
               ),
             ],
           ),
-          // Rounded container for input fields and button
+          
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
              
             child: Container(
-  height: 528.h, // Fixed scrollable height
+  height: 528.h, 
   decoration: BoxDecoration(
     color: const Color.fromRGBO(29, 29, 44, 1.0),
     borderRadius: BorderRadius.only(

@@ -156,7 +156,7 @@ void initState() {
         child: SafeArea(
           child: Column(
             children: [
-              // Back button and header.
+              
               SizedBox(
                 height: 60.h,
                 child: Padding(
@@ -198,7 +198,7 @@ void initState() {
                 ),
               ),
               SizedBox(height: 10.h),
-              // Scrollable list of symptom cards.
+              
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.fromLTRB(screenWidth * 0.07, 5.h, screenWidth * 0.07, 80.h),

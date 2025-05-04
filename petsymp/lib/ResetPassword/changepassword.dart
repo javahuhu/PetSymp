@@ -22,7 +22,6 @@ class ChangepasswordScreenState extends State<ChangepasswordScreen> {
   bool _isConfirmPasswordVisible = false;
   bool _isUpdating = false;
 
-  // Your backend URL for resetting password
   final String resetPasswordURL = AppConfig.resetPassURL;
 
   Future<void> _updatePassword() async {

@@ -125,7 +125,7 @@ class UserPetScreenState extends State<UserPetScreen>
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
     final history = userData.history;
-    // Compute items only from history. When no history is available, items is an empty list.
+  
     final List<Map<String, dynamic>> items = history.isNotEmpty
         ? history
             .where((entry) => entry['petType'] == userData.selectedPetType)
@@ -144,7 +144,7 @@ class UserPetScreenState extends State<UserPetScreen>
             .toList()
         : [];
     final bool hasItems = items.isNotEmpty;
-    // Use primaryColor from items (if available), otherwise a default color.
+  
     final Color primaryColor = hasItems
         ? (items.firstWhere(
                     (pet) => pet['name'] == _selectedPet,
@@ -223,7 +223,6 @@ class UserPetScreenState extends State<UserPetScreen>
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
               child: Row(
                 children: [
-                  // "New" Button – always enabled.
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _navigateToNewPetScreen,

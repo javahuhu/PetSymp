@@ -62,7 +62,7 @@ class SettingscreenState extends State<Settingscreen> {
               // Second Group
               _buildCardContainer([
                 _buildInputCard("img4", "Edit Profile"),
-                _buildInputCard("img5", "History"),
+                _buildInputCard("img5", "Pet Account"),
                 _buildInputCard("img6", "Log out", isLast: true),
               ]),
             ],

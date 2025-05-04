@@ -535,7 +535,7 @@ void navigateToNextPage() async {
                                       return 'Only letters are allowed';
                                     }
                                   
-                                  // Only check for commas or plus signs
+                                  
                                   if (value.contains(',') || value.contains('+')) {
                                     return 'Please enter only one symptom at a time';
                                   }
@@ -544,7 +544,7 @@ void navigateToNextPage() async {
                                   
                                   final inputLower = value.trim().toLowerCase();
 
-                                  // Check if it's in the list of predefined symptoms
+                                  
                                   final petType = userData.selectedPetType;
                                   final Map<String, dynamic> petSymptoms = {
                                     // ...symptomQuestions,
@@ -561,7 +561,7 @@ void navigateToNextPage() async {
                                 },
                               ),
                             ),
-                            // Suggested Symptoms List - Only show when _showSuggestions is true
+                            
                             if (_showSuggestions)
                               Container(
                                 width: screenWidth * 0.8,

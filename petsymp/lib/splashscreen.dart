@@ -39,19 +39,19 @@ class _SplashScreenState extends State<SplashScreen> {
   child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      // Logo Image (Adjusts with screen size)
+   
       Image.asset(
         'assets/logo.png',
-        width: screenWidth * 0.7,  // Adjust 70% of screen width
-        height: screenHeight * 0.4, // Adjust height based on screen
+        width: screenWidth * 0.7,  
+        height: screenHeight * 0.4, 
       ),
 
-      // Spacer to push progress indicator down dynamically
+      
       const Spacer(),
 
-      // Circular Progress Indicator - Responsive
+    
       SizedBox(
-        width: screenWidth * 0.12, // Make progress indicator responsive
+        width: screenWidth * 0.12, 
         height: screenWidth * 0.12,
         child: const CircularProgressIndicator(
           strokeWidth: 4, // Responsive thickness
@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
 
-      // Spacer to balance layout and avoid bottom overflow
+      
       SizedBox(height: screenHeight * 0.02), 
     ],
   ),

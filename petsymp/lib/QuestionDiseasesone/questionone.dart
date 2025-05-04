@@ -118,13 +118,11 @@ class _QoneScreenState extends State<QoneScreen>
   }
 
   String _capitalizeEachWord(String text) {
-  return text.split(' ').map((word) {
-    if (word.isEmpty) return word;
-    return word[0].toUpperCase() + word.substring(1);
-  }).join(' ');
-}
-
-
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,16 +167,20 @@ class _QoneScreenState extends State<QoneScreen>
                 ),
                 label: const Text(''),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
-                  elevation: MaterialStateProperty.all(0), // Changed from WidgetStateProperty
-                  shadowColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
-                  overlayColor: MaterialStateProperty.all(Colors.transparent), // Changed from WidgetStateProperty
+                  backgroundColor: MaterialStateProperty.all(
+                      Colors.transparent), // Changed from WidgetStateProperty
+                  elevation: MaterialStateProperty.all(
+                      0), // Changed from WidgetStateProperty
+                  shadowColor: MaterialStateProperty.all(
+                      Colors.transparent), // Changed from WidgetStateProperty
+                  overlayColor: MaterialStateProperty.all(
+                      Colors.transparent), // Changed from WidgetStateProperty
                 ),
               ),
             ),
 
             Positioned(
-              top: screenHeight * 0.22,
+              top: screenHeight * 0.15,
               left: screenWidth * 0.05,
               right: screenWidth * 0.05,
               child: Column(
@@ -192,14 +194,13 @@ class _QoneScreenState extends State<QoneScreen>
                       padding:
                           EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                       child: Text(
-                      "About the ${_capitalizeEachWord(widget.symptom)}",
-                      style: TextStyle(
-                        fontSize: 25.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromRGBO(29, 29, 44, 1.0),
+                        "About the ${_capitalizeEachWord(widget.symptom)}",
+                        style: TextStyle(
+                          fontSize: 25.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromRGBO(29, 29, 44, 1.0),
+                        ),
                       ),
-                    ),
-
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -214,7 +215,7 @@ class _QoneScreenState extends State<QoneScreen>
                         borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05), 
+                            color: Colors.black.withOpacity(0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -237,73 +238,90 @@ class _QoneScreenState extends State<QoneScreen>
                   ),
                   SizedBox(height: 20.h),
                   if (_buttonsVisible && currentChoices.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: List.generate(currentChoices.length, (index) {
-                        return FadeInUp(
-                          duration: const Duration(milliseconds: 500),
-                          delay: Duration(milliseconds: 1000 + (index * 100)),
-                          from: 30,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 6.h),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                nextQuestion(context, currentChoices[index]);
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith((states) { // Changed from WidgetStateProperty
-                                  if (states.contains(MaterialState.pressed)) { // Changed from WidgetState.pressed
-                                    return const Color.fromARGB(255, 0, 0, 0);
-                                  }
-                                  return Colors.transparent;
-                                }),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith((states) { 
-                                  if (states.contains(MaterialState.pressed)) { 
-                                    return const Color.fromARGB(
-                                        255, 255, 255, 255);
-                                  }
-                                  return const Color.fromRGBO(29, 29, 44, 1.0);
-                                }),
-                                shadowColor:
-                                    MaterialStateProperty.all(Colors.transparent),
-                                side: MaterialStateProperty.all( 
-                                  const BorderSide(
-                                    color: Color.fromRGBO(82, 170, 164, 1),
-                                    width: 2.0,
+                    if (_buttonsVisible && currentChoices.isNotEmpty)
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height * 0.7,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children:
+                                List.generate(currentChoices.length, (index) {
+                              return FadeInUp(
+                                duration: const Duration(milliseconds: 500),
+                                delay: Duration(
+                                    milliseconds: 1000 + (index * 100)),
+                                from: 30,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 6.h),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      nextQuestion(
+                                          context, currentChoices[index]);
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.resolveWith(
+                                              (states) {
+                                        if (states
+                                            .contains(MaterialState.pressed)) {
+                                          return const Color.fromARGB(
+                                              255, 0, 0, 0);
+                                        }
+                                        return Colors.transparent;
+                                      }),
+                                      foregroundColor:
+                                          MaterialStateProperty.resolveWith(
+                                              (states) {
+                                        if (states
+                                            .contains(MaterialState.pressed)) {
+                                          return Colors.white;
+                                        }
+                                        return const Color.fromRGBO(
+                                            29, 29, 44, 1.0);
+                                      }),
+                                      shadowColor: MaterialStateProperty.all(
+                                          Colors.transparent),
+                                      side: MaterialStateProperty.all(
+                                        const BorderSide(
+                                          color:
+                                              Color.fromRGBO(82, 170, 164, 1),
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(100.r)),
+                                        ),
+                                      ),
+                                      fixedSize: MaterialStateProperty.all(
+                                        Size(double.infinity, 55.h),
+                                      ),
+                                      padding: MaterialStateProperty.all(
+                                        EdgeInsets.symmetric(vertical: 12.h),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _capitalizeEachWord(
+                                          currentChoices[index]),
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                shape: MaterialStateProperty.all( 
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(100.r)),
-                                  ),
-                                ),
-                                fixedSize: MaterialStateProperty.all( // Changed from WidgetStateProperty
-                                  Size(double.infinity, 55.h),
-                                ),
-                                padding: MaterialStateProperty.all( // Changed from WidgetStateProperty
-                                  EdgeInsets.symmetric(vertical: 12.h),
-                                ),
-                              ),
-                              child:  Text(
-                              _capitalizeEachWord(currentChoices[index]),
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            ),
+                              );
+                            }),
                           ),
-                        );
-                      }),
-                    ),
+                        ),
+                      ),
                 ],
               ),
             ),
-            
+
             // Floating catalog button.
             Positioned(
               bottom: 100.h,
@@ -333,7 +351,7 @@ class _QoneScreenState extends State<QoneScreen>
                     borderRadius: BorderRadius.circular(100.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1), 
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

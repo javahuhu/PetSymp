@@ -73,7 +73,7 @@ class SymptomDetail {
   }
 }
 
-// Internal chart data model.
+
 class _ChartData {
   _ChartData(this.x, this.y);
   final String x;
@@ -1190,7 +1190,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_fc"]}",
+                                                              '${(scores["confidence_fc"]! * 100).round()}%',
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
@@ -1217,7 +1217,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_gb"]}",
+                                                              '${(scores["confidence_gb"]! * 100).round()}%',
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
@@ -1246,7 +1246,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Text(
-                                                              "${scores["confidence_ab"]}",
+                                                              '${(scores["confidence_ab"]! * 100).round()}%',
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       'Inter')),
@@ -1364,14 +1364,14 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                                         .normal)),
                                                         TextSpan(
                                                             text:
-                                                                " Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,",
+                                                                " Compared to Forward Chaining score of ${((scores["confidence_fc"] ?? 0.0) * 100).round()}%,",
                                                             style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold)),
                                                         TextSpan(
                                                             text:
-                                                                " AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%",
+                                                                " AdaBoost increase the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%",
                                                             style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight

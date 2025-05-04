@@ -17,7 +17,7 @@ class LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // ✅ Background Image (Auto-Scaled)
+        
           Positioned.fill(
             child: Image.asset(
               'assets/catlogin.jpg',
@@ -25,26 +25,25 @@ class LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // ✅ Content Layer (on top of the background)
+        
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ✅ Logo Image (Auto-Scaled)
               Padding(
-                padding: EdgeInsets.only(left: 0.w), // Auto-scaled left padding
+                padding: EdgeInsets.only(left: 0.w), 
                 child: Image.asset(
                   'assets/logo.png',
-                  width: 0.7.sw, // Auto-scale width (70% of screen width)
-                  height: 0.3.sh, // Auto-scale height (30% of screen height)
+                  width: 0.7.sw, 
+                  height: 0.3.sh, 
                 ),
               ),
-              SizedBox(height: 0.161.sh), // Auto-scaled spacing
+              SizedBox(height: 0.161.sh), 
 
               // ✅ Welcome Text (Auto-Scaled)
               Padding(
               padding: EdgeInsets.only(
-                left: 0.05.sw, // Auto-scaled left padding
-               // Adjusts how high the text is (increase for more top)
+                left: 0.05.sw, 
               ),
               child: Text(
                 'Welcome!',
@@ -56,11 +55,11 @@ class LoginScreenState extends State<LoginScreen> {
               ),
             ),
 
-              SizedBox(height: 0.27.sh), // Auto-scaled spacing
+              SizedBox(height: 0.27.sh), 
 
-              SizedBox(height: 0.03.sh), // Auto-scaled spacing
+              SizedBox(height: 0.03.sh), 
 
-              // ✅ Log In Button (Auto-Scaled)
+              
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -82,15 +81,14 @@ class LoginScreenState extends State<LoginScreen> {
                   child: Text(
                     "Log In",
                     style: TextStyle(
-                      fontSize: 22.sp, // Auto-scaled font size
+                      fontSize: 22.sp, 
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 0.01.sh), // Auto-scaled spacing
+              SizedBox(height: 0.01.sh),
 
-              // ✅ Create Account Button (Auto-Scaled)
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -105,14 +103,14 @@ class LoginScreenState extends State<LoginScreen> {
                     backgroundColor: const Color.fromRGBO(66, 134, 130, 1.0),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50.r), // Auto-scaled border radius
+                      borderRadius: BorderRadius.circular(50.r), 
                     ),
-                    fixedSize: Size(0.9.sw, 0.068.sh), // Auto-scaled size
+                    fixedSize: Size(0.9.sw, 0.068.sh), 
                   ),
                   child: Text(
                     "Create your account",
                     style: TextStyle(
-                      fontSize: 22.sp, // Auto-scaled font size
+                      fontSize: 22.sp, 
                       fontWeight: FontWeight.bold,
                     ),
                   ),

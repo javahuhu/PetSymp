@@ -655,9 +655,9 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                             ),
                           ],
                         ),
-                        _buildResultRow("Forward Chaining", scores["confidence_fc"]!, false),
-                        _buildResultRow("Gradient Boosting", scores["confidence_gb"]!, false),
-                        _buildResultRow("AdaBoost", scores["confidence_ab"]!, true),
+                        _buildResultRow("Forward Chaining", ((scores["confidence_fc"] ?? 0.0) * 100).round(), false),
+                        _buildResultRow("Gradient Boosting", ((scores["confidence_gb"] ?? 0.0) * 100).round(), false),
+                        _buildResultRow("AdaBoost", ((scores["confidence_ab"] ?? 0.0) * 100).round(), true),
                       ],
                     ),
                     
@@ -689,14 +689,15 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                           ],
                           border: Border.all(color: Colors.green.shade200),
                         ),
-                        child: Text(
-                          "Final Score: ${scores["confidence_ab"]!.toStringAsFixed(2)}%",
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade700,
-                          ),
-                        ),
+                       child: Text(
+                      "Final Score: ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%",
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade700,
+                      ),
+                    ),
+
                       ),
                     ),
                   ],
@@ -757,7 +758,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "Insight: Compared to Forward Chaining score of ${scores["confidence_fc"]!.toStringAsFixed(2)}%,  AdaBoost increase the confidence to ${scores["confidence_ab"]!.toStringAsFixed(2)}%, by reweighting the symptoms and resolving the overlaps, Making the result more accurate.",
+                        "Insight: Compared to Forward Chaining score of ${((scores["confidence_fc"] ?? 0.0) * 100).round()}%,  AdaBoost increase the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%, by reweighting the symptoms and resolving the overlaps, Making the result more accurate.",
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 12.sp,
@@ -973,7 +974,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
   }
 
   // Enhanced result table row
-  TableRow _buildResultRow(String algorithm, double score, bool isHighlighted) {
+  TableRow _buildResultRow(String algorithm, int score, bool isHighlighted) {
     final Color bgColor = isHighlighted ? Colors.amber.shade50 : Colors.transparent;
     
     return TableRow(
@@ -994,7 +995,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
           padding: const EdgeInsets.all(10.0),
           child: Center(
             child: Text(
-              "${score.toStringAsFixed(2)}%",
+              "${score.toStringAsFixed(0)}%",
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,

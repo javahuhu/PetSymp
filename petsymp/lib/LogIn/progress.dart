@@ -83,10 +83,10 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
           _isAnimating = false;
         });
 
-        // Stop the animation
+        
         _lottieController.stop();
         
-        // Delay navigation to show success state
+       
         Future.delayed(const Duration(milliseconds: 100), () {
           Navigator.pushReplacement(
             context,
@@ -100,7 +100,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
         _isAnimating = false;
       });
 
-      // Stop the animation
+      
       _lottieController.stop();
 
       // Handle Wrong Password
@@ -113,7 +113,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
           textColor: Colors.white,
         );
       }
-      // Handle User Not Found (Email not in Firebase Auth)
+      
       else if (e.code == 'user-not-found') {
         Fluttertoast.showToast(
           msg: "User not found",
@@ -123,7 +123,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
           textColor: Colors.white,
         );
       }
-      // Handle Other FirebaseAuth Errors
+      
       else {
         Fluttertoast.showToast(
           msg: "Login Failed Wrong Username or Password",
@@ -134,7 +134,7 @@ class ProgressScreenState extends State<ProgressScreen> with TickerProviderState
         );
       }
 
-      // Delay navigation to show error state
+      
       Future.delayed(const Duration(milliseconds: 800), () {
         Navigator.pushReplacement(
           context,
