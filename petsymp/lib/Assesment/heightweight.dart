@@ -35,8 +35,10 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTickerProviderStateMixin {
-  bool _isAnimated = false; // Animation toggle // State to track the selected tab
+class MeasureinputScreenState extends State<MeasureinputScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isAnimated =
+      false; // Animation toggle // State to track the selected tab
   late AnimationController _bubbleAnimationController;
 
   @override
@@ -47,7 +49,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
-    
+
     // Trigger the animation after the widget builds
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
@@ -69,13 +71,14 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
       throw Exception('Could not launch $url');
     }
   }
-  
+
   final TextEditingController _sizeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  
+
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
-      Provider.of<UserData>(context, listen: false).setpetSize(_sizeController.text);
+      Provider.of<UserData>(context, listen: false)
+          .setpetSize(_sizeController.text);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const BreedScreen()),
@@ -85,6 +88,11 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
 
   // Function to show the pet size guide modal
   void _showPetSizeGuideModal() {
+    final isCat = Provider.of<UserData>(context, listen: false)
+            .selectedPetType
+            .toLowerCase() ==
+        'cat';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -101,9 +109,10 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
           ),
           child: Column(
             children: [
-              // Header with title and close button
+              // Header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 decoration: const BoxDecoration(
                   color: Color.fromRGBO(66, 134, 129, 0.1),
                   borderRadius: BorderRadius.only(
@@ -115,7 +124,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Pet Size Guide",
+                      isCat ? "Cat Size Guide" : "Dog Size Guide",
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
@@ -132,63 +141,64 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                   ],
                 ),
               ),
-              // Content area with size examples
+
+              // Size examples
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Common pet size classifications:",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromRGBO(66, 134, 129, 1.0),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      
-                      // Small size
-                      _buildSizeInfoRow(
-                        "Small",
-                        "Up to 20 pounds (9 kg)",
-                        "Examples: Chihuahua, Pomeranian, Toy Poodle, Mini Dachshund",
-                        "smallpet.png",
-                      ),
-                      
-                      const Divider(height: 30),
-                      
-                      // Medium size
-                      _buildSizeInfoRow(
-                        "Medium",
-                        "20-60 pounds (9-27 kg)",
-                        "Examples: Beagle, Cocker Spaniel, Border Collie, Bulldog",
-                        "mediumpet.png",
-                      ),
-                      
-                      const Divider(height: 30),
-                      
-                      // Large size
-                      _buildSizeInfoRow(
-                        "Large",
-                        "60-100 pounds (27-45 kg)",
-                        "Examples: Labrador, Golden Retriever, German Shepherd, Boxer",
-                        "largepet.png",
-                      ),
-                      
-                      const Divider(height: 30),
-                      
-                      // Extra Large size
-                      _buildSizeInfoRow(
-                        "Giant",
-                        "Over 100 pounds (45+ kg)",
-                        "Examples: Great Dane, Saint Bernard, Newfoundland, Mastiff",
-                        "extralargepet.png",
-                      ),
-                      
-                      const SizedBox(height: 20),
-                    ],
+                    children: isCat
+                        ? [
+                            _buildSizeInfoRow(
+                                "Small",
+                                "Up to 5 pounds (2.3 kg)",
+                                "Examples: Singapura, Munchkin, Cornish Rex",
+                                "smallcat.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Medium",
+                                "5–10 pounds (2.3–4.5 kg)",
+                                "Examples: American Shorthair, Burmese",
+                                "mediumcat.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Large",
+                                "10–15 pounds (4.5–6.8 kg)",
+                                "Examples: Ragdoll, Maine Coon",
+                                "largecat.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Giant",
+                                "Over 15 pounds (6.8+ kg)",
+                                "Examples: Savannah Cat, Norwegian Forest Cat",
+                                "giantcat.png"),
+                          ]
+                        : [
+                            _buildSizeInfoRow(
+                                "Small",
+                                "Up to 20 pounds (9 kg)",
+                                "Examples: Chihuahua, Pomeranian, Toy Poodle",
+                                "smallpet.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Medium",
+                                "20–60 pounds (9–27 kg)",
+                                "Examples: Beagle, Bulldog, Cocker Spaniel",
+                                "mediumpet.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Large",
+                                "60–100 pounds (27–45 kg)",
+                                "Examples: Golden Retriever, Boxer",
+                                "largepet.png"),
+                            const Divider(height: 30),
+                            _buildSizeInfoRow(
+                                "Giant",
+                                "Over 100 pounds (45+ kg)",
+                                "Examples: Great Dane, Mastiff",
+                                "extralargepet.png"),
+                          ],
                   ),
                 ),
               ),
@@ -198,9 +208,10 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
       },
     );
   }
-  
+
   // Helper method to build each size info row
-  Widget _buildSizeInfoRow(String size, String weight, String examples, String imageName) {
+  Widget _buildSizeInfoRow(
+      String size, String weight, String examples, String imageName) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -305,14 +316,15 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       height: screenHeight * 0.5,
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(66, 134, 129, 0.07),
-                        borderRadius: BorderRadius.circular(screenHeight * 0.25),
+                        borderRadius:
+                            BorderRadius.circular(screenHeight * 0.25),
                       ),
                     ),
                   );
                 },
               ),
             ),
-            
+
             // Smaller wave-like shape in bottom-right
             Positioned(
               bottom: -screenHeight * 0.1,
@@ -330,14 +342,15 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       height: screenHeight * 0.3,
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(66, 134, 129, 0.08),
-                        borderRadius: BorderRadius.circular(screenHeight * 0.15),
+                        borderRadius:
+                            BorderRadius.circular(screenHeight * 0.15),
                       ),
                     ),
                   );
                 },
               ),
             ),
-            
+
             // Middle-left floating bubble
             Positioned(
               top: screenHeight * 0.45,
@@ -366,7 +379,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                 },
               ),
             ),
-            
+
             // Middle-right small floating circle
             Positioned(
               top: screenHeight * 0.6,
@@ -396,7 +409,7 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                 },
               ),
             ),
-            
+
             // Small dot pattern top-right
             Positioned(
               top: screenHeight * 0.25,
@@ -422,20 +435,22 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                 ),
               ),
             ),
-            
-            
+
             // AnimatedPositioned for Paw Image
             AnimatedPositioned(
               duration: const Duration(seconds: 1),
               curve: Curves.easeInOut,
-              top: _isAnimated ? screenHeight * 0.13 : -100, // From off-screen to final position
+              top: _isAnimated
+                  ? screenHeight * 0.13
+                  : -100, // From off-screen to final position
               left: screenWidth * 0.1,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     width: screenWidth * 0.15, // 15% of screen width
-                    height: screenWidth * 0.15, // Equal height for circular image
+                    height:
+                        screenWidth * 0.15, // Equal height for circular image
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                     ),
@@ -444,32 +459,35 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       fit: BoxFit.contain,
                     ),
                   ),
-                  SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
+                  SizedBox(
+                      width:
+                          screenWidth * 0.05), // Spacing between paw and text
                 ],
               ),
             ),
-            
+
             Positioned(
               top: screenHeight * 0.22, // Text and input below the paw
               left: screenWidth * 0.12,
               right: screenWidth * 0.02,
-              child:  Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   SlideInLeft(
-                          duration:const Duration(milliseconds: 1000),
-                          delay: const Duration(milliseconds: 300),
-                        from: 400,
-                        child: Text(
-                    "What are pet sizes?",
-                    style: TextStyle(
-                      fontSize: 25.sp,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Oswald',
-                      color: const Color.fromRGBO(29, 29, 44, 1.0),
+                  SlideInLeft(
+                    duration: const Duration(milliseconds: 1000),
+                    delay: const Duration(milliseconds: 300),
+                    from: 400,
+                    child: Text(
+                      "What are pet sizes?",
+                      style: TextStyle(
+                        fontSize: 25.sp,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Oswald',
+                        color: const Color.fromRGBO(29, 29, 44, 1.0),
+                      ),
                     ),
-                  ),
-              )],
+                  )
+                ],
               ),
             ),
 
@@ -484,50 +502,64 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                   children: [
                     const SizedBox(height: 10),
                     TextFormField(
-                      controller: _sizeController,
-                      autofillHints: const [AutofillHints.name],
-                      inputFormatters: [
-                        FirstLetterUpperCaseTextFormatter(),
-                        FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                      ],
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(
-                            color: Color.fromRGBO(82, 170, 164, 1), // Border color when not focused
-                            width: 2.0, // Thickness when not focused
+                        controller: _sizeController,
+                        autofillHints: const [AutofillHints.name],
+                        inputFormatters: [
+                          FirstLetterUpperCaseTextFormatter(),
+                          FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                        ],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(82, 170, 164,
+                                  1), // Border color when not focused
+                              width: 2.0, // Thickness when not focused
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(
+                                  72, 38, 163, 1), // Border color when focused
+                              width: 2.0, // Thickness when focused
+                            ),
+                          ),
+                          hintText: 'Enter the Size of the Pet',
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 20.0,
+                            horizontal: 15.0,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: const BorderSide(
-                            color: Color.fromRGBO(72, 38, 163, 1),// Border color when focused
-                            width: 2.0, // Thickness when focused
-                          ),
-                        ),
-                        hintText: 'Enter the Size of the Pet',
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20.0,
-                          horizontal: 15.0,
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter size of the pet';
-                        }
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter size of the pet';
+                          }
 
-                       const validSizes = ["Small", "Medium", "Large", "Giant"];
-                        if (!validSizes.contains(value)) {
-                          return 'Small, Medium, Large, or Giant Only';
-                        }
+                          final cleanedValue = value.trim();
 
+                          // Disallow comma, plus, or space (multiple entries)
+                          if (cleanedValue.contains(',') ||
+                              cleanedValue.contains('+') ||
+                              cleanedValue.contains(' ')) {
+                            return 'Please enter only one size';
+                          }
 
-                        return null;
-                      },
-                    ),
+                          const validSizes = [
+                            "Small",
+                            "Medium",
+                            "Large",
+                            "Giant"
+                          ];
+                          if (!validSizes.contains(cleanedValue)) {
+                            return 'Small, Medium, Large, or Giant Only';
+                          }
+
+                          return null;
+                        }),
                     // New help button text below the TextFormField
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, left: 5.0),
@@ -551,12 +583,14 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
             // Original Next Button - unchanged
             Positioned(
               top: screenHeight * 0.9,
-              right: screenWidth * 0.02, // Adjust dynamically for right alignment
+              right:
+                  screenWidth * 0.02, // Adjust dynamically for right alignment
               child: SlideInUp(
-                duration:const Duration(milliseconds: 1000),
+                duration: const Duration(milliseconds: 1000),
                 delay: const Duration(milliseconds: 300),
                 from: 400,
-                child: SizedBox( // Wrap with SizedBox to ensure correct width
+                child: SizedBox(
+                  // Wrap with SizedBox to ensure correct width
                   width: 100, // Adjust as needed
                   child: ElevatedButton(
                     onPressed: navigateToNextPage,
@@ -565,7 +599,8 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       backgroundColor: WidgetStateProperty.resolveWith(
                         (states) {
                           if (states.contains(WidgetState.pressed)) {
-                            return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
+                            return const Color.fromARGB(
+                                255, 0, 0, 0); // Background color when pressed
                           }
                           return Colors.transparent; // Default background color
                         },
@@ -574,9 +609,11 @@ class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTicke
                       foregroundColor: WidgetStateProperty.resolveWith(
                         (states) {
                           if (states.contains(WidgetState.pressed)) {
-                            return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
+                            return const Color.fromARGB(
+                                255, 255, 255, 255); // Text color when pressed
                           }
-                          return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
+                          return const Color.fromRGBO(
+                              29, 29, 44, 1.0); // Default text color
                         },
                       ),
                       shadowColor: WidgetStateProperty.all(Colors.transparent),

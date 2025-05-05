@@ -711,7 +711,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         petData['petDetails'] is List ? petData['petDetails'] : [];
     final String age = details.length > 2 ? '${details[2]['value']} yrs' : '–';
     final String breed = details.length > 4 ? details[4]['value'] : 'Unknown';
-    final String imageUrl = petData['petImage'] ?? 'assets/sampleimage.jpg';
+    final String imageUrl = petData['petImage'] ?? 'assets/noimagepet.jpg';
     final Timestamp? ts = petData['date'] as Timestamp?;
     final String dateStr =
         ts != null ? DateFormat('MMM d, yyyy').format(ts.toDate()) : '';

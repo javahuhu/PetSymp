@@ -350,6 +350,7 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                               return 'Please enter less than 20 characters';
                             }
 
+                                                                    
 
                             if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
                               return 'Only letters and spaces are allowed';

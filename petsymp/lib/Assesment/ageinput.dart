@@ -497,9 +497,9 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                     
                     // Enhanced increment/decrement buttons
                     Container(
-                      margin: const EdgeInsets.only(top: 20),
+                      margin: const EdgeInsets.only(top: 20, left: 25, right: 25),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           // Decrement button
                           GestureDetector(
@@ -533,6 +533,8 @@ class AgeinputScreenState extends State<AgeinputScreen> with SingleTickerProvide
                               ),
                             ),
                           ),
+
+                          const Spacer(),
                           
                           // Increment button
                           GestureDetector(

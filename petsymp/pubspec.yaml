@@ -66,6 +66,8 @@ dependencies:
   card_swiper: ^3.0.1
   iconify_flutter: ^0.0.7
   animated_text_kit: ^4.2.3
+  carousel_slider: ^5.0.0
+  smooth_page_indicator: ^1.2.1
 
   
 
@@ -100,6 +102,7 @@ flutter:
       - assets/petlogo.png
       - assets/cat.png
       - assets/catanddog.jpg
+      - assets/catlog.jpg
       - assets/logindog.jpg
       - assets/catlogin.jpg
       - assets/facebooklogo.png
@@ -161,10 +164,29 @@ flutter:
       - assets/dotanimation.json
       - assets/catdog.png
       - assets/linebg.png
+      - assets/smilepet.png
+      - assets/catsmile.png
       - assets/imgsymptomcatalog/abdominaldiscomfort.jpg
       - assets/imgsymptomcatalog/abdominalpain.jpg
       - assets/imgsymptomcatalog/abdominalenlargment.jpg
       - assets/noimagepet.jpg
+      - assets/introductionimg/pettype.png
+      - assets/introductionimg/petimage.png
+      - assets/introductionimg/basicinfo.png
+      - assets/introductionimg/symptoms.png
+      - assets/introductionimg/searchsymptoms.png
+      - assets/introductionimg/listsymptoms.png
+      - assets/introductionimg/summary.png
+      - assets/introductionimg/disclaimer.png
+      - assets/introductionimg/saved.png
+      - assets/introductionimg/petprofile.png
+      - assets/introductionimg/illnessinfo.png
+      - assets/introductionimg/petaccount.png
+      - assets/introductionimg/petprofile.png
+      - assets/smallcat.png
+      - assets/mediumcat.png
+      - assets/largecat.png
+      - assets/giantcat.png
 
 
   fonts:
