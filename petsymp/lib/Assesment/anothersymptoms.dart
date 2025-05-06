@@ -16,6 +16,8 @@ class AnothersympScreen extends StatefulWidget {
 class AnothersympScreenState extends State<AnothersympScreen>
     with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
+  bool _isSubmitted = false;
+
   final List<bool> _buttonVisible = [false, false];
   late AnimationController _bubblesController;
   late List<Bubble> _bubbles;
@@ -266,186 +268,186 @@ String _capitalizeEachWord(String text) {
                 SizedBox(
                   height: 50.h,
                 ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                  child: Column(
-                    children: [
-                      // Yes, Add Another Button
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 800),
-                        opacity: _buttonVisible[0] ? 1.0 : 0.0,
-                        child: Container(
-                          width: double.infinity,
-                          height: 55.h,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const MentionsympScreen()),
-                              );
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStateProperty.resolveWith((states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return const Color.fromRGBO(82, 170, 164, 1);
-                                }
-                                return Colors.white.withOpacity(0.9);
-                              }),
-                              foregroundColor:
-                                  WidgetStateProperty.resolveWith((states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return Colors.white;
-                                }
-                                return const Color.fromRGBO(29, 29, 44, 1.0);
-                              }),
-                              shadowColor:
-                                  MaterialStateProperty.all(Colors.transparent),
-                              side: MaterialStateProperty.all(
-                                const BorderSide(
-                                    color: Color.fromRGBO(82, 170, 164, 0.8),
-                                    width: 2.0),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              elevation: MaterialStateProperty.all(0),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Yes, Add Another",
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                if (!_isSubmitted)
+  Container(
+    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+    child: Column(
+      children: [
+        // Yes, Add Another Button
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 800),
+          opacity: _buttonVisible[0] ? 1.0 : 0.0,
+          child: Container(
+            width: double.infinity,
+            height: 55.h,
+            margin: const EdgeInsets.only(bottom: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MentionsympScreen(),
+                  ),
+                );
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromRGBO(82, 170, 164, 1);
+                  }
+                  return Colors.white.withOpacity(0.9);
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return Colors.white;
+                  }
+                  return const Color.fromRGBO(29, 29, 44, 1.0);
+                }),
+                shadowColor:
+                    MaterialStateProperty.all(Colors.transparent),
+                side: MaterialStateProperty.all(
+                  const BorderSide(
+                    color: Color.fromRGBO(82, 170, 164, 0.8),
+                    width: 2.0,
+                  ),
+                ),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                elevation: MaterialStateProperty.all(0),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    "Yes, Add Another",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // No, Get Diagnosis Button
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 800),
+          opacity: _buttonVisible[1] ? 1.0 : 0.0,
+          child: Container(
+            width: double.infinity,
+            height: 55.h,
+            child: ElevatedButton(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    title: const Text("Are you sure?"),
+                    content: const Text(
+                      "Once you proceed, you won't be able to go back and edit previous answers.",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text("Cancel"),
                       ),
-
-                      // No, Get Diagnosis Button
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 800),
-                        opacity: _buttonVisible[1] ? 1.0 : 0.0,
-                        child: Container(
-                          width: double.infinity,
-                          height: 55.h,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  title: const Text("Are you sure?"),
-                                  content: const Text(
-                                      "Once you proceed, you won't be able to go back and edit previous answers."),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text("Cancel"),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromRGBO(
-                                            82, 170, 164, 1),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      child: const Text("Confirm"),
-                                    ),
-                                  ],
-                                ),
-                              );
-
-                              if (confirm != true) return;
-
-                              final userData =
-                                  Provider.of<UserData>(context, listen: false);
-
-                              // Finalize all pending symptoms
-                              for (final sym
-                                  in userData.pendingSymptoms.toList()) {
-                                userData.finalizeSymptom(sym);
-                              }
-
-                              // Send to backend after finalizing
-                              await userData.fetchDiagnosis();
-
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const ReportScreen()),
-                              );
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStateProperty.resolveWith((states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return const Color.fromRGBO(82, 170, 164, 1);
-                                }
-                                return const Color.fromRGBO(82, 170, 164, 0.1);
-                              }),
-                              foregroundColor:
-                                  WidgetStateProperty.resolveWith((states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return Colors.white;
-                                }
-                                return const Color.fromRGBO(29, 29, 44, 1.0);
-                              }),
-                              shadowColor:
-                                  MaterialStateProperty.all(Colors.transparent),
-                              side: MaterialStateProperty.all(
-                                const BorderSide(
-                                    color: Color.fromRGBO(82, 170, 164, 1),
-                                    width: 2.0),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              elevation: MaterialStateProperty.all(0),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.check, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  "No, Get Diagnosis",
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _isSubmitted = true;
+                          });
+                          Navigator.pop(context, true);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromRGBO(82, 170, 164, 1),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        child: const Text("Confirm"),
                       ),
                     ],
                   ),
+                );
+
+                if (confirm != true) return;
+
+                final userData =
+                    Provider.of<UserData>(context, listen: false);
+
+                for (final sym in userData.pendingSymptoms.toList()) {
+                  userData.finalizeSymptom(sym);
+                }
+
+                await userData.fetchDiagnosis();
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ReportScreen()),
+                );
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return const Color.fromRGBO(82, 170, 164, 1);
+                  }
+                  return const Color.fromRGBO(82, 170, 164, 0.1);
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return Colors.white;
+                  }
+                  return const Color.fromRGBO(29, 29, 44, 1.0);
+                }),
+                shadowColor:
+                    MaterialStateProperty.all(Colors.transparent),
+                side: MaterialStateProperty.all(
+                  const BorderSide(
+                    color: Color.fromRGBO(82, 170, 164, 1),
+                    width: 2.0,
+                  ),
                 ),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                elevation: MaterialStateProperty.all(0),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    "No, Get Diagnosis",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+
               ],
             ),
           ),

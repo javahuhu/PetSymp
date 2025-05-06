@@ -1344,7 +1344,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
   Widget _buildTag(String text) {
     return Container(
       width: 170.w,
-      height: 25.h,
+      height: 30.h,
       margin: EdgeInsets.only(right: 10.w),
       padding: EdgeInsets.symmetric(horizontal: 10.w),
       decoration: BoxDecoration(
