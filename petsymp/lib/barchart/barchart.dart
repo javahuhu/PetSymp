@@ -1371,7 +1371,7 @@ class _BarChartSample2State extends State<BarChartSample2> {
                                                                         .bold)),
                                                         TextSpan(
                                                             text:
-                                                                " AdaBoost increase the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%",
+                                                                " AdaBoost adjust the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%",
                                                             style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight

@@ -975,7 +975,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
           'id': petData['id'], // Include document ID for editing
           'petName': petData['petName'] ?? "Unknown",
           'petDetails': updatedPetDetails,
-          'petImage': petData['petImage'] ?? "assets/sampleimage.jpg",
+          'petImage': petData['petImage'] ?? "assets/noimagepet.jpg",
           'petType': petData['petType'] ?? "",
           // Overwrite/assign assessment-specific fields
           'date': assessment['date'] ?? defaultDateStr,
@@ -1883,7 +1883,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                                         .startsWith("http")
                                 ? NetworkImage(widget.petData['petImage'])
                                 : AssetImage(widget.petData['petImage'] ??
-                                    "assets/sampleimage.jpg")) as ImageProvider,
+                                    "assets/noimagepet.jpg")) as ImageProvider,
                         child: Align(
                           alignment: Alignment.bottomRight,
                           child: CircleAvatar(
@@ -2168,7 +2168,7 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
                                   .startsWith("http")
                           ? NetworkImage(widget.petData['petImage'])
                           : AssetImage(widget.petData['petImage'] ??
-                              "assets/sampleimage.jpg") as ImageProvider,
+                              "assets/noimagepet.jpg") as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),

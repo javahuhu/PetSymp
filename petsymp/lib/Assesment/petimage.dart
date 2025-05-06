@@ -271,34 +271,22 @@ class PetimageScreenState extends State<PetimageScreen> {
                   ),
                 ),
                 // Animated image asset.
-               Consumer<UserData>(
-              builder: (context, userData, _) {
-                final isCat = userData.selectedPetType.toLowerCase() == 'cat';
-
-                final String imagePath = isCat ? 'assets/catsmile.png' : 'assets/smilepet.png';
-                final double imageWidth = isCat ? 0.4.sw : 0.4.sw;
-                final double imageHeight = isCat ? 0.38.sh : 0.4.sh;
-                final double imageTop = isCat ? 182.5.h : 182.5.h;
-                final double imageLeft = isCat ? 111.w : 112.w;
-
-                return Positioned(
-                  top: imageTop,
-                  left: imageLeft,
-                  child: SlideInLeft(
-                    duration: const Duration(milliseconds: 1000),
-                    delay: const Duration(milliseconds: 300),
-                    from: 100,
-                    child: Image.asset(
-                      imagePath,
-                      width: imageWidth,
-                      height: imageHeight,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                );
-              },
-            ),
-
+               Positioned(
+               top: 94.h,
+               left: 37.w,
+               child: SlideInLeft(
+                 duration:const Duration(milliseconds: 1000),
+                 delay: const Duration(milliseconds: 300),
+                 from: 100,
+                 child: Image.asset(
+                   "assets/takingpicture.png",
+                   width: 0.8.sw, // Adjust width relative to screen
+                   height: 0.8.sh, // Adjust height relative to screen
+                   fit: BoxFit.contain, // Keep aspect ratio
+                 ),
+               )
+             ),
+             
 
                 // Foreground UI elements.
                 Column(

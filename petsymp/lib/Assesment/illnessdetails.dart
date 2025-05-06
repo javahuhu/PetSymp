@@ -425,7 +425,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
                             SizedBox(width: 10.w),
                             Expanded(
                               child: Baseline(
-                                baseline: 25.sp,
+                                baseline: 18.sp,
                                 baselineType: TextBaseline.alphabetic,
                                 child: Text.rich(
                                   TextSpan(

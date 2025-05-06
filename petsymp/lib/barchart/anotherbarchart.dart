@@ -35,8 +35,10 @@ class MyApp extends StatelessWidget {
               child: Consumer<userdata.UserData>(
                 builder: (_, userData, __) {
                   // Use a null check on diagnosisResults to avoid accessing null.
-                  final diagnoses = List<Map<String, dynamic>>.from(userData?.diagnosisResults ?? [])
-                    ..sort((a, b) => (b['confidence_ab'] as num).compareTo(a['confidence_ab'] as num));
+                  final diagnoses = List<Map<String, dynamic>>.from(
+                      userData?.diagnosisResults ?? [])
+                    ..sort((a, b) => (b['confidence_ab'] as num)
+                        .compareTo(a['confidence_ab'] as num));
 
                   // Choose the top diagnosis: if one has confidence_ab exactly 1.0, take that; otherwise, take the first.
                   Map<String, dynamic> topDiagnosis = diagnoses.isNotEmpty
@@ -54,9 +56,15 @@ class MyApp extends StatelessWidget {
 
                   // Prepare chart data for a single group.
                   final labels = [topDiagnosis['illness'] as String];
-                  final fc = [(topDiagnosis['confidence_fc'] as num).toDouble()];
-                  final gb = [(topDiagnosis['confidence_gb'] as num).toDouble()];
-                  final ab = [(topDiagnosis['confidence_ab'] as num).toDouble()];
+                  final fc = [
+                    (topDiagnosis['confidence_fc'] as num).toDouble()
+                  ];
+                  final gb = [
+                    (topDiagnosis['confidence_gb'] as num).toDouble()
+                  ];
+                  final ab = [
+                    (topDiagnosis['confidence_ab'] as num).toDouble()
+                  ];
 
                   // Use screen width for the chart so the single bar can be centered.
                   final double chartWidth = MediaQuery.of(context).size.width;
@@ -133,11 +141,13 @@ class _BarChartSample3State extends State<BarChartSample3> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20.h,),
+            SizedBox(
+              height: 20.h,
+            ),
             Expanded(
               child: BarChart(
                 BarChartData(
-                  alignment: BarChartAlignment.center,  // Centers the bar group.
+                  alignment: BarChartAlignment.center, // Centers the bar group.
                   maxY: 100,
                   groupsSpace: 20,
                   barGroups: showingBarGroups,
@@ -146,8 +156,8 @@ class _BarChartSample3State extends State<BarChartSample3> {
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final algorithm = ['FC', 'GB', 'AB'][rodIndex];
                         return BarTooltipItem(
-                          '$algorithm: ${rod.toY.toStringAsFixed(1)}',
-                          const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          '$algorithm: ${rod.toY.toStringAsFixed(0)}',
+                          const TextStyle(color: Color.fromARGB(255, 237, 235, 235)),
                         );
                       },
                     ),
@@ -173,75 +183,81 @@ class _BarChartSample3State extends State<BarChartSample3> {
                     },
                   ),
 
-                  
                   titlesData: FlTitlesData(
-
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 20,
-                        reservedSize: 30, 
+                        reservedSize: 30,
                         getTitlesWidget: (value, meta) => Text(
                           '${value.toInt()}',
-                          style: TextStyle(color: const Color.fromARGB(221, 160, 222, 241)),
+                          style: const TextStyle(
+                              color: Color.fromARGB(221, 160, 222, 241)),
                         ),
                       ),
                     ),
-
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                         reservedSize: 30.h,
+                        reservedSize: 30.h,
                         getTitlesWidget: (value, meta) {
-                        final i = value.toInt();
-                        if (i < 0 || i >= widget.illnessLabels.length) return const SizedBox.shrink();
+                          final i = value.toInt();
+                          if (i < 0 || i >= widget.illnessLabels.length)
+                            return const SizedBox.shrink();
 
-                        // Use the complete illness name without truncating it.
-                        String label = widget.illnessLabels[i];
+                          // Use the complete illness name without truncating it.
+                          String label = widget.illnessLabels[i];
 
-                        return SideTitleWidget(
-                          space: 3.h,
-                          meta: meta,
-                          child: Text(
-                            label,
-                            style: TextStyle(fontSize: 18.sp, color:const Color.fromARGB(255, 214, 59, 59), fontFamily: 'Inter',),
-                            // Option 1: Allow wrapping if you want to see the full text on multiple lines.
-                            softWrap: true,
-                            textAlign: TextAlign.center,
-                            
-                            // Option 2: If you prefer a single line, you could set maxLines to 1 
-                            // and let the text scale down or overflow (choose one):
-                            // maxLines: 1,
-                            // overflow: TextOverflow.visible,
-                          ),
-                        );
-                      },
-
+                          return SideTitleWidget(
+                            space: 6.h,
+                            meta: meta,
+                            child: Container(
+                              constraints: BoxConstraints(
+                                maxWidth: 375.w, // 👈 Set a maximum width (responsive)
+                              ),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  color: const Color.fromARGB(255, 214, 59, 59),
+                                  fontFamily: 'Inter',
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
-                   gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
-                  drawVerticalLine: true,
-                    horizontalInterval: 20, 
-                  getDrawingHorizontalLine: (value) {
-                    return const FlLine(
-                      color:  Color.fromARGB(192, 160, 222, 241),
-                      strokeWidth: 1.2,
-                      dashArray: [5, 5], // 5 pixels on, 5 pixels off
-                    );
-                  },
-                  getDrawingVerticalLine: (value) {
-                    return const FlLine(
-                      color:  Color.fromARGB(178, 160, 222, 241),
-                      strokeWidth: 1.2,
-                      dashArray: [5, 5],
-                    );
-                  },
-                ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: true,
+                    horizontalInterval: 20,
+                    getDrawingHorizontalLine: (value) {
+                      return const FlLine(
+                        color: Color.fromARGB(192, 160, 222, 241),
+                        strokeWidth: 1.2,
+                        dashArray: [5, 5], // 5 pixels on, 5 pixels off
+                      );
+                    },
+                    getDrawingVerticalLine: (value) {
+                      return const FlLine(
+                        color: Color.fromARGB(178, 160, 222, 241),
+                        strokeWidth: 1.2,
+                        dashArray: [5, 5],
+                      );
+                    },
+                  ),
                   borderData: FlBorderData(show: false),
                 ),
               ),

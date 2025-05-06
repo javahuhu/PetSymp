@@ -155,6 +155,11 @@ final CarouselSliderController _carouselController = CarouselSliderController();
                           MaterialPageRoute(builder: (context) => const LoginScreen()),
                         );
                       },
+                      style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(Colors.transparent), 
+                    shadowColor: MaterialStateProperty.all(Colors.transparent),  
+                  ),
+
                       child: Text(
                         "Proceed",
                         style: TextStyle(

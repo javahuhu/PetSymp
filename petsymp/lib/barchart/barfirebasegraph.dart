@@ -177,7 +177,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                               context: context,
                               builder: (context) => _buildSimpleDialog(
                                 title: "No Matching Symptoms",
-                                content: "The selected illness does not have saved symptom details.",
+                                content: "The selected illness does not have saved symptom details chech your internet connection.",
                                 context: context,
                               ),
                             );
@@ -758,7 +758,7 @@ class _BarChartRetrieveState extends State<BarChartRetrieve> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "Insight: Compared to Forward Chaining score of ${((scores["confidence_fc"] ?? 0.0) * 100).round()}%,  AdaBoost increase the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%, by reweighting the symptoms and resolving the overlaps, Making the result more accurate.",
+                        "Insight: Compared to Forward Chaining score of ${((scores["confidence_fc"] ?? 0.0) * 100).round()}%,  AdaBoost adjust the confidence to ${((scores["confidence_ab"] ?? 0.0) * 100).round()}%, by reweighting the symptoms and resolving the overlaps, Making the result more accurate.",
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 12.sp,
