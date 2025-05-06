@@ -538,7 +538,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 238, 242, 243),
+        backgroundColor: const Color.fromARGB(255, 219, 230, 233),
         body: Stack(
           children: [
             SingleChildScrollView(
