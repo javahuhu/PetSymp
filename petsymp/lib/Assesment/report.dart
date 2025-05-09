@@ -14,7 +14,8 @@ class ReportScreen extends StatefulWidget {
   ReportScreenState createState() => ReportScreenState();
 }
 
-class ReportScreenState extends State<ReportScreen> with SingleTickerProviderStateMixin{
+class ReportScreenState extends State<ReportScreen>
+    with SingleTickerProviderStateMixin {
   static const int _bubbleCount = 8; // number of static bubbles
   late List<Bubble> _bubbles;
 
@@ -128,7 +129,8 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                         width: screenWidth * 0.15,
                         height: screenWidth * 0.15,
                         decoration: const BoxDecoration(shape: BoxShape.circle),
-                        child: Image.asset('assets/paw.png', fit: BoxFit.contain),
+                        child:
+                            Image.asset('assets/paw.png', fit: BoxFit.contain),
                       ),
                       SizedBox(width: screenWidth * 0.05),
                     ],
@@ -160,7 +162,9 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
 
                 // Animated Continue button
                 buildAnimatedButton(
-                  screenHeight * 1.03, screenWidth, 0.87,
+                  screenHeight * 1.03,
+                  screenWidth,
+                  0.88,
                   "Continue",
                   const NewSummaryScreen(),
                   1,
@@ -187,8 +191,8 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
       curve: Curves.easeInOut,
       top: _buttonVisible[index] ? screenHeight * topFactor : screenHeight,
       right: screenWidth * 0.02,
-      child: ElevatedButton(
-        onPressed: _isLoading
+      child: GestureDetector(
+        onTap: _isLoading
             ? null
             : () async {
                 setState(() => _isLoading = true);
@@ -206,41 +210,44 @@ class ReportScreenState extends State<ReportScreen> with SingleTickerProviderSta
                   if (mounted) setState(() => _isLoading = false);
                 }
               },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
-              return const Color.fromARGB(255, 0, 0, 0);
-            }
-            return Colors.transparent;
-          }),
-          foregroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
-              return const Color.fromARGB(255, 255, 255, 255);
-            }
-            return const Color.fromRGBO(29, 29, 44, 1.0);
-          }),
-          shadowColor: MaterialStateProperty.all(Colors.transparent),
-          side: MaterialStateProperty.all(
-            const BorderSide(color: Color.fromRGBO(82, 170, 164, 1), width: 2),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          height: 60.h,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color.fromRGBO(82, 170, 164, 1),
+                Color.fromRGBO(82, 170, 164, 1)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(30.r),
           ),
-          shape: MaterialStateProperty.all(
-            const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
-          ),
-          fixedSize: MaterialStateProperty.all(const Size(155, 55)),
-        ),
-        child: _isLoading
-            ? SizedBox(
-                height: 20.w,
-                width: 20.w,
-                child: const CircularProgressIndicator(
-                  color: Color.fromARGB(255, 64, 35, 93),
-                  strokeWidth: 5,
-                ),
-              )
-            : Text(
-                label,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: EdgeInsets.only(left: 5.w),
+                  child: Text(
+                    "CONTINUE",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  )),
+              SizedBox(width: 8.w),
+              Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 22.sp,
               ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -253,7 +260,9 @@ class Bubble {
   final double opacity;
 
   Bubble()
-      : position = Offset(math.Random().nextDouble(), math.Random().nextDouble()),
-        size = 0.5 + math.Random().nextDouble() * 0.5, // relative size (50–100%)
+      : position =
+            Offset(math.Random().nextDouble(), math.Random().nextDouble()),
+        size =
+            0.5 + math.Random().nextDouble() * 0.5, // relative size (50–100%)
         opacity = 0.3 + math.Random().nextDouble() * 0.5; // 30–80% opacity
 }

@@ -1,33 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:petsymp/Assesment/symptoms.dart';
 import 'package:provider/provider.dart';
 import '../userdata.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:animate_do/animate_do.dart';
-
-// Custom TextInputFormatter to capitalize only the first letter
-class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    if (newValue.text.isEmpty) {
-      return newValue; // Return empty value
-    }
-
-    // Capitalize the first letter and keep the rest as-is
-    final text = newValue.text;
-    final firstLetter = text[0].toUpperCase();
-    final restOfText = text.substring(1);
-
-    return newValue.copyWith(
-      text: firstLetter + restOfText,
-      selection: newValue.selection,
-    );
-  }
-}
+import 'package:petsymp/Assesment/searchsymptoms.dart';
+import 'package:petsymp/Breed/dogBreed.dart';
+import 'package:petsymp/Breed/catBreed.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class BreedScreen extends StatefulWidget {
   const BreedScreen({super.key});
@@ -36,25 +16,24 @@ class BreedScreen extends StatefulWidget {
   BreedScreenState createState() => BreedScreenState();
 }
 
-class BreedScreenState extends State<BreedScreen> with SingleTickerProviderStateMixin {
-  bool _isAnimated = false; // Animation toggle
-  // Initialize the controller directly instead of using late
+class BreedScreenState extends State<BreedScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isAnimated = false;
   AnimationController? _bubbleAnimationController;
-  
-  // State to track the selected tab
+  int? selectedIndex;
   final TextEditingController _breedcontroller = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
+  String searchQuery = '';
+  String selectedLetter = 'All';
 
   @override
   void initState() {
     super.initState();
-    // Initialize animation controller first
     _bubbleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
-    
-    // Trigger the animation after the widget builds
+
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _isAnimated = true;
@@ -64,18 +43,65 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
 
   @override
   void dispose() {
-    // Safely dispose the controller
+    _scrollController.dispose();
     _bubbleAnimationController?.dispose();
     super.dispose();
   }
 
   void navigateToNextPage() {
-    if (_formKey.currentState?.validate() ?? false) {
-      Provider.of<UserData>(context, listen: false).setpetBreed(_breedcontroller.text);
-      // Navigate only if the input is valid
+    if (selectedIndex != null) {
+      Provider.of<UserData>(context, listen: false)
+          .setpetBreed(_breedcontroller.text);
+
+      // Add a subtle haptic feedback
+      HapticFeedback.mediumImpact();
+
+      // Transition to next screen with a smooth animation
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SymptomsScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const SearchsymptomsScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+
+            var tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
+      );
+    } else {
+      // Improved error feedback
+      HapticFeedback.vibrate();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.pets, color: Colors.white),
+              const SizedBox(width: 10),
+              const Text("Please select a pet breed first"),
+            ],
+          ),
+          backgroundColor: const Color(0xFF2A384D),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height * 0.1,
+            left: 20,
+            right: 20,
+          ),
+          duration: const Duration(seconds: 2),
+        ),
       );
     }
   }
@@ -84,10 +110,31 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final petType =
+        Provider.of<UserData>(context).selectedPetType.toLowerCase();
+    final breedList = petType == "cat" ? catBreed : dogBreed;
+
+    final displayedBreeds = breedList.where((breed) {
+      final name = breed["breed"]!.toLowerCase();
+      final matchesSearch = name.contains(searchQuery.toLowerCase());
+      final matchesLetter = selectedLetter == 'All' ||
+          name.startsWith(selectedLetter.toLowerCase());
+      return matchesSearch && matchesLetter;
+    }).toList();
+
+    final List<String> letters = [
+      'All',
+      ...List.generate(26, (i) => String.fromCharCode(65 + i))
+    ];
+
+    const primaryColor = Color.fromRGBO(82, 170, 164, 1);
+    const secondaryColor = Color(0xFF263238);
+    const accentColor = Color(0xFFFF5252);
+    const backgroundColor = Color(0xFFF5FCFF);
+    const textDarkColor = Color(0xFF1D2B3A);
 
     return Scaffold(
       body: Container(
-        // Enhanced background with gradient
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -122,14 +169,15 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                         height: screenHeight * 0.5,
                         decoration: BoxDecoration(
                           color: const Color.fromRGBO(66, 134, 129, 0.07),
-                          borderRadius: BorderRadius.circular(screenHeight * 0.25),
+                          borderRadius:
+                              BorderRadius.circular(screenHeight * 0.25),
                         ),
                       ),
                     );
                   },
                 ),
               ),
-              
+
               // Smaller wave-like shape in bottom-right
               Positioned(
                 bottom: -screenHeight * 0.1,
@@ -147,14 +195,15 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                         height: screenHeight * 0.3,
                         decoration: BoxDecoration(
                           color: const Color.fromRGBO(66, 134, 129, 0.08),
-                          borderRadius: BorderRadius.circular(screenHeight * 0.15),
+                          borderRadius:
+                              BorderRadius.circular(screenHeight * 0.15),
                         ),
                       ),
                     );
                   },
                 ),
               ),
-              
+
               // Middle-left floating bubble
               Positioned(
                 top: screenHeight * 0.45,
@@ -183,7 +232,7 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                   },
                 ),
               ),
-              
+
               // Middle-right small floating circle
               Positioned(
                 top: screenHeight * 0.6,
@@ -214,7 +263,7 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                 ),
               ),
             ],
-            
+
             // Static background elements that don't need the animation controller
             // Small dot pattern top-right
             Positioned(
@@ -241,200 +290,435 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
                 ),
               ),
             ),
-            
-            
-            
-            // AnimatedPositioned for Paw Image
-            AnimatedPositioned(
-              duration: const Duration(seconds: 1),
-              curve: Curves.easeInOut,
-              top: _isAnimated ? screenHeight * 0.13 : -100, // From off-screen to final position
-              left: screenWidth * 0.1,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: screenWidth * 0.15, // 15% of screen width
-                    height: screenWidth * 0.15, // Equal height for circular image
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(66, 134, 129, 0.2),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      'assets/paw.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.05), // Spacing between paw and text
-                ],
-              ),
-            ),
-            
-            // Title and input form
-            Positioned(
-              top: screenHeight * 0.22, // Text and input below the paw
-              left: screenWidth * 0.12,
-              right: screenWidth * 0.02,
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 50.h),
                   SlideInLeft(
-                    duration: const Duration(milliseconds: 1000),
-                    delay: const Duration(milliseconds: 300),
-                    from: 100,
-                    child: Text(
-                      "What is your pet Breed?",
-                      style: TextStyle(
-                        fontSize: 25.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Oswald',
-                        color: const Color.fromRGBO(29, 29, 44, 1.0),
-                      ),
-                    ),
-                  ),
-                  
-                  SizedBox(height: 55.h),
-                  FadeIn(
-                    duration: const Duration(milliseconds: 800),
-                    delay: const Duration(milliseconds: 400),
-                    child: SizedBox(
-                      width: screenWidth * 0.8,
-                      child: Form(
-                        key: _formKey,
-                        child: TextFormField(
-                          controller: _breedcontroller,
-                          autofillHints: const [AutofillHints.name],
-                          inputFormatters: [
-                            FirstLetterUpperCaseTextFormatter(),
-                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
-                            FilteringTextInputFormatter.deny(RegExp(r'[!@#%^&*(),.?":{}|<>]')),
-                          ],
-                          textInputAction: TextInputAction.done,
+                      duration: const Duration(milliseconds: 1000),
+                      delay: const Duration(milliseconds: 300),
+                      from: 300,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 5.w, top: 25.h),
+                        child: Text(
+                          "What is your pet Breed?",
+                          style: TextStyle(
+                            fontSize: 25.sp,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Oswald',
+                            color: const Color.fromRGBO(29, 29, 44, 1.0),
+                          ),
+                        ),
+                      )),
+                  SizedBox(height: 20.h),
+                  Row(
+                    children: [
+                      // Search Bar
+                      Expanded(
+                        flex: 6,
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value;
+                            });
+                          },
                           decoration: InputDecoration(
+                            hintText: "Search breed...",
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 12),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade300),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1), // Border color when not focused
-                                width: 2.0, // Thickness when not focused
+                            prefixIcon: const Icon(Icons.search),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      // Dropdown A-Z
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            value: selectedLetter,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedLetter = value!;
+                              });
+                            },
+                            items: letters.map((letter) {
+                              return DropdownMenuItem<String>(
+                                value: letter,
+                                child: Text(letter,
+                                    style: const TextStyle(fontSize: 14)),
+                              );
+                            }).toList(),
+                            buttonStyleData: ButtonStyleData(
+                              height: 45,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade300),
+                                color: Colors.white,
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: const BorderSide(
-                                color: Color.fromRGBO(72, 38, 163, 1),// Border color when focused
-                                width: 2.0, // Thickness when focused
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200, // limit dropdown height
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white,
                               ),
-                            ),
-                            hintText: 'Enter your pet breed',
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 20.0,
-                              horizontal: 15.0,
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the breed of pet';
-                            }
-
-                            // ✅ Use directly in validation (fix warning)
-                            if (value.trim().length > 20) {
-                              return 'Please enter less than 20 characters';
-                            }
-
-                                                                    
-
-                            if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value.trim())) {
-                              return 'Only letters and spaces are allowed';
-                            }
-                            return null;
-                          },
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  
-                  // Example breeds hint
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0, left: 8.0),
-                    child: SlideInLeft(
-                      duration: const Duration(milliseconds: 800),
-                      delay: const Duration(milliseconds: 600),
-                      from: 50,
-                      child: const Text(
-                        "Examples: Golden Retriever, Persian Cat, Labrador",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.blue,
+                  SizedBox(height: 20.h),
+
+                  // Results count indicator
+                  if (displayedBreeds.isNotEmpty)
+                    FadeIn(
+                      duration: const Duration(milliseconds: 600),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
+                        child: Text(
+                          "Found ${displayedBreeds.length} breeds",
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
+
+                  // Breed grid or empty state
+                  Expanded(
+                    child: displayedBreeds.isEmpty
+                        ? Center(
+                            child: FadeInUp(
+                              duration: const Duration(milliseconds: 800),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(16.w),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.7),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.search_off_rounded,
+                                      size: 56.sp,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    "No breeds found",
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Text(
+                                    "Try another search term or filter",
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Scrollbar(
+                            controller: _scrollController,
+                            thickness: 6,
+                            radius: const Radius.circular(8),
+                            child: GridView.builder(
+                              controller: _scrollController,
+                              padding: EdgeInsets.only(top: 8.h, bottom: 100.h),
+                              itemCount: displayedBreeds.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 3 / 3.3,
+                                mainAxisSpacing: 16.h,
+                                crossAxisSpacing: 16.w,
+                              ),
+                              itemBuilder: (context, index) {
+                                final breed = displayedBreeds[index];
+                                final isSelected =
+                                    breed["breed"] == _breedcontroller.text;
+
+                                return FadeInUp(
+                                  duration: Duration(
+                                      milliseconds: 600 + (index * 50)),
+                                  from: 20,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedIndex = index;
+                                        _breedcontroller.text = breed["breed"]!;
+                                      });
+                                      HapticFeedback.lightImpact();
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Curves.easeOutExpo,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? secondaryColor
+                                            : Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(22.r),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: isSelected
+                                                ? secondaryColor
+                                                    .withOpacity(0.4)
+                                                : Colors.black
+                                                    .withOpacity(0.08),
+                                            blurRadius: isSelected ? 15 : 10,
+                                            spreadRadius: isSelected ? 1 : 0,
+                                            offset: const Offset(0, 5),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          // Card content
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              // Breed name
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5.w,
+                                                    vertical: 14.h),
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: isSelected
+                                                      ? secondaryColor
+                                                      : Colors.grey[50],
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(22.r),
+                                                    topRight:
+                                                        Radius.circular(22.r),
+                                                    bottomLeft:
+                                                        Radius.circular(15.r),
+                                                    bottomRight:
+                                                        Radius.circular(15.r),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  breed["breed"]!,
+                                                  textAlign: TextAlign.center,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: isSelected
+                                                        ? Colors.white
+                                                        : textDarkColor,
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              // Image area with dark background
+                                              Expanded(
+                                                child: Container(
+                                                  padding: EdgeInsets.all(8.w),
+                                                  child: Center(
+                                                    child: Hero(
+                                                      tag:
+                                                          "breed_${breed["breed"]}",
+                                                      child: Container(
+                                                        height: 125.w,
+                                                        width: 125.w,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          gradient:
+                                                              LinearGradient(
+                                                            colors: [
+                                                              Colors.black
+                                                                  .withOpacity(
+                                                                      0.08),
+                                                              Colors.black
+                                                                  .withOpacity(
+                                                                      0.03),
+                                                            ],
+                                                            begin: Alignment
+                                                                .topLeft,
+                                                            end: Alignment
+                                                                .bottomRight,
+                                                          ),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: isSelected
+                                                                  ? primaryColor
+                                                                      .withOpacity(
+                                                                          0.2)
+                                                                  : Colors.black
+                                                                      .withOpacity(
+                                                                          0.1),
+                                                              blurRadius: 15,
+                                                              offset:
+                                                                  const Offset(
+                                                                      0, 5),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: ClipOval(
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    5.w),
+                                                            child: Image.asset(
+                                                              breed["img"]!,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          // Smooth animated check icon
+                                          AnimatedPositioned(
+                                            duration: const Duration(
+                                                milliseconds: 500),
+                                            curve: Curves.easeOut,
+                                            bottom: isSelected ? 14.h : 0,
+                                            right: isSelected ? 14.w : 0,
+                                            child: AnimatedOpacity(
+                                              duration: const Duration(
+                                                  milliseconds: 300),
+                                              opacity: isSelected ? 1.0 : 0.0,
+                                              child: AnimatedScale(
+                                                scale: isSelected ? 1.0 : 0.6,
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                child: Container(
+                                                  padding: EdgeInsets.all(5.w),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: accentColor,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: accentColor
+                                                            .withOpacity(0.3),
+                                                        blurRadius: 6,
+                                                        offset:
+                                                            const Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.check,
+                                                    color: Colors.white,
+                                                    size: 16.sp,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                   ),
                 ],
               ),
             ),
-            
-            // Next Button with animation
+
             Positioned(
-              top: screenHeight * 0.9,
-              right: screenWidth * 0.02, // Adjust dynamically for right alignment
+              bottom: 24.h,
+              left: 0,
+              right: 0,
               child: SlideInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 300),
-                from: 100,
-                child: SizedBox( // Wrap with SizedBox to ensure correct width
-                  width: 100, // Adjust as needed
-                  child: ElevatedButton(
-                    onPressed: navigateToNextPage,
-                    style: ButtonStyle(
-                      // Dynamic background color based on button state
-                      backgroundColor: WidgetStateProperty.resolveWith(
-                        (states) {
-                          if (states.contains(WidgetState.pressed)) {
-                            return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                          }
-                          return Colors.transparent; // Default background color
-                        },
-                      ),
-                      // Dynamic text color based on button state
-                      foregroundColor: WidgetStateProperty.resolveWith(
-                        (states) {
-                          if (states.contains(WidgetState.pressed)) {
-                            return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                          }
-                          return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                        },
-                      ),
-                      shadowColor: WidgetStateProperty.all(Colors.transparent),
-                      side: WidgetStateProperty.all(
-                        const BorderSide(
-                          color: Color.fromRGBO(82, 170, 164, 1),
-                          width: 2.0,
+                duration: const Duration(milliseconds: 800),
+                from: 40,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: GestureDetector(
+                    onTap: navigateToNextPage,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: selectedIndex != null
+                              ? [
+                                  primaryColor,
+                                  const Color.fromRGBO(82, 170, 164, 1)
+                                ]
+                              : [Colors.grey.shade300, Colors.grey.shade400],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(30.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: selectedIndex != null
+                                ? primaryColor.withOpacity(0.4)
+                                : Colors.grey.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                      shape: WidgetStateProperty.all(
-                        const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(100)),
-                        ),
-                      ),
-                      fixedSize: WidgetStateProperty.all(
-                        const Size(100, 55),
-                      ),
-                    ),
-                    child: const Text(
-                      "Next",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Continue",
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 22.sp,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -445,5 +729,55 @@ class BreedScreenState extends State<BreedScreen> with SingleTickerProviderState
         ),
       ),
     );
+  }
+
+  List<Widget> _buildBackgroundAnimation(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return [
+      // Top large background
+      Positioned(
+        top: -screenHeight * 0.2,
+        left: -screenWidth * 0.25,
+        child: AnimatedBuilder(
+          animation: _bubbleAnimationController!,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, _bubbleAnimationController!.value * 10),
+              child: Container(
+                width: screenWidth * 1.5,
+                height: screenHeight * 0.5,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(66, 134, 129, 0.07),
+                  borderRadius: BorderRadius.circular(screenHeight * 0.25),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+      // Bottom-right shape
+      Positioned(
+        bottom: -screenHeight * 0.1,
+        right: -screenWidth * 0.25,
+        child: AnimatedBuilder(
+          animation: _bubbleAnimationController!,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, -_bubbleAnimationController!.value * 10),
+              child: Container(
+                width: screenWidth * 0.9,
+                height: screenHeight * 0.3,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(66, 134, 129, 0.08),
+                  borderRadius: BorderRadius.circular(screenHeight * 0.15),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    ];
   }
 }

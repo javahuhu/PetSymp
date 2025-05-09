@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'dart:math' as math;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:petsymp/Assesment/anothersearchsymptoms.dart';
 
 class AnothersympScreen extends StatefulWidget {
   const AnothersympScreen({super.key});
@@ -286,7 +287,7 @@ String _capitalizeEachWord(String text) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const MentionsympScreen(),
+                    builder: (_) => const AnothersearchsymptomsScreen(),
                   ),
                 );
               },

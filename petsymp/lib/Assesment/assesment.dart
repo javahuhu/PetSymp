@@ -287,57 +287,54 @@ class AssesmentScreenState extends State<AssesmentScreen> {
                 )),
                 Positioned(
                 top: screenHeight * 0.9,
-                right: screenWidth * 0.02, // Adjust dynamically for right alignment
+                right: screenWidth * 0.03, // Adjust dynamically for right alignment
                 child:
                 SlideInUp(
                           duration:const Duration(milliseconds: 1000),
                           delay: const Duration(milliseconds: 300),
                         from: 400,
                   child:
-                 SizedBox( // Wrap with SizedBox to ensure correct width
-                  width: 100, // Adjust as needed
-                  child: ElevatedButton(
-                    onPressed: () => navigateToNextPage(context),
-                    style: ButtonStyle(
-                    // Dynamic background color based on button state
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                        }
-                        return Colors.transparent; // Default background color
-                      },
-                    ),
-                    // Dynamic text color based on button state
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                        }
-                        return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                      },
-                    ),
-                    shadowColor: WidgetStateProperty.all(Colors.transparent),
-                    side: WidgetStateProperty.all(
-                      const BorderSide(
-                        color: Color.fromRGBO(82, 170, 164, 1),
-                        width: 2.0,
+                 SizedBox( 
+                  width: 125, 
+                  child: GestureDetector(
+                    onTap: () => navigateToNextPage(context),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color.fromRGBO(82, 170, 164, 1),
+                            Color.fromRGBO(82, 170, 164, 1)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(30.r),
+                        
                       ),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                    ),
-                    fixedSize: WidgetStateProperty.all(
-                      const Size(100, 55),
-                    ),
-                  ),
-                    child: const Text(
-                      "Next",
-                      style: TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.only(left: 5.w),
+                              child: Text(
+                                "Next",
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              )),
+                          SizedBox(width: 8.w),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 22.sp,
+                          ),
+                        ],
                       ),
                     ),
                   ),

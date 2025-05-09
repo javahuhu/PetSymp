@@ -68,6 +68,7 @@ dependencies:
   animated_text_kit: ^4.2.3
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.1
+  dropdown_button2: ^2.3.9
 
   
 
@@ -83,9 +84,10 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   image_path: "assets/Petsympicon.png" 
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -187,6 +189,124 @@ flutter:
       - assets/mediumcat.png
       - assets/largecat.png
       - assets/giantcat.png
+      - assets/Breed/ShihTzu.png
+      - assets/Breed/akita.png
+      - assets/Breed/alaskanmalamute.png
+      - assets/Breed/americanbulldog.png
+      - assets/Breed/americaneskimo.png
+      - assets/Breed/australiancattle.png
+      - assets/Breed/australianshepperd.png
+      - assets/Breed/bassethound.png
+      - assets/Breed/beagle.png
+      - assets/Breed/belgianmalinois.png
+      - assets/Breed/bernesemountain.png
+      - assets/Breed/bichonfrise.png
+      - assets/Breed/bordercollie.png
+      - assets/Breed/bostonterrier.png
+      - assets/Breed/boxer.png
+      - assets/Breed/bulldog.png
+      - assets/Breed/bullterrier.png
+      - assets/Breed/cairnterrier.png
+      - assets/Breed/kingcharles.png
+      - assets/Breed/Chihuahua.png
+      - assets/Breed/chowchow.png
+      - assets/Breed/cockerspaniel.png
+      - assets/Breed/collie.png
+      - assets/Breed/corgi.png
+      - assets/Breed/dachshund.png
+      - assets/Breed/dalmatian.png
+      - assets/Breed/dobermanpinscher.png
+      - assets/Breed/englishsetter.png
+      - assets/Breed/englishspringer.png
+      - assets/Breed/finnishspitz.png
+      - assets/Breed/frenchbulldog.png
+      - assets/Breed/germanshepherd.png
+      - assets/Breed/greatdane.png
+      - assets/Breed/greyhound.png
+      - assets/Breed/goldenretriever.png
+      - assets/Breed/havanese.png
+      - assets/Breed/irishsetter.png
+      - assets/Breed/italiangreyhound.png
+      - assets/Breed/JRTerrier.png
+      - assets/Breed/japanesechin.png
+      - assets/Breed/keeshond.png
+      - assets/Breed/komondor.png
+      - assets/Breed/labradorretriever.png
+      - assets/Breed/lhasaapso.png
+      - assets/Breed/maltese.png
+      - assets/Breed/mastiff.png
+      - assets/Breed/miniaturepincher.png
+      - assets/Breed/miniatureschnauzer.png
+      - assets/Breed/newfoundland.png
+      - assets/Breed/norwegianelkhound.png
+      - assets/Breed/papillion.png
+      - assets/Breed/pekingese.png
+      - assets/Breed/pembrokewelshcorgi.png
+      - assets/Breed/pomerian.png
+      - assets/Breed/poodle.png
+      - assets/Breed/pug.png
+      - assets/Breed/rhodesianridgeback.png
+      - assets/Breed/rottwailer.png
+      - assets/Breed/saintbernard.png
+      - assets/Breed/samoyed.png
+      - assets/Breed/schipperke.png
+      - assets/Breed/schnauzer.png
+      - assets/Breed/scottishterrier.png
+      - assets/Breed/sharpei.png
+      - assets/Breed/shetlandsheepdog.png
+      - assets/Breed/shibainu.png
+      - assets/Breed/siberianhusky.png
+      - assets/Breed/staffordshirebullterrier.png
+      - assets/Breed/toypoodle.png
+      - assets/Breed/welshterrier.png
+      - assets/Breed/westhighlandwhiteterrier.png
+      - assets/Breed/yorkshireterrier.png
+
+
+
+        #Cat Breed IMG
+      - assets/BreedCat/abyssiniancat.png
+      - assets/BreedCat/americanbobtail.png
+      - assets/BreedCat/americancurl.png
+      - assets/BreedCat/americanshorthair.png
+      - assets/BreedCat/americanwirehair.png
+      - assets/BreedCat/balinese.png
+      - assets/BreedCat/bengal.png
+      - assets/BreedCat/birman.png
+      - assets/BreedCat/bombay.png
+      - assets/BreedCat/britishlonghair.png
+      - assets/BreedCat/britishshorthair.png
+      - assets/BreedCat/burmese.png
+      - assets/BreedCat/burmilla.png
+      - assets/BreedCat/chartreux.png
+      - assets/BreedCat/cornishrex.png
+      - assets/BreedCat/devonrex.png
+      - assets/BreedCat/egyptianmau.png
+      - assets/BreedCat/exoticshorthair.png
+      - assets/BreedCat/himalayan.png
+      - assets/BreedCat/japanesebobtail.png
+      - assets/BreedCat/khaomanee.png
+      - assets/BreedCat/laperm.png
+      - assets/BreedCat/mainecoon.png
+      - assets/BreedCat/manx.png
+      - assets/BreedCat/munchkin.png
+      - assets/BreedCat/norwegianforest.png
+      - assets/BreedCat/ocicat.png
+      - assets/BreedCat/oriental.png
+      - assets/BreedCat/persian.png
+      - assets/BreedCat/ragdoll.png
+      - assets/BreedCat/russianblue.png
+      - assets/BreedCat/scottishfold.png
+      - assets/BreedCat/siamese.png
+      - assets/BreedCat/siberian.png
+      - assets/BreedCat/singapura.png
+      - assets/BreedCat/snowshoe.png
+      - assets/BreedCat/sumali.png
+      - assets/BreedCat/sphynx.png
+      - assets/BreedCat/tonkinese.png
+      - assets/BreedCat/toyger.png
+      - assets/BreedCat/turkishangora.png
+      - assets/BreedCat/turkishvan.png
 
 
   fonts:

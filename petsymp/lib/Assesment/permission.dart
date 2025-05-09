@@ -3,6 +3,7 @@ import 'package:petsymp/Assesment/ageinput.dart';
 import '../userdata.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PermissionScreen extends StatefulWidget {
   const PermissionScreen({super.key});
@@ -213,64 +214,61 @@ class PermissionScreenState extends State<PermissionScreen> {
                 // Next Button at the previous position
                 Positioned(
                   top: screenHeight * 0.9,
-                  right: screenWidth * 0.05, // Adjust dynamically for right alignment
+                  right: screenWidth * 0.03, // Adjust dynamically for right alignment
                   child: 
                   SlideInUp(
                     duration: Duration(milliseconds: 1000),
                     delay: Duration(milliseconds: 300),
                     from: 100,
                     child: SizedBox( // Wrap with SizedBox to ensure correct width
-                      width: 150, // Adjust as needed
-                      child: ElevatedButton(
-                        onPressed: () {
+                      width: 170.w, // Adjust as needed
+                      child: GestureDetector(
+                    onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const AgeinputScreen()),
                           );
                         },
-                        style: ButtonStyle(
-                          // Dynamic background color based on button state
-                          backgroundColor: WidgetStateProperty.resolveWith(
-                            (states) {
-                              if (states.contains(WidgetState.pressed)) {
-                                return const Color.fromARGB(255, 0, 0, 0); // Background color when pressed
-                              }
-                              return Colors.transparent; // Default background color
-                            },
-                          ),
-                          // Dynamic text color based on button state
-                          foregroundColor: WidgetStateProperty.resolveWith(
-                            (states) {
-                              if (states.contains(WidgetState.pressed)) {
-                                return const Color.fromARGB(255, 255, 255, 255); // Text color when pressed
-                              }
-                              return const Color.fromRGBO(29, 29, 44, 1.0); // Default text color
-                            },
-                          ),
-                          shadowColor: WidgetStateProperty.all(Colors.transparent),
-                          side: WidgetStateProperty.all(
-                            const BorderSide(
-                              color: Color.fromRGBO(82, 170, 164, 1),
-                              width: 2.0,
-                            ),
-                          ),
-                          shape: WidgetStateProperty.all(
-                            const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(100)),
-                            ),
-                          ),
-                          fixedSize: WidgetStateProperty.all(
-                            const Size(110, 55),
-                          ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color.fromRGBO(82, 170, 164, 1),
+                            Color.fromRGBO(82, 170, 164, 1)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        child: const Text(
-                          "CONFIRM",
-                          style: TextStyle(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        borderRadius: BorderRadius.circular(30.r),
+                        
                       ),
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.only(left: 5.w),
+                              child: Text(
+                                "CONFIRM",
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              )),
+                          SizedBox(width: 8.w),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 22.sp,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                     ),
                   )
                 ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
 import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
-import 'package:petsymp/SymptomQuestions/symptomsquestions.dart';
 import 'package:provider/provider.dart';
 import '../userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -10,29 +9,64 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../SymptomsCatalog/symptomscatalog.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:petsymp/Assesment/anothersymptoms.dart';
-import 'mentionsymptoms.dart';
 import 'package:petsymp/searchdescription.dart';
+import 'package:flutter/services.dart';
+
+class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+    final text = newValue.text;
+    final firstLetter = text[0].toUpperCase();
+    final restOfText = text.substring(1);
+    return newValue.copyWith(
+      text: firstLetter + restOfText,
+      selection: newValue.selection,
+    );
+  }
+}
 
 class AnothersearchsymptomsScreen extends StatefulWidget {
-  final List<String> symptoms;
-
-  const AnothersearchsymptomsScreen({super.key, required this.symptoms});
+  const AnothersearchsymptomsScreen({super.key});
 
   @override
   AnothersearchsymptomsScreenState createState() =>
       AnothersearchsymptomsScreenState();
 }
 
-class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen>
+class AnothersearchsymptomsScreenState
+    extends State<AnothersearchsymptomsScreen>
     with SingleTickerProviderStateMixin {
   bool _isAnimated = false;
   bool _isNavigating = false;
   AnimationController? _bubbleAnimationController;
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  List<String> _filteredSymptoms = [];
+  List<String> _symptomList = [];
+  String candidateSymptom = '';
 
+  void _filterSymptoms() {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) {
+      setState(() {
+        _filteredSymptoms = _symptomList;
+      });
+      return;
+    }
+
+    setState(() {
+      _filteredSymptoms = _symptomList.where((symptom) {
+        return symptom.toLowerCase().contains(query);
+      }).toList();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
     _bubbleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -43,6 +77,49 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
         _isAnimated = true;
       });
     });
+
+    final userData = Provider.of<UserData>(context, listen: false);
+    final petType = userData.selectedPetType;
+
+    final Map<String, dynamic> petSymptoms = {
+      if (petType == 'Dog') ...symptomQuestionsDog,
+      if (petType == 'Cat') ...symptomQuestionsCat,
+    };
+
+    final List<String> predefinedSymptoms = petSymptoms.keys.toList();
+    final List<String> additionalSymptoms = [
+      'Frequent Bowel Movements',
+      'Frequent Episodes',
+    ];
+
+    final Set<String> pendingSet =
+        userData.pendingSymptoms.map((s) => s.toLowerCase()).toSet();
+
+    if (userData.pendingSymptoms.isNotEmpty) {
+      candidateSymptom = userData.pendingSymptoms.last;
+    } else if (userData.selectedSymptom.isNotEmpty) {
+      candidateSymptom = userData.selectedSymptom;
+    }
+
+    final List<String> candidateList = [
+      ...predefinedSymptoms,
+      ...additionalSymptoms,
+    ];
+
+    final List<String> uniqueList = [];
+    for (String s in candidateList) {
+      final sLower = s.toLowerCase();
+      if (!uniqueList.any((u) => u.toLowerCase() == sLower) &&
+          sLower != candidateSymptom.toLowerCase() &&
+          !pendingSet.contains(sLower)) {
+        uniqueList.add(s);
+      }
+    }
+
+    _symptomList = uniqueList;
+    _filteredSymptoms = List.from(_symptomList);
+
+    _searchController.addListener(_filterSymptoms);
   }
 
   @override
@@ -62,85 +139,22 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
     });
   }
 
-
-    String _capitalizeEachWord(String text) {
-  return text
-      .split(' ')
-      .map((word) => word.isNotEmpty
-          ? word[0].toUpperCase() + word.substring(1)
-          : '')
-      .join(' ');
-}
-
+  String _capitalizeEachWord(String text) {
+    return text
+        .split(' ')
+        .map((word) =>
+            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
+        .join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
     // Screen dimensions.
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final UserData userData = Provider.of<UserData>(context, listen: false);
-    final petType = userData.selectedPetType;
-
-    final Map<String, dynamic> petSymptoms = {
-      // ...symptomQuestions,
-      if(petType == 'Dog') ...symptomQuestionsDog,
-      if(petType == 'Cat') ...symptomQuestionsCat,
-    };
-
-    // Get predefined symptoms from userData.
-    final List<String> predefinedSymptoms = petSymptoms.keys.toList();
-
-    // Define additional symptoms.
-    final List<String> additionalSymptoms = [
-      'Frequent Bowel Movements',
-      'Frequent Episodes',
-    ];
-
-    
-    String inputSymptom = "";
-    if (widget.symptoms.isNotEmpty && widget.symptoms[0].trim().isNotEmpty) {
-      inputSymptom = widget.symptoms[0].toLowerCase();
-    }
-
-    // Determine the candidate symptom:
-    // Priority: pending > selected > input.
-    String candidateSymptom = "";
-    if (userData.pendingSymptoms.isNotEmpty) {
-      candidateSymptom = userData.pendingSymptoms.last;
-    } else if (userData.selectedSymptom.isNotEmpty) {
-      candidateSymptom = userData.selectedSymptom;
-    } else if (inputSymptom.isNotEmpty) {
-      candidateSymptom = inputSymptom;
-    }
-
-    List<String> candidateList = [];
-    if (inputSymptom.isNotEmpty) candidateList.add(inputSymptom);
-    candidateList.addAll(predefinedSymptoms);
-    candidateList.addAll(additionalSymptoms);
-
-  
-    List<String> uniqueList = [];
-    for (String s in candidateList) {
-      if (!uniqueList.any((u) => u.toLowerCase() == s.toLowerCase())) {
-        uniqueList.add(s);
-      }
-    }
-
-  
-    final Set<String> pendingSet =
-        userData.pendingSymptoms.map((s) => s.toLowerCase()).toSet();
-    uniqueList.removeWhere((s) => pendingSet.contains(s.toLowerCase()));
-
-    
-    if (candidateSymptom.isNotEmpty) {
-      uniqueList.removeWhere((s) =>
-          s.toLowerCase() == candidateSymptom.toLowerCase());
-    }
-
-    final List<String> symptomList = uniqueList;
 
     // If no selectable symptoms exist, show an error page.
-    if (symptomList.isEmpty && candidateSymptom.isEmpty) {
+    if (_symptomList.isEmpty && candidateSymptom.isEmpty) {
       return Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -165,9 +179,10 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MentionsympScreen()),
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const AnothersympScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
@@ -185,280 +200,323 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.fromRGBO(225, 240, 243, 1.0),
-              Color.fromRGBO(201, 229, 231, 1.0),
-              Color(0xFFE8F2F5),
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Animated background bubbles.
-            if (_bubbleAnimationController != null) ...[
-              Positioned(
-                top: -screenHeight * 0.2,
-                left: -screenWidth * 0.25,
-                child: AnimatedBuilder(
-                  animation: _bubbleAnimationController!,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, _bubbleAnimationController!.value * 10),
-                      child: Container(
-                        width: screenWidth * 1.5,
-                        height: screenHeight * 0.5,
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(66, 134, 129, 0.07),
-                          borderRadius:
-                              BorderRadius.circular(screenHeight * 0.25),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Positioned(
-                bottom: -screenHeight * 0.1,
-                right: -screenWidth * 0.25,
-                child: AnimatedBuilder(
-                  animation: _bubbleAnimationController!,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, -_bubbleAnimationController!.value * 10),
-                      child: Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.3,
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(66, 134, 129, 0.08),
-                          borderRadius:
-                              BorderRadius.circular(screenHeight * 0.15),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.45,
-                left: screenWidth * 0.05,
-                child: AnimatedBuilder(
-                  animation: _bubbleAnimationController!,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        _bubbleAnimationController!.value * 5,
-                        _bubbleAnimationController!.value * 8,
-                      ),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color.fromRGBO(66, 134, 129, 0.2),
-                          border: Border.all(
-                            color: const Color.fromRGBO(66, 134, 129, 0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Positioned(
-                top: screenHeight * 0.6,
-                right: screenWidth * 0.1,
-                child: AnimatedBuilder(
-                  animation: _bubbleAnimationController!,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        -_bubbleAnimationController!.value * 8,
-                        -_bubbleAnimationController!.value * 6,
-                      ),
-                      child: Container(
-                        width: 35,
-                        height: 35,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              Color.fromRGBO(72, 138, 163, 0.3),
-                              Color.fromRGBO(72, 138, 163, 0.1),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-            // Static background dots.
-            Positioned(
-              top: screenHeight * 0.25,
-              right: screenWidth * 0.15,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color.fromRGBO(72, 138, 163, 0.4),
-                ),
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: false,
+          body: Container(
+            width: screenWidth,
+            height: screenHeight,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromRGBO(225, 240, 243, 1.0),
+                  Color.fromRGBO(201, 229, 231, 1.0),
+                  Color(0xFFE8F2F5),
+                ],
+                stops: [0.0, 0.5, 1.0],
               ),
             ),
-            Positioned(
-              top: screenHeight * 0.26,
-              right: screenWidth * 0.2,
-              child: Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color.fromRGBO(72, 138, 163, 0.3),
-                ),
-              ),
-            ),
-            // Main content.
-            SafeArea(
-              child: Column(
-                children: [
-                  // Back button and header.
-                  SizedBox(
-                    height: 60.h,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.05, vertical: 10.h),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(
-                              Icons.arrow_back_ios_new,
-                              color: const Color.fromRGBO(61, 47, 40, 1),
-                              size: 26.sp,
-                            ),
-
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                              elevation: WidgetStateProperty.all(0),
-                              shadowColor: WidgetStateProperty.all(Colors.transparent),
-                              overlayColor: WidgetStateProperty.all(Colors.transparent), 
+            child: Stack(
+              children: [
+                // Animated background bubbles.
+                if (_bubbleAnimationController != null) ...[
+                  Positioned(
+                    top: -screenHeight * 0.2,
+                    left: -screenWidth * 0.25,
+                    child: AnimatedBuilder(
+                      animation: _bubbleAnimationController!,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset:
+                              Offset(0, _bubbleAnimationController!.value * 10),
+                          child: Container(
+                            width: screenWidth * 1.5,
+                            height: screenHeight * 0.5,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(66, 134, 129, 0.07),
+                              borderRadius:
+                                  BorderRadius.circular(screenHeight * 0.25),
                             ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(height: 10.h),
-                  // Animated header title.
-                  AnimatedOpacity(
-                    duration: const Duration(seconds: 1),
-                    opacity: _isAnimated ? 1 : 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SlideInLeft(
-                          duration: const Duration(milliseconds: 1000),
-                          from: 50,
-                          child: AutoSizeText(
-                            "Select Another Symptoms",
-                            maxLines: 1,
-                            minFontSize: 12,
-                            style: TextStyle(
-                              fontSize: 30.sp,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Oswald',
-                              color: const Color.fromRGBO(29, 29, 44, 1.0),
+                  Positioned(
+                    bottom: -screenHeight * 0.1,
+                    right: -screenWidth * 0.25,
+                    child: AnimatedBuilder(
+                      animation: _bubbleAnimationController!,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(
+                              0, -_bubbleAnimationController!.value * 10),
+                          child: Container(
+                            width: screenWidth * 0.9,
+                            height: screenHeight * 0.3,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(66, 134, 129, 0.08),
+                              borderRadius:
+                                  BorderRadius.circular(screenHeight * 0.15),
                             ),
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(height: 10.h),
-                  // If a candidate (pending or input) symptom exists, show it as a header.
-                  if (candidateSymptom.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Text(
-                          "Symptoms: ${_capitalizeEachWord(candidateSymptom)}",
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                  Positioned(
+                    top: screenHeight * 0.45,
+                    left: screenWidth * 0.05,
+                    child: AnimatedBuilder(
+                      animation: _bubbleAnimationController!,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(
+                            _bubbleAnimationController!.value * 5,
+                            _bubbleAnimationController!.value * 8,
                           ),
-                        ),
-                      ),
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color.fromRGBO(66, 134, 129, 0.2),
+                              border: Border.all(
+                                color: const Color.fromRGBO(66, 134, 129, 0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  SizedBox(height: 10.h),
-                  // Selectable symptom list.
-                  Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.fromLTRB(screenWidth * 0.07, 5.h, screenWidth * 0.07, 80.h),
-                      itemCount: symptomList.length,
-                      itemBuilder: (context, index) {
-                        final symptom = symptomList[index];
-                        return FadeInUp(
-                          duration: const Duration(milliseconds: 600),
-                          delay: Duration(milliseconds: index * 100),
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 15.h),
-                            child: buildSymptomsContainer(screenWidth, symptom, context),
+                  ),
+                  Positioned(
+                    top: screenHeight * 0.6,
+                    right: screenWidth * 0.1,
+                    child: AnimatedBuilder(
+                      animation: _bubbleAnimationController!,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(
+                            -_bubbleAnimationController!.value * 8,
+                            -_bubbleAnimationController!.value * 6,
+                          ),
+                          child: Container(
+                            width: 35,
+                            height: 35,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  Color.fromRGBO(72, 138, 163, 0.3),
+                                  Color.fromRGBO(72, 138, 163, 0.1),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
                 ],
-              ),
-            ),
-            // Floating catalog button.
-            Positioned(
-              bottom: 50.h,
-              right: 16.w,
-              child: FloatingActionButton(
-                onPressed: _navigateToSymptomCatalog,
-                backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
-                foregroundColor: const Color(0xFFE8F2F5),
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.r)
+                // Static background dots.
+                Positioned(
+                  top: screenHeight * 0.25,
+                  right: screenWidth * 0.15,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromRGBO(72, 138, 163, 0.4),
+                    ),
+                  ),
                 ),
-                child: const Icon(Icons.menu_book_sharp),
-              ),
+                Positioned(
+                  top: screenHeight * 0.26,
+                  right: screenWidth * 0.2,
+                  child: Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.fromRGBO(72, 138, 163, 0.3),
+                    ),
+                  ),
+                ),
+                // Main content.
+                SafeArea(
+                  child: Column(
+                    children: [
+                      // Back button and header.
+                      SizedBox(
+                        height: 60.h,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.05, vertical: 10.h),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const AnothersympScreen()),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: const Color.fromRGBO(61, 47, 40, 1),
+                                  size: 26.sp,
+                                ),
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      Colors.transparent),
+                                  elevation: WidgetStateProperty.all(0),
+                                  shadowColor: WidgetStateProperty.all(
+                                      Colors.transparent),
+                                  overlayColor: WidgetStateProperty.all(
+                                      Colors.transparent),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      // Animated header title.
+                      AnimatedOpacity(
+                        duration: const Duration(seconds: 1),
+                        opacity: _isAnimated ? 1 : 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SlideInLeft(
+                              duration: const Duration(milliseconds: 1000),
+                              from: 50,
+                              child: AutoSizeText(
+                                "Select Another Symptoms",
+                                maxLines: 1,
+                                minFontSize: 12,
+                                style: TextStyle(
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Oswald',
+                                  color: const Color.fromRGBO(29, 29, 44, 1.0),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      
+                      if (candidateSymptom.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.05),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12.h, horizontal: 16.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Text(
+                              "Symptoms: ${_capitalizeEachWord(candidateSymptom)}",
+                              style: TextStyle(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 10.h),
+
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.07),
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          inputFormatters: [
+                            FirstLetterUpperCaseTextFormatter(),
+                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                            FilteringTextInputFormatter.deny(RegExp(r'[!@#%^&*(),.?":{}|<>]')),
+                          ],
+                          decoration: InputDecoration(
+                            hintText: 'Search symptom...',
+                            prefixIcon: const Icon(Icons.search),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+
+                      Expanded(
+                        child: ListView.builder(
+                          padding: EdgeInsets.fromLTRB(screenWidth * 0.1, 5.h,
+                              screenWidth * 0.1, 80.h),
+                          itemCount: _filteredSymptoms.length,
+                          itemBuilder: (context, index) {
+                            final symptom = _filteredSymptoms[index];
+
+                            return FadeInUp(
+                              duration: const Duration(milliseconds: 600),
+                              delay: Duration(milliseconds: index * 100),
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 15.h),
+                                child: buildSymptomsContainer(
+                                    screenWidth, symptom, context),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Floating catalog button.
+                Positioned(
+                  bottom: 50.h,
+                  right: 16.w,
+                  child: FloatingActionButton(
+                    onPressed: _navigateToSymptomCatalog,
+                    backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
+                    foregroundColor: const Color(0xFFE8F2F5),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.r)),
+                    child: const Icon(Icons.menu_book_sharp),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   /// Builds a card for a given symptom.
   /// The "Select" button sets the symptom as selected and updates the questions,
   /// then navigates to QoneScreen. It does not add the symptom to pending immediately.
-  Widget buildSymptomsContainer(double screenWidth, String title, BuildContext context) {
+  Widget buildSymptomsContainer(
+      double screenWidth, String title, BuildContext context) {
     final String symptomKey = title.toLowerCase();
-    final String description = symptomDescriptions[symptomKey] ??
-        'No Description Available.';
-        
+    final String description =
+        symptomDescriptions[symptomKey] ?? 'No Description Available.';
+
     return Container(
       padding: EdgeInsets.all(16.sp),
       width: double.infinity,
@@ -469,7 +527,7 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,
-            offset:  Offset(2, 2),
+            offset: Offset(2, 2),
           ),
         ],
         border: Border.all(
@@ -504,32 +562,32 @@ class AnothersearchsymptomsScreenState extends State<AnothersearchsymptomsScreen
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                  final userData = Provider.of<UserData>(context, listen: false);
-                  userData.setSelectedSymptom(title);
-                  userData.updateQuestions();
+                final userData = Provider.of<UserData>(context, listen: false);
+                userData.setSelectedSymptom(title);
+                userData.updateQuestions();
 
-                  if (userData.questions.isEmpty) {
-                    // 🔵 No follow-up → instantly add to pending + go to next screen
-                    userData.addPendingSymptom(title, source: 'auto');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AnothersympScreen()),
-                    );
-                  } else {
-                    
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QoneScreen(
-                          symptom: title,
-                          questions: List<String>.from(userData.questions),
-                          impactChoices: List<List<String>>.from(userData.impactChoices),
-                        ),
+                if (userData.questions.isEmpty) {
+                  // 🔵 No follow-up → instantly add to pending + go to next screen
+                  userData.addPendingSymptom(title, source: 'auto');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AnothersympScreen()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QoneScreen(
+                        symptom: title,
+                        questions: List<String>.from(userData.questions),
+                        impactChoices:
+                            List<List<String>>.from(userData.impactChoices),
                       ),
-                    );
-                  }
-                },
-
+                    ),
+                  );
+                }
+              },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.pressed)) {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:petsymp/Assesment/petimage.dart';
-import 'package:petsymp/Assesment/symptoms.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../userdata.dart';
+import 'package:petsymp/Assesment/searchsymptoms.dart';
 
 class UserPetScreen extends StatefulWidget {
   const UserPetScreen({super.key});
@@ -89,7 +89,7 @@ class UserPetScreenState extends State<UserPetScreen>
     _animationController.reverse().then((_) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const SymptomsScreen()),
+        MaterialPageRoute(builder: (_) => const SearchsymptomsScreen()),
       ).then((_) {
         _animationController.forward().then((_) {
           setState(() {

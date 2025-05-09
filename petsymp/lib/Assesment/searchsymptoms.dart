@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:petsymp/QuestionDiseasesone/questionone.dart';
 import 'package:petsymp/SymptomQuestions/CatQuestions.dart';
 import 'package:petsymp/SymptomQuestions/DogQuestions.dart';
-import 'package:petsymp/SymptomQuestions/symptomsquestions.dart';
 import 'package:provider/provider.dart';
 import 'package:petsymp/userdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -11,12 +10,25 @@ import 'package:petsymp/SymptomsCatalog/symptomscatalog.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:petsymp/Assesment/anothersymptoms.dart';
 import 'package:petsymp/searchdescription.dart';
+import 'package:flutter/services.dart';
+
+class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+    final text = newValue.text;
+    final firstLetter = text[0].toUpperCase();
+    final restOfText = text.substring(1);
+    return newValue.copyWith(
+      text: firstLetter + restOfText,
+      selection: newValue.selection,
+    );
+  }
+}
 
 class SearchsymptomsScreen extends StatefulWidget {
-  /// Expected to be a single-element list with the input symptom.
-  final List<String> symptoms;
-
-  const SearchsymptomsScreen({super.key, required this.symptoms});
+  const SearchsymptomsScreen({super.key});
 
   @override
   SearchsymptomsScreenState createState() => SearchsymptomsScreenState();
@@ -26,7 +38,28 @@ class SearchsymptomsScreenState extends State<SearchsymptomsScreen>
     with SingleTickerProviderStateMixin {
   bool _isNavigating = false;
   AnimationController? _bubbleAnimationController;
-  @override
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  List<String> _filteredSymptoms = [];
+  List<String> _symptomList = [];
+
+  void _filterSymptoms() {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) {
+      setState(() {
+        _filteredSymptoms = _symptomList;
+      });
+      return;
+    }
+
+    setState(() {
+      _filteredSymptoms = _symptomList.where((symptom) {
+        return symptom.toLowerCase().contains(query);
+      }).toList();
+    });
+  }
+
+ @override
 void initState() {
   super.initState();
 
@@ -35,8 +68,18 @@ void initState() {
     duration: const Duration(seconds: 5),
   )..repeat(reverse: true);
 
+  final userData = Provider.of<UserData>(context, listen: false);
+  final petType = userData.selectedPetType;
 
+  final Map<String, dynamic> petSymptoms = {
+    if (petType == 'Dog') ...symptomQuestionsDog,
+    if (petType == 'Cat') ...symptomQuestionsCat,
+  };
 
+  _symptomList = petSymptoms.keys.toList();
+  _filteredSymptoms = List.from(_symptomList);
+
+  _searchController.addListener(_filterSymptoms);
 }
 
 
@@ -57,48 +100,23 @@ void initState() {
     });
   }
 
-
   String _capitalizeEachWord(String text) {
-  return text
-      .split(' ')
-      .map((word) => word.isNotEmpty
-          ? word[0].toUpperCase() + word.substring(1)
-          : '')
-      .join(' ');
-}
-
+    return text
+        .split(' ')
+        .map((word) =>
+            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
+        .join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final userData = Provider.of<UserData>(context, listen: false);
-    final petType = userData.selectedPetType;
+    
 
-    final Map<String,dynamic> petSymptoms = {
-      // ...symptomQuestions,
-      if(petType == 'Dog') ...symptomQuestionsDog,
-      if(petType == 'Cat') ...symptomQuestionsCat,
-    };
+    
 
-    final List<String> predefinedSymptoms = petSymptoms.keys.toList();
-
-    // Determine the input symptom.
-    String inputSymptom = "";
-    if (widget.symptoms.isNotEmpty && widget.symptoms[0].trim().isNotEmpty) {
-      inputSymptom = widget.symptoms[0].toLowerCase();
-    }
-
-    // Build the symptom list: input symptom at top, then others excluding it.
-    List<String> symptomList = [];
-    if (inputSymptom.isNotEmpty) {
-      symptomList.add(inputSymptom);
-      symptomList.addAll(predefinedSymptoms.where((s) => s.toLowerCase() != inputSymptom));
-    } else {
-      symptomList = predefinedSymptoms;
-    }
-
-    if (symptomList.isEmpty) {
+    if (_symptomList.isEmpty) {
       return Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -117,14 +135,16 @@ void initState() {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("No symptoms available.", style: TextStyle(fontSize: 20, color: Colors.black)),
+                const Text("No symptoms available.",
+                    style: TextStyle(fontSize: 20, color: Colors.black)),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
                   ),
                   child: const Text("Go Back"),
                 ),
@@ -156,26 +176,29 @@ void initState() {
         child: SafeArea(
           child: Column(
             children: [
-              
               SizedBox(
                 height: 60.h,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.05, vertical: 10.h),
                   child: Row(
                     children: [
                       IconButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-
-                    style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                  elevation: WidgetStateProperty.all(0),
-                  shadowColor: WidgetStateProperty.all(Colors.transparent),
-                  overlayColor: WidgetStateProperty.all(Colors.transparent), 
-                ),
-
-                        icon: Icon(Icons.arrow_back_ios_new, color: const Color.fromRGBO(61, 47, 40, 1), size: 26.sp),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                          elevation: WidgetStateProperty.all(0),
+                          shadowColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                          overlayColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                        ),
+                        icon: Icon(Icons.arrow_back_ios_new,
+                            color: const Color.fromRGBO(61, 47, 40, 1),
+                            size: 26.sp),
                       ),
                     ],
                   ),
@@ -198,19 +221,45 @@ void initState() {
                 ),
               ),
               SizedBox(height: 10.h),
-              
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                   inputFormatters: [
+                            FirstLetterUpperCaseTextFormatter(),
+                            FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                            FilteringTextInputFormatter.deny(RegExp(r'[!@#%^&*(),.?":{}|<>]')),
+                          ],
+                  decoration: InputDecoration(
+                    hintText: 'Search symptom...',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+
               Expanded(
                 child: ListView.builder(
-                  padding: EdgeInsets.fromLTRB(screenWidth * 0.07, 5.h, screenWidth * 0.07, 80.h),
-                  itemCount: symptomList.length,
+                  padding: EdgeInsets.fromLTRB(
+                      screenWidth * 0.1, 5.h, screenWidth * 0.1, 80.h),
+                  itemCount: _filteredSymptoms.length,
                   itemBuilder: (context, index) {
-                    final symptom = symptomList[index];
+                    final symptom = _filteredSymptoms[index];
+
                     return FadeInUp(
                       duration: const Duration(milliseconds: 600),
                       delay: Duration(milliseconds: index * 100),
                       child: Padding(
                         padding: EdgeInsets.only(bottom: 15.h),
-                        child: buildSymptomsContainer(screenWidth, symptom, context),
+                        child: buildSymptomsContainer(
+                            screenWidth, symptom, context),
                       ),
                     );
                   },
@@ -225,18 +274,20 @@ void initState() {
         backgroundColor: const Color.fromRGBO(29, 29, 44, 1.0),
         foregroundColor: const Color(0xFFE8F2F5),
         elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(100.r)),
         child: const Icon(Icons.menu_book_sharp),
       ),
     );
   }
 
   /// Builds a card for a given symptom.
-  Widget buildSymptomsContainer(double screenWidth, String title, BuildContext context) {
+  Widget buildSymptomsContainer(
+      double screenWidth, String title, BuildContext context) {
     final symptomKey = title.toLowerCase();
-    final description = symptomDescriptions[symptomKey] ??
-        'No Description available.'; 
-        
+    final description =
+        symptomDescriptions[symptomKey] ?? 'No Description available.';
+
     return Container(
       padding: EdgeInsets.all(16.sp),
       width: double.infinity,
@@ -247,7 +298,7 @@ void initState() {
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,
-            offset:  Offset(2, 2),
+            offset: Offset(2, 2),
           ),
         ],
         border: Border.all(
@@ -260,7 +311,7 @@ void initState() {
         children: [
           // Symptom title.
           Text(
-             _capitalizeEachWord(title),
+            _capitalizeEachWord(title),
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -281,33 +332,32 @@ void initState() {
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-             onPressed: () {
-                  final userData = Provider.of<UserData>(context, listen: false);
-                  userData.setSelectedSymptom(title);
-                  userData.updateQuestions();
+              onPressed: () {
+                final userData = Provider.of<UserData>(context, listen: false);
+                userData.setSelectedSymptom(title);
+                userData.updateQuestions();
 
-                  if (userData.questions.isEmpty) {
-                    
-                    userData.addPendingSymptom(title, source: 'auto');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AnothersympScreen()),
-                    );
-                  } else {
-                   
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QoneScreen(
-                          symptom: title,
-                          questions: List<String>.from(userData.questions),
-                          impactChoices: List<List<String>>.from(userData.impactChoices),
-                        ),
+                if (userData.questions.isEmpty) {
+                  userData.addPendingSymptom(title, source: 'auto');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AnothersympScreen()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QoneScreen(
+                        symptom: title,
+                        questions: List<String>.from(userData.questions),
+                        impactChoices:
+                            List<List<String>>.from(userData.impactChoices),
                       ),
-                    );
-                  }
-                },
-
+                    ),
+                  );
+                }
+              },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.pressed)) {

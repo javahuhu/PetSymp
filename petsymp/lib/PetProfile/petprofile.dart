@@ -1025,16 +1025,14 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-      enableDrag:
-          false, // Disable default dragging to use our custom implementation
+      enableDrag: false, 
       isDismissible: true,
       builder: (context) {
         return ImageDraggableBottomSheet(
           key: resizableSheetKey,
-          initialHeight:
-              screenSize.height * 0.85, // Start at 85% of screen height
-          minHeight: screenSize.height * 0.5, // Minimum height (40%)
-          maxHeight: screenSize.height * 0.95, // Maximum height (95%)
+          initialHeight:screenSize.height * 0.7, 
+          minHeight: screenSize.height * 0.5, 
+          maxHeight: screenSize.height * 1, 
           petData: petData,
           borderRadius: BorderRadius.vertical(top: Radius.circular(50.r)),
           petBreed: breed,
@@ -1641,10 +1639,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   }
 }
 
-/// A bottom sheet that can be resized by dragging the image area.
-///
-/// This widget displays a bottom sheet with a pet image at the top that
-/// can be dragged to adjust the height of the sheet.
+
 class ImageDraggableBottomSheet extends StatefulWidget {
   final Widget child;
   final double initialHeight;

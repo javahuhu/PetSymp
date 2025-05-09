@@ -14,6 +14,8 @@ import 'dart:convert';
 import 'package:petsymp/Connection/dynamicconnections.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:intl/intl.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/mdi.dart';
 
 class NewSummaryScreen extends StatefulWidget {
   const NewSummaryScreen({super.key});
@@ -535,10 +537,20 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
     final ageLabel2 = ageRaw2.toLowerCase() == 'any' ? 'Any Age' : ageRaw2;
     final sizeLabel2 = sizeRaw2.toLowerCase() == 'any' ? 'Any Size' : sizeRaw2;
 
+    final Map<String, String> iconMap = {
+      "Pet": Mdi.pets,
+      "Pet Name": Mdi.rename_box,
+      "Age": Mdi.cake_variant,
+      "Size": Mdi.ruler,
+      "Breed": Mdi.dog,
+      "Color": Mdi.palette,
+      "Symptoms": Mdi.emoticon_sick_outline,
+    };
+
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 219, 230, 233),
+        backgroundColor: Color.fromRGBO(201, 229, 231, 1.0),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -631,53 +643,124 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0.h),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 0.h, horizontal: 10.w),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 35.h,
-                          child: SizedBox(
-                            child: Lottie.asset(
-                              'assets/wavy.json',
-                              fit: BoxFit.cover,
-                              repeat: true,
+                        Container(
+                          padding: EdgeInsets.all(16.w),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: const Color(0xFF52AAA4),
+                              width: 1.5,
                             ),
                           ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(10.w),
-                          width: double.infinity,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: petDetails.map((detail) {
-                                return Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 30.w),
-                                  child: SizedBox(
-                                    height: 90.h,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "Pet Information",
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        const Color.fromARGB(255, 15, 15, 15),
+                                    fontFamily: 'Oswald',
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Center(
+                                child: Container(
+                                  width: 60.w,
+                                  height: 3.h,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF52AAA4),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20.h),
+                              ...petDetails.map((detail) {
+                                final iconName = iconMap[detail["label"]] ??
+                                    Mdi.help_circle_outline;
+
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 12.h),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey.shade200,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(bottom: 12.h),
+                                    child: Row(
                                       children: [
-                                        Text(
-                                          detail["label"]!,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
+                                        Container(
+                                          width: 40.w,
+                                          height: 40.w,
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                                82, 170, 164, 0.366),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: const Color(0xFF52AAA4),
+                                              width: 1.w,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Iconify(
+                                              iconName,
+                                              size: 20.sp,
+                                              color: const Color.fromARGB(
+                                                  255, 15, 15, 15),
+                                            ),
                                           ),
                                         ),
-                                        Text(
-                                          detail["value"]!,
-                                          style: TextStyle(
-                                            fontSize: 18.sp,
-                                            fontFamily: 'Oswald',
-                                            color: const Color.fromRGBO(
-                                                29, 29, 44, 1.0),
+                                        SizedBox(width: 16.w),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                detail["label"]!,
+                                                style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: const Color.fromARGB(
+                                                      255, 15, 15, 15),
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                              Text(
+                                                detail["value"]!,
+                                                style: TextStyle(
+                                                  fontSize: 18.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Oswald',
+                                                  color: const Color.fromARGB(
+                                                      255, 15, 15, 15),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -685,9 +768,9 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                                   ),
                                 );
                               }).toList(),
-                            ),
+                            ],
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -697,116 +780,112 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                     child: Center(
                       child: SizedBox(
                         width: 380.w,
-                        child:  Container(
+                        child: Container(
                           decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 248, 248, 248),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              blurRadius: 5,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                            child: topDiagnoses.isEmpty
-                                ? Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 30.h),
-                                    child: Text(
-                                      "No available diagnosis.",
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                : Column(
-                                    children: [
-                                      if (topDiagnoses.isNotEmpty &&
-                                          (topDiagnoses[0]['illness'] ?? '')
-                                              .isNotEmpty) ...[
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 20.h),
-                                          child: _buildDiagnosisCard(
-                                              context,
-                                              topDiagnoses[0],
-                                              "1",
-                                              ageLabel0,
-                                              sizeLabel0),
-                                        ),
-                                        _buildSeeMoreButton(context,
-                                            topDiagnoses[0]['illness']),
-                                        Divider(
-                                          color: Colors.black.withOpacity(0.1),
-                                          thickness: 1.5,
-                                          indent: 20.w,
-                                          endIndent: 20.w,
-                                        ),
-                                      ],
-                                      if (topDiagnoses.length > 1 &&
-                                          (topDiagnoses[1]['illness'] ?? '')
-                                              .isNotEmpty) ...[
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 15.h),
-                                          child: _buildDiagnosisCard(
-                                              context,
-                                              topDiagnoses[1],
-                                              "2",
-                                              ageLabel1,
-                                              sizeLabel1),
-                                        ),
-                                        _buildSeeMoreButton(context,
-                                            topDiagnoses[1]['illness']),
-                                        Divider(
-                                          color: Colors.black.withOpacity(0.1),
-                                          thickness: 1.5,
-                                          indent: 20.w,
-                                          endIndent: 20.w,
-                                        ),
-                                      ],
-                                      if (topDiagnoses.length > 2 &&
-                                          (topDiagnoses[2]['illness'] ?? '')
-                                              .isNotEmpty) ...[
-                                        Padding(
-                                          padding: EdgeInsets.only(top: 15.h),
-                                          child: _buildDiagnosisCard(
-                                              context,
-                                              topDiagnoses[2],
-                                              "3",
-                                              ageLabel2,
-                                              sizeLabel2),
-                                        ),
-                                        _buildSeeMoreButton(context,
-                                            topDiagnoses[2]['illness']),
-                                      ],
-                                      SizedBox(height: 15.h),
-                                    ],
-                                  ),
+                            color: const Color.fromARGB(255, 248, 248, 248),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                              ),
+                            ],
                           ),
-                        
+                          child: topDiagnoses.isEmpty
+                              ? Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 30.h),
+                                  child: Text(
+                                    "No available diagnosis.",
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                              : Column(
+                                  children: [
+                                    if (topDiagnoses.isNotEmpty &&
+                                        (topDiagnoses[0]['illness'] ?? '')
+                                            .isNotEmpty) ...[
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 20.h),
+                                        child: _buildDiagnosisCard(
+                                            context,
+                                            topDiagnoses[0],
+                                            "1",
+                                            ageLabel0,
+                                            sizeLabel0),
+                                      ),
+                                      _buildSeeMoreButton(
+                                          context, topDiagnoses[0]['illness']),
+                                      Divider(
+                                        color: Colors.black.withOpacity(0.1),
+                                        thickness: 1.5,
+                                        indent: 20.w,
+                                        endIndent: 20.w,
+                                      ),
+                                    ],
+                                    if (topDiagnoses.length > 1 &&
+                                        (topDiagnoses[1]['illness'] ?? '')
+                                            .isNotEmpty) ...[
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 15.h),
+                                        child: _buildDiagnosisCard(
+                                            context,
+                                            topDiagnoses[1],
+                                            "2",
+                                            ageLabel1,
+                                            sizeLabel1),
+                                      ),
+                                      _buildSeeMoreButton(
+                                          context, topDiagnoses[1]['illness']),
+                                      Divider(
+                                        color: Colors.black.withOpacity(0.1),
+                                        thickness: 1.5,
+                                        indent: 20.w,
+                                        endIndent: 20.w,
+                                      ),
+                                    ],
+                                    if (topDiagnoses.length > 2 &&
+                                        (topDiagnoses[2]['illness'] ?? '')
+                                            .isNotEmpty) ...[
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 15.h),
+                                        child: _buildDiagnosisCard(
+                                            context,
+                                            topDiagnoses[2],
+                                            "3",
+                                            ageLabel2,
+                                            sizeLabel2),
+                                      ),
+                                      _buildSeeMoreButton(
+                                          context, topDiagnoses[2]['illness']),
+                                    ],
+                                    SizedBox(height: 15.h),
+                                  ],
+                                ),
+                        ),
                       ),
                     ),
                   ),
-
                   SizedBox(height: 15.h),
-
                   Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Container(
                           decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
                           child: Theme(
                               data: Theme.of(context).copyWith(
                                 dividerColor: Colors.transparent,
@@ -928,16 +1007,16 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                           horizontal: 20.w, vertical: 20.h),
                       child: Container(
                           decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
                           child: Theme(
                               data: Theme.of(context).copyWith(
                                 dividerColor: Colors.transparent,
@@ -1181,56 +1260,49 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                       alignment: Alignment.centerRight,
                       child: SizedBox(
                         width: 130.w,
-                        child: ElevatedButton(
-                          onPressed: () {
+                        child: GestureDetector(
+                          onTap: () {
                             _showDisclaimerThenProceed(context, userData,
                                 diagnoses, petDetails, allSymptoms);
                           },
-                          style: ButtonStyle(
-                            // Dynamic background color based on button state
-                            backgroundColor: WidgetStateProperty.resolveWith(
-                              (states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return const Color.fromARGB(255, 0, 0,
-                                      0); // Background color when pressed
-                                }
-                                return Colors
-                                    .transparent; // Default background color
-                              },
-                            ),
-                            // Dynamic text color based on button state
-                            foregroundColor: WidgetStateProperty.resolveWith(
-                              (states) {
-                                if (states.contains(WidgetState.pressed)) {
-                                  return const Color.fromARGB(255, 255, 255,
-                                      255); // Text color when pressed
-                                }
-                                return const Color.fromRGBO(
-                                    29, 29, 44, 1.0); // Default text color
-                              },
-                            ),
-                            shadowColor:
-                                WidgetStateProperty.all(Colors.transparent),
-                            side: WidgetStateProperty.all(
-                              const BorderSide(
-                                color: Color.fromRGBO(82, 170, 164, 1),
-                                width: 2.0,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            height: 60.h,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color.fromRGBO(82, 170, 164, 1),
+                                  Color.fromRGBO(82, 170, 164, 1)
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
+                              borderRadius: BorderRadius.circular(30.r),
                             ),
-                            shape: WidgetStateProperty.all(
-                              const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(100)),
-                              ),
-                            ),
-                            fixedSize: WidgetStateProperty.all(
-                              const Size(155, 55),
+                            padding: EdgeInsets.symmetric(horizontal: 10.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(left: 5.w),
+                                    child: Text(
+                                      "FINISH",
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    )),
+                                SizedBox(width: 8.w),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                  size: 22.sp,
+                                ),
+                              ],
                             ),
                           ),
-                          child: Text("Finish",
-                              style: TextStyle(
-                                  fontSize: 22.sp,
-                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
