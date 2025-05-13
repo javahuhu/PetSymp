@@ -318,7 +318,7 @@ class _AgeinputScreenState extends State<AgeinputScreen>
                         setState(() {
                           selectedDate = newDate;
                           ageInYears = _calculateAge(newDate);
-                          userData.setpetAge(ageInYears);
+                          userData.setPetBirthDate(newDate);
                         });
                       },
                     ),
