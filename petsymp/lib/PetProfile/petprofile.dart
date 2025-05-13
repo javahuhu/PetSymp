@@ -709,8 +709,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     final String petName = petData['petName'] ?? 'Unknown';
     final List details =
         petData['petDetails'] is List ? petData['petDetails'] : [];
-    final String age = details.length > 2 ? '${details[2]['value']} yrs' : '–';
-    final String breed = details.length > 4 ? details[4]['value'] : 'Unknown';
+    final String age = details.length > 3 ? '${details[3]['value']} yrs' : '–';
+    final String breed = details.length > 5 ? details[5]['value'] : 'Unknown';
     final String imageUrl = petData['petImage'] ?? 'assets/noimagepet.jpg';
     final Timestamp? ts = petData['date'] as Timestamp?;
     final String dateStr =
@@ -850,7 +850,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     );
   }
 
-  /// Add this method to create/update pets with a random color and shape type
+  
   Future<void> createNewPet(Map<String, dynamic> petData) async {
     try {
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
@@ -919,11 +919,11 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
     final String age = details.length > 2
         ? (details[2]['value']?.toString() ?? "Unknown")
         : "Unknown";
-    final String size = details.length > 3
-        ? (details[3]['value']?.toString() ?? "Unknown")
-        : "Unknown";
-    final String breed = details.length > 4
+    final String size = details.length > 4
         ? (details[4]['value']?.toString() ?? "Unknown")
+        : "Unknown";
+    final String breed = details.length > 5
+        ? (details[5]['value']?.toString() ?? "Unknown")
         : "Unknown";
 
     List<Widget> healthRecords = [];
@@ -933,10 +933,9 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             assessment['date']?.toString() ??
             DateTime.now().millisecondsSinceEpoch.toString();
 
-        // Use the symptom input stored in this assessment
         final String inputSymptoms = assessment['allSymptoms'] ?? "";
 
-        // Get the diagnosis results from the assessment
+       
         final List<dynamic> diag = assessment['diagnosisResults'] ?? [];
         String finalIllness = "No Result";
         Timestamp? assessTimestamp;
@@ -955,20 +954,25 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             ? "${assessTimestamp.toDate().day} ${_getMonthAbbr(assessTimestamp.toDate().month)} ${assessTimestamp.toDate().year}"
             : defaultDateStr;
 
-        // Create a deep copy of the petDetails list
+        
         List<dynamic> updatedPetDetails =
             (petData['petDetails'] as List<dynamic>?)
                     ?.map((e) => Map<String, dynamic>.from(e))
                     .toList() ??
                 [];
 
-        // Update or add the Symptoms detail for this assessment
-        if (updatedPetDetails.length >= 6) {
-          updatedPetDetails[5]['value'] = inputSymptoms;
+        
+        final int symptomsIndex = updatedPetDetails.indexWhere((item) => item['label'] == 'Symptoms');
+        if (symptomsIndex != -1) {
+          updatedPetDetails[symptomsIndex]['value'] = inputSymptoms;
         } else {
-          updatedPetDetails
-              .add({"icon": "☣️", "label": "Symptoms", "value": inputSymptoms});
-        }
+          updatedPetDetails.add({
+            "icon": "☣️",
+            "label": "Symptoms",
+            "value": inputSymptoms,
+          });
+}
+
 
         // Merge the pet's basic data with the assessment-specific fields
         Map<String, dynamic> mergedData = {
@@ -1017,8 +1021,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
       );
     }
 
-    final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey =
-        GlobalKey<ImageDraggableBottomSheetState>();
+    final GlobalKey<ImageDraggableBottomSheetState> resizableSheetKey = GlobalKey<ImageDraggableBottomSheetState>();
 
     final Size screenSize = MediaQuery.of(context).size;
     showModalBottomSheet(
@@ -1073,7 +1076,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                       child: _buildDetailCard(
                         icon: Icons.cake,
                         iconColor: Colors.amber,
-                        label: "Age",
+                        label: "Birth Date",
                         value: age,
                       ),
                     ),
@@ -1817,14 +1820,14 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
       builder: (BuildContext dialogContext) {
         final ageController = TextEditingController(
           text:
-              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 2
-                  ? (widget.petData['petDetails'][2]['value']?.toString() ?? '')
+              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 3
+                  ? (widget.petData['petDetails'][3]['value']?.toString() ?? '')
                   : '',
         );
         final sizeController = TextEditingController(
           text:
-              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 3
-                  ? (widget.petData['petDetails'][3]['value']?.toString() ?? '')
+              (widget.petData['petDetails'] as List<dynamic>? ?? []).length > 4
+                  ? (widget.petData['petDetails'][4]['value']?.toString() ?? '')
                   : '',
         );
 
@@ -2064,18 +2067,18 @@ class ImageDraggableBottomSheetState extends State<ImageDraggableBottomSheet>
       if (widget.petData['petDetails'] is List) {
         updatedDetails = List.from(widget.petData['petDetails']);
 
-        // Update age (index 1)
-        if (updatedDetails.length > 2) {
-          updatedDetails[2] = {
-            ...updatedDetails[2] as Map<String, dynamic>,
+       
+        if (updatedDetails.length > 3) {
+          updatedDetails[3] = {
+            ...updatedDetails[3] as Map<String, dynamic>,
             'value': newAge
           };
         }
 
         // Update size (index 2)
-        if (updatedDetails.length > 3) {
-          updatedDetails[3] = {
-            ...updatedDetails[3] as Map<String, dynamic>,
+        if (updatedDetails.length > 4) {
+          updatedDetails[4] = {
+            ...updatedDetails[4] as Map<String, dynamic>,
             'value': newSize
           };
         }
