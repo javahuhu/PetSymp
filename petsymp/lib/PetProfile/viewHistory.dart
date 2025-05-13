@@ -1,11 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:petsymp/HomePage/homepage.dart';
-import 'package:petsymp/HomePage/profile.dart';
 import 'package:provider/provider.dart';
 import '../userdata.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../barchart/barfirebasegraph.dart';
 import 'historyillnessdetails.dart';
 import 'package:petsymp/illnessdescriptions.dart';
@@ -57,6 +54,8 @@ class ViewhistoryScreenState extends State<ViewhistoryScreen> {
               {"icon": "🐶", "label": "Breed", "value": "Unknown"},
               {"icon": "☣️", "label": "Symptoms", "value": ""},
             ];
+
+    
     final List<Map<String, dynamic>> diagnoses =
         List<Map<String, dynamic>>.from(historyData['diagnosisResults'] ?? []);
     List<Map<String, dynamic>> topDiagnoses = [];
