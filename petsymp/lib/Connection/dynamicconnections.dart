@@ -1,4 +1,3 @@
-
 class AppConfig {
   static const String fallbackIP = "petsympbackend.onrender.com";
 
