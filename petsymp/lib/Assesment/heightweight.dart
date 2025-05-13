@@ -35,10 +35,9 @@ class FirstLetterUpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class MeasureinputScreenState extends State<MeasureinputScreen>
-    with SingleTickerProviderStateMixin {
-  bool _isAnimated =
-      false; // Animation toggle // State to track the selected tab
+class MeasureinputScreenState extends State<MeasureinputScreen> with SingleTickerProviderStateMixin {
+  bool _isAnimated = false; 
+  String _selectedSize = ''; 
   late AnimationController _bubbleAnimationController;
 
   @override
@@ -74,6 +73,13 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
 
   final TextEditingController _sizeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _handleSizeSelection(String selectedSize) {
+  setState(() {
+    _selectedSize = selectedSize;
+    _sizeController.text = selectedSize;
+  });
+}
 
   void navigateToNextPage() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -154,50 +160,50 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
                                 "Small",
                                 "Up to 5 pounds (2.3 kg)",
                                 "Examples: Singapura, Munchkin, Cornish Rex",
-                                "smallcat.png"),
+                                "smallcat.png", _handleSizeSelection, _selectedSize == "Small"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Medium",
                                 "5–10 pounds (2.3–4.5 kg)",
                                 "Examples: American Shorthair, Burmese",
-                                "mediumcat.png"),
+                                "mediumcat.png", _handleSizeSelection, _selectedSize == "Medium"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Large",
                                 "10–15 pounds (4.5–6.8 kg)",
                                 "Examples: Ragdoll, Maine Coon",
-                                "largecat.png"),
+                                "largecat.png", _handleSizeSelection, _selectedSize == "Large"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Giant",
                                 "Over 15 pounds (6.8+ kg)",
                                 "Examples: Savannah Cat, Norwegian Forest Cat",
-                                "giantcat.png"),
+                                "giantcat.png", _handleSizeSelection, _selectedSize == "Giant"),
                           ]
                         : [
                             _buildSizeInfoRow(
                                 "Small",
                                 "Up to 20 pounds (9 kg)",
                                 "Examples: Chihuahua, Pomeranian, Toy Poodle",
-                                "smallpet.png"),
+                                "smallpet.png", _handleSizeSelection, _selectedSize == "Small"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Medium",
                                 "20–60 pounds (9–27 kg)",
                                 "Examples: Beagle, Bulldog, Cocker Spaniel",
-                                "mediumpet.png"),
+                                "mediumpet.png", _handleSizeSelection, _selectedSize == "Medium"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Large",
                                 "60–100 pounds (27–45 kg)",
                                 "Examples: Golden Retriever, Boxer",
-                                "largepet.png"),
+                                "largepet.png", _handleSizeSelection, _selectedSize == "Large"),
                             const Divider(height: 30),
                             _buildSizeInfoRow(
                                 "Giant",
                                 "Over 100 pounds (45+ kg)",
                                 "Examples: Great Dane, Mastiff",
-                                "extralargepet.png"),
+                                "extralargepet.png", _handleSizeSelection, _selectedSize == "Giant"),
                           ],
                   ),
                 ),
@@ -209,10 +215,35 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
     );
   }
 
-  // Helper method to build each size info row
+  
   Widget _buildSizeInfoRow(
-      String size, String weight, String examples, String imageName) {
-    return Row(
+  String size,
+  String weight,
+  String examples,
+  String imageName,
+  void Function(String) onSelect,
+  bool isSelected, 
+) {
+  return GestureDetector(
+  onTap: () {
+    onSelect(size);
+    Navigator.pop(context);
+  },
+  child: Container(
+    decoration: BoxDecoration(
+      color: isSelected
+          ? const Color.fromRGBO(82, 170, 164, 0.15) 
+          : Colors.transparent,
+      border: Border.all(
+        color: isSelected
+            ? const Color.fromRGBO(82, 170, 164, 1)
+            : Colors.transparent,
+        width: 2,
+      ),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    padding: const EdgeInsets.all(10),
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Pet image or placeholder
@@ -230,7 +261,6 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
               height: 70,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                // Fallback if image doesn't exist
                 return const Icon(
                   Icons.pets,
                   size: 40,
@@ -273,8 +303,12 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
           ),
         ),
       ],
-    );
-  }
+    ),
+  ),
+);
+
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -560,6 +594,8 @@ class MeasureinputScreenState extends State<MeasureinputScreen>
 
                           return null;
                         }),
+
+                        
                     // New help button text below the TextFormField
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, left: 5.0),
