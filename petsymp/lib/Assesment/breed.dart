@@ -316,7 +316,6 @@ class BreedScreenState extends State<BreedScreen>
                   SizedBox(height: 20.h),
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         flex: 6,
                         child: TextField(
@@ -373,7 +372,7 @@ class BreedScreenState extends State<BreedScreen>
                               ),
                             ),
                             dropdownStyleData: DropdownStyleData(
-                              maxHeight: 200, // limit dropdown height
+                              maxHeight: 200,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 color: Colors.white,
@@ -451,7 +450,7 @@ class BreedScreenState extends State<BreedScreen>
                             radius: const Radius.circular(8),
                             child: GridView.builder(
                               controller: _scrollController,
-                              padding: EdgeInsets.only(top: 8.h, bottom: 100.h),
+                              padding: EdgeInsets.only(top: 8.h, bottom: 100.h, left: 10.w, right: 10.w),
                               itemCount: displayedBreeds.length,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
@@ -516,7 +515,7 @@ class BreedScreenState extends State<BreedScreen>
                                                 decoration: BoxDecoration(
                                                   color: isSelected
                                                       ? secondaryColor
-                                                      : Colors.grey[50],
+                                                      : Colors.white,
                                                   borderRadius:
                                                       BorderRadius.only(
                                                     topLeft:
