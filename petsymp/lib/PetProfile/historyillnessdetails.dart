@@ -144,13 +144,7 @@ void _showThresholdIllnessesDialog() {
                     ),
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    "Probability: ${(prob * 100).toStringAsFixed(2)}%",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color.fromARGB(191, 41, 168, 210),
-                    ),
-                  ),
+                 
                 ],
               ),
             );
