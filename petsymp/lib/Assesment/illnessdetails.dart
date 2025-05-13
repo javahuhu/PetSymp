@@ -371,14 +371,7 @@ class IllnessdetailsScreenState extends State<IllnessdetailsScreen> {
                                         ),
                                       ),
                                       SizedBox(height: 4.h),
-                                      Text(
-                                        "Probability: ${(probability * 100).toStringAsFixed(2)}%",
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: const Color.fromARGB(
-                                              191, 41, 168, 210),
-                                        ),
-                                      ),
+                                    
                                     ],
                                   ),
                                 );
