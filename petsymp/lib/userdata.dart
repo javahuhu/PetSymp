@@ -18,6 +18,8 @@ class UserData with ChangeNotifier {
   String? _petImage;
   String _selectedPetType = '';
   String _otpCode = '';
+  String _birthDateFormatted = '';
+  int _age = 0;
 
   // History of past assessments (no petType filter)
   List<Map<String, dynamic>> _history = [];
@@ -46,6 +48,7 @@ class UserData with ChangeNotifier {
   String get breed => _breed;
   String get size => _petSize;
   int get age => _petAge;
+  String get birthDateFormatted => _birthDateFormatted;
   String get anotherSymptom => _anotherSymptom;
   String? get petImage => _petImage;
   String get selectedPetType => _selectedPetType;
@@ -61,6 +64,7 @@ class UserData with ChangeNotifier {
   List<String> get questionSymptoms => _questionSymptoms;
   Map<String, List<Map<String, dynamic>>> get symptomDetails => _symptomDetails;
   String get otpCode => _otpCode;
+ 
 
   /// Getter used by NewSummaryScreen
   List<String> get petSymptoms => [..._finalizedSymptoms, ..._pendingSymptoms];
@@ -101,6 +105,7 @@ class UserData with ChangeNotifier {
   void setpetBreed(String breed) { _breed = breed; notifyListeners(); }
   void setpetSize(String size) { _petSize = size; notifyListeners(); }
   void setpetAge(int age) { _petAge = age; notifyListeners(); }
+   void setpetBirthDate(String birth) { _birthDateFormatted = birth; notifyListeners(); }
   void setAnotherSymptom(String symptom) {
     _anotherSymptom = symptom.trim().toLowerCase();
     notifyListeners();
@@ -109,6 +114,25 @@ class UserData with ChangeNotifier {
     _petImage = imageUrl;
     notifyListeners();
   }
+
+  void setPetBirthDate(DateTime date) {
+  final formatted = "${date.month.toString().padLeft(2, '0')}/"
+                    "${date.day.toString().padLeft(2, '0')}/"
+                    "${date.year}";
+  _birthDateFormatted = formatted;
+  _petAge = _calculateAge(date);
+  notifyListeners();
+}
+
+int _calculateAge(DateTime birthDate) {
+  DateTime now = DateTime.now();
+  int age = now.year - birthDate.year;
+  if (now.month < birthDate.month ||
+      (now.month == birthDate.month && now.day < birthDate.day)) {
+    age--;
+  }
+  return age;
+}
   
   void setSelectedPetType(String type) {
     _selectedPetType = type;
