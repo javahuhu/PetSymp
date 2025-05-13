@@ -69,12 +69,14 @@ class UserPetScreenState extends State<UserPetScreen>
     final petDetails = entry['petDetails'] as List<dynamic>? ?? [];
 
     // Corrected indices:
-    final age   = int.tryParse(petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '') ?? 0;
-    final size  =             petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '';
-    final breed =             petDetails.length > 4 ? petDetails[4]['value'] ?? '' : '';
+    final birth = petDetails.length > 2 ? petDetails[2]['value'] ?? '' : '';
+    final age   = int.tryParse(petDetails.length > 3 ? petDetails[3]['value'] ?? '' : '') ?? 0;
+    final size  =             petDetails.length > 4 ? petDetails[4]['value'] ?? '' : '';
+    final breed =             petDetails.length > 5 ? petDetails[5]['value'] ?? '' : '';
 
     userData
       ..setUserName(entry['petName'] ?? '')
+      ..setpetBirthDate(birth)
       ..setpetAge(age)
       ..setpetSize(size)
       ..setpetBreed(breed)
