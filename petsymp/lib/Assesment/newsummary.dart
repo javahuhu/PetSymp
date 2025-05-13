@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
 import 'illnessdetails.dart';
 import 'package:petsymp/HomePage/homepage.dart';
 import 'package:provider/provider.dart';
@@ -515,7 +514,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
     final petDetails = [
       {"icon": "🎂", "label": "Pet", "value": userData.selectedPetType},
       {"icon": "🎂", "label": "Pet Name", "value": userData.userName},
-      {"icon": "🎂", "label": "Age", "value": userData.age.toString()},
+      {"icon": "🎂", "label": "Date of Birth", "value": "${userData.birthDateFormatted}"},
+      {"icon": "🎂", "label": "Age", "value": "${userData.age}"},
       {"icon": "📏", "label": "Size", "value": userData.size},
       {"icon": "🐶", "label": "Breed", "value": userData.breed},
       {"icon": "☣️", "label": "Symptoms", "value": allSymptoms},
@@ -540,6 +540,7 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
     final Map<String, String> iconMap = {
       "Pet": Mdi.pets,
       "Pet Name": Mdi.rename_box,
+      "Date of Birth": Mdi.date_range ,
       "Age": Mdi.cake_variant,
       "Size": Mdi.ruler,
       "Breed": Mdi.dog,
@@ -774,6 +775,8 @@ class NewSummaryScreenState extends State<NewSummaryScreen>
                       ],
                     ),
                   ),
+
+
                   Padding(
                     padding:
                         EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
