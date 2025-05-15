@@ -243,12 +243,12 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
         ? petDetails[2]['value'].toString()
         : "Unknown";
 
-      final String size = petDetails.length > 3 && petDetails[3]['value'] != null
-        ? petDetails[3]['value'] as String
+      final String size = petDetails.length > 4 && petDetails[4]['value'] != null
+        ? petDetails[4]['value'] as String
         : "Medium";
 
-      final String breed = petDetails.length > 4 && petDetails[4]['value'] != null
-        ? petDetails[4]['value'] as String
+      final String breed = petDetails.length > 5 && petDetails[5]['value'] != null
+        ? petDetails[5]['value'] as String
         : "Unknown";
 
     String accountCreated = "";
@@ -514,7 +514,7 @@ class HistoryassesmentScreenState extends State<HistoryassesmentScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildDetailItem(Icons.cake_rounded, "Age", age),
+                    _buildDetailItem(Icons.cake_rounded, "Birth Date", age),
                     _buildDetailItem(Icons.straighten_rounded, "Size", size),
                     _buildDetailItem(Icons.pets_rounded, "Breed", breed.isNotEmpty ? breed : "Unknown"),
                   ],
